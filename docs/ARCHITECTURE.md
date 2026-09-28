@@ -68,7 +68,7 @@ a busca. Nenhuma rota de conteúdo foi removida.
 - Sentences: blocos e digitação para situações específicas.
 - Reference: kanji, partículas, expressões, biblioteca e revisão.
 - Study: palavras por tema, exercícios, escuta e glossário.
-- Worksheets/Book 1: folhas avulsas e volume de impressão compilado do currículo existente, sem conteúdo paralelo.
+- Worksheets/Book 1: folhas avulsas e volume colorido adaptado do currículo existente; `book-content.js` define a progressão impressa em kana e a seleção de dez kanji básicos exclusiva da seção final, sem alterar o curso online.
 - Teacher/Package: seleção de etapa ou tema codificada no link público; não há tabela de turmas, contas de aluno nem acesso ao progresso individual.
 - Worksheets: folhas A4 de caracteres, palavras e frases com gabaritos opcionais; seleção livre de caracteres e páginas extras de repetição vazias.
 - Settings: modo visual, áudio, romaji, meta diária, indicadores e conquistas.

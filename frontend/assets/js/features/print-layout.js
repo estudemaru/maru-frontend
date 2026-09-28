@@ -1,18 +1,21 @@
 // Measure at physical A4 size. Preview scaling never changes the typesetting.
 const INTRO = '.paper-header, .paper-name, h2, .paper-instructions, .paper-book-goal, .eyebrow';
 
-function createPage(preview, heading, continuation) {
+function createPage(preview, heading, continuation, lessonTitle = "") {
   const frame = document.createElement('div');
   frame.className = 'paper-preview-page';
   const page = document.createElement('article');
   page.className = 'print-sheet';
+  const sourceHeader = heading.find(node => node.matches('.paper-header'));
+  page.dataset.paperTone = sourceHeader?.dataset.paperTone || 'teal';
+  if (sourceHeader?.hasAttribute('data-book-kanji')) page.dataset.bookKanji = 'true';
   const head = document.createElement('div');
   head.className = 'paper-heading';
-  heading.forEach(node => head.append(node.cloneNode(true)));
+  heading.filter(node => !continuation || node.matches('.paper-header')).forEach(node => head.append(node.cloneNode(true)));
   if (continuation) {
     const label = document.createElement('p');
     label.className = 'paper-continuation';
-    label.textContent = 'Continuação';
+    label.textContent = [lessonTitle || heading.find(node => node.matches('h2'))?.textContent, 'continuação'].filter(Boolean).join(' · ');
     head.append(label);
   }
   const body = document.createElement('div');
@@ -27,31 +30,33 @@ function createPage(preview, heading, continuation) {
 }
 
 const fits = body => body.scrollHeight <= body.clientHeight + 1;
-const usedHeight = body => [...body.children].reduce((sum,node) => {
-  const style = getComputedStyle(node);
-  return sum + node.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
-}, 0);
-
-function balancePages(pages) {
-  for (let index = pages.length - 1; index > 0; index--) {
-    const before = pages[index - 1].body, after = pages[index].body;
-    while (before.childElementCount > 1) {
-      const node = before.lastElementChild;
-      const difference = usedHeight(before) - usedHeight(after);
-      const size = node.offsetHeight + parseFloat(getComputedStyle(node).marginBlockStart) + parseFloat(getComputedStyle(node).marginBlockEnd);
-      if (difference <= size * 1.1) break;
-      after.prepend(node);
-      if (!fits(after)) { before.append(node); break; }
-    }
+// Section titles travel with their first exercise or explanation.
+function contentBlocks(nodes) {
+  const blocks = [];
+  for (let index = 0; index < nodes.length; index++) {
+    const node = nodes[index];
+    if (node.matches('.paper-answer')) {
+      const row = document.createElement('div');
+      row.className = 'paper-answer-pair';
+      row.append(node);
+      if (nodes[index + 1]?.matches('.paper-answer')) row.append(nodes[++index]);
+      blocks.push(row);
+    } else if (node.matches('[data-keep-next]') && nodes[index + 1]) {
+      const group = document.createElement('div');
+      group.className = 'paper-section-start';
+      group.append(node, nodes[++index]);
+      blocks.push(group);
+    } else blocks.push(node);
   }
+  return blocks;
 }
 
-// A measured source may span several pages, but questions and kana families
+// A measured source may span several pages, but questions and writing rows
 // remain atomic. Never shrink the whole page or silently clip overflowing text.
 export async function renderPrintPages(preview, sheets, isCurrent) {
   preview.style.setProperty('--paper-scale', '1');
   preview.dataset.ready = 'false';
-  preview.innerHTML = sheets.map(html => `<div class="paper-source">${html}</div>`).join('');
+  preview.innerHTML = sheets.map(html => `<div class="print-sheet paper-source">${html}</div>`).join('');
   await document.fonts.ready;
   await Promise.all([...preview.querySelectorAll('img')].map(image => image.decode()));
   if (!isCurrent()) return null;
@@ -62,31 +67,32 @@ export async function renderPrintPages(preview, sheets, isCurrent) {
     const heading = [];
     while (nodes[0]?.matches(INTRO)) heading.push(nodes.shift());
     let current = createPage(preview, heading, false);
-    const sectionPages = [current];
     pages.push(current);
-    for (const node of nodes) {
+    let lessonTitle = "";
+    for (const node of contentBlocks(nodes)) {
+      lessonTitle = node.querySelector("[data-book-lesson] h2")?.textContent || lessonTitle;
       current.body.append(node);
       if (!fits(current.body)) {
         node.remove();
         if (!current.body.childElementCount) throw new Error('Um bloco de conteúdo excede a área A4.');
-        current = createPage(preview, heading, true);
-        sectionPages.push(current);
+        current = createPage(preview, heading, true, lessonTitle);
         pages.push(current);
         current.body.append(node);
         if (!fits(current.body)) throw new Error('Um bloco de conteúdo excede a área A4.');
       }
     }
-    balancePages(sectionPages);
   }
   for (const [index, { page, body, footer }] of pages.entries()) {
-    // Writing exercises use spare space for answers, not oversized type.
-    if (body.querySelector(':scope > .paper-question, :scope > .paper-book-question')) body.classList.add('paper-body-practice');
-    if (body.querySelector('.paper-kana-family')) body.classList.add('paper-body-kana');
     if (body.querySelector('.paper-book-cover')) body.classList.add('paper-body-cover');
     if (body.querySelector('.model svg')) footer.firstElementChild.innerHTML += '<small>Traços: KanjiVG · Ulrich Apel e colaboradores · CC BY-SA 3.0</small>';
     footer.querySelector('.paper-page-number').textContent = `${index + 1} / ${pages.length}`;
     page.setAttribute('aria-label', `Folha ${index + 1} de ${pages.length}`);
     if (!fits(body)) throw new Error('Não foi possível ajustar esta folha ao A4.');
+  }
+  // Reserve the number column in CSS so resolving the contents cannot reflow it.
+  for (const entry of preview.querySelectorAll('[data-paper-target]')) {
+    const index = pages.findIndex(({ body }) => [...body.querySelectorAll('[data-paper-anchor]')].some(node => node.dataset.paperAnchor === entry.dataset.paperTarget));
+    entry.textContent = index < 0 ? '—' : String(index + 1);
   }
   preview.dataset.ready = 'true';
   return pages.length;
