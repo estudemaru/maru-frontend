@@ -77,18 +77,26 @@ como erro absoluto uma alternativa possível em outro contexto. Gírias incluem
 situação, grau de informalidade e alternativas educadas quando cabíveis.
 
 As folhas usam paginação medida em A4, com margens de 14 mm. Os caracteres
-selecionados seguem a ordem do silabário, sem reservar espaços para os demais.
+selecionados ficam agrupados por família, sem reservar espaços para os demais.
 Cada linha de escrita e cada exercício permanecem inteiros; as continuações
 repetem apenas um cabeçalho curto. Os quadrados têm cerca de 20 mm, com guias
 tracejadas, sem degradês. Páginas extras de repetição são opcionais e vêm
 desativadas inicialmente.
 
 No livro, cada etapa começa em uma nova folha e suas lições seguem em sequência.
-Na prática de hiragana e katakana do livro, cada família ocupa sua própria
+Na prática de hiragana e katakana do livro e nas folhas avulsas, cada família ocupa sua própria
 folha, com todos os seus caracteres juntos. A ordem é: vogais, KA, GA, SA, ZA,
 TA, DA, NA, HA, BA, PA, MA, YA, RA e WA/WO/N. Assim, as famílias com dakuten
-e handakuten aparecem logo depois da família-base. Essa organização é específica
-do livro; a seleção livre das folhas avulsas continua disponível.
+e handakuten aparecem logo depois da família-base. A seleção livre das folhas
+avulsas continua disponível, mantendo famílias diferentes em folhas separadas.
+No livro, a apresentação e a escrita ficam intercaladas: conhecer as vogais,
+escrever as vogais; conhecer KA/GA, escrever KA e GA; conhecer SA/ZA, escrever
+SA e ZA, e assim por diante, nos dois silabários. `book-kana.js` adapta as seções
+do currículo para essa sequência. Cada seção indica suas famílias de prática;
+o gerador reúne o exemplo de cada família e seus blocos de escrita na mesma
+folha. As famílias com marcas apresentam seu próprio exemplo acima dos blocos.
+Não há mais uma página separada apenas para apresentar cada grupo.
+O sumário aponta para a primeira explicação de cada etapa.
 São sete etapas em kana, com 36 lições adaptadas do currículo. Exemplos,
 instruções, alternativas e gabaritos usam hiragana e katakana, com leituras
 provenientes do conteúdo. O módulo de kanji do curso online é substituído no
@@ -101,6 +109,21 @@ do volume. O currículo online continua completo.
 Cabeçalhos, objetivos e quadros usam verde, coral, violeta, azul e dourado, com
 fundos claros e áreas de resposta brancas. As cores se mantêm no PDF e não
 dependem do tema da interface.
+O seletor de cor atende ao livro e a todas as atividades. A opção preto e branco
+usa texto escuro, superfícies brancas, contornos reforçados e ilustrações em
+cinza com contraste ajustado. Modelos de traços ficam escuros; os dois modelos
+para cobrir ficam em cinza médio, distintos das guias pontilhadas mais claras.
+A prévia usa o mesmo estilo aplicado à impressão e ao PDF.
+
+As explicações iniciais do impresso têm versões concisas em `book-notes.js`.
+Os exemplos permanecem completos e aparecem em cartões: caracteres isolados
+em 44 pt (36 pt quando compartilham a folha com a escrita), palavras em 25 pt e
+frases em 18 pt. Ilustrações do acervo acompanham
+palavras reconhecidas, sem associar desenhos a fragmentos de outras palavras.
+Cada família de escrita começa com kana grandes; a seção final
+apresenta os kanji em 54 pt, com desenhos do significado e modelos de traços.
+Esses desenhos são apoio de memória, não explicações da origem dos caracteres.
+Os cartões podem seguir para a próxima folha sem reduzir a escala de impressão.
 
 Títulos acompanham a primeira explicação, e o sumário recebe os números reais
 após a paginação. Não se esticam exercícios para preencher a página: o espaço
@@ -114,7 +137,8 @@ Os testes em `tests/e2e/print.spec.js` conferem conteúdo completo, seleção de
 caracteres, quadrados, rodapés, sumário e correspondência entre folhas da prévia
 e páginas do PDF, incluindo os dois temas e a prévia em celular.
 Também verificam a ausência de kanji antes da seção final e a lista restrita
-de caracteres nessa seção, com e sem gabaritos.
+de caracteres nessa seção, com e sem gabaritos, além da preservação de todos os
+exemplos, do carregamento das ilustrações e do tamanho dos caracteres destacados.
 
 Pronúncias novas entram automaticamente no catálogo textual quando fazem parte
 dos exemplos. Para caracteres ou palavras com leitura ambígua, informe a leitura

@@ -5,6 +5,7 @@ import { PICTURE_WORDS, PICTURE_BANK_ORDER, PRINT_DIALOGUES } from "/shared/prin
 import { PARTICLE_EXERCISES } from "/shared/exercises.js";
 import { book1Pages } from "./book1.js";
 import { BOOK_KANJI, BOOK_KANA_ORDER, bookKanaHTML } from "./book-content.js";
+import { bookPicture, bookPictureHTML, kanjiSketch } from "./book-visuals.js";
 import { renderPrintPages, scalePrintPreview } from "./print-layout.js";
 import { pageHeading, esc, icon, routeLink, jpHTML } from "../core/ui.js";
 
@@ -15,16 +16,18 @@ const repeatPage = () => header("Página de repetição") + '<div class="paper-r
 const strokeSVG = (char, paths = []) => `<svg viewBox="-4 -4 117 117" role="img" aria-label="Ordem dos traços de ${char}">${paths.map(d=>`<path d="${esc(d)}"/>`).join("")}</svg>`;
 const practiceRow = (item, strokes, reading = item.romaji) => `<section class="paper-row" data-print-char="${item.char}"${item.family ? ` data-kana-row="${item.family}" data-script="${item.script}"` : ""}><div class="paper-row-label"><strong>${item.char} · ${reading}</strong><span>${item.meaning || "Leia em voz alta antes de escrever."}</span></div><div class="paper-boxes"><div class="paper-box model">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div>${blankBox.repeat(6)}</div></section>`;
 const printKanaRows = KANA_ROWS.filter(row=>row.id!=="n");
-const kanaSheet = (script, selected, strokes, family = null) => {
+const kanaSheet = (script, selected, strokes, family = null, embedded = false) => {
   const families = family ? printKanaRows.filter(row=>row.id===family) : printKanaRows;
   const items = families.flatMap(row => KANA.filter(item => item.script===script && (item.row===row.id || (row.id==="wa" && item.row==="n"))).filter(item=>selected.has(item.char)).map(item=>({...item,family:row.id})));
   if (!items.length) return null;
   const name = script==="hiragana" ? "Hiragana" : "Katakana";
   const title = !family ? 'do modelo à memória' : family==='a' ? 'vogais' : family==='wa' ? 'WA · WO · N' : `família ${family.toUpperCase()}`;
-  const practice =
+  const overview = family && !embedded ? `<div class="paper-family-overview" aria-label="Leia os caracteres desta família">${items.map(item=>`<div><strong lang="ja">${item.char}</strong><small>${item.romaji==="wo" ? "wo/o" : item.romaji}</small></div>`).join('')}</div>` : '';
+  const practice = overview +
     items.map(item=>practiceRow(item,strokes,item.romaji==="wo" ? "wo/o" : item.romaji)).join("") +
     (items.length===1 ? `<section class="paper-writing-extension"><h3>Agora, sem olhar o modelo</h3><p class="paper-instructions">Cubra a primeira linha. Repita o caractere, compare com o modelo e circule sua melhor tentativa.</p><div class="paper-recall-grid">${blankBox.repeat(45)}</div></section>` : '') +
-    '<section class="paper-writing-extension"><h3>Teste sua memória</h3><p class="paper-instructions">Cubra os modelos e escreva os caracteres que você consegue lembrar. Depois confira os traços.</p><div class="paper-practice-line"></div><div class="paper-practice-line"></div><div class="paper-checklist"><span>□ Segui a ordem dos traços.</span><span>□ Li em voz alta.</span><span>□ Revisei minhas dúvidas.</span></div></section>';
+    '<section class="paper-writing-extension"><h3>Teste sua memória</h3><p class="paper-instructions">Cubra os modelos e escreva os caracteres que você consegue lembrar. Depois confira os traços.</p><div class="paper-practice-line"></div>' + (family ? '' : '<div class="paper-practice-line"></div>') + '<div class="paper-checklist"><span>□ Segui a ordem dos traços.</span><span>□ Li em voz alta.</span><span>□ Revisei minhas dúvidas.</span></div></section>';
+  if (embedded) return `<div class="paper-kana-family" data-family="${family}" data-script="${script}">${practice}</div>`;
   return header(name) + `<h2>${name} · ${title}</h2><p class="paper-instructions">1. Observe a ordem dos traços. 2. Trace por cima dos dois modelos claros. 3. Escreva nas casas vazias e leia em voz alta.</p>` +
     (family ? `<div class="paper-kana-family" data-family="${family}" data-script="${script}">${practice}</div>` : practice);
 };
@@ -58,14 +61,14 @@ const particleSheet = (items, offset) => header("Atividade · partículas") +
 const particleAnswerSheet = (items, offset) => header("Gabarito · partículas") + '<h2>Compare suas respostas.</h2>' +
   items.map((item,index)=>`<section class="paper-answer"><strong>${offset+index+1}. <span lang="ja">${jpHTML(item.speech,item.reading&&item.reading.replace("＿",item.answer))}</span></strong><p>${esc(item.explanation)}</p></section>`).join("");
 const bookWordSheet = items => header("Livro 1 · primeiras palavras") + '<h2>Palavras para reconhecer e usar</h2>' +
-  chunks(items,2).map(pair=>`<div class="paper-book-words">${pair.map(item=>`<div><strong lang="ja">${esc(item.jp)}</strong><span>${esc(item.reading)} · ${esc(item.romaji)}</span><span>${esc(item.pt)}</span><small lang="ja">${jpHTML(item.sentence,item.sentenceReading)}</small></div>`).join("")}</div>`).join("");
+  chunks(items,2).map(pair=>`<div class="paper-book-words">${pair.map(item=>`<div class="paper-vocabulary-card">${bookPictureHTML(bookPicture(item))}<div><strong lang="ja">${esc(item.jp)}</strong><span>${esc(item.reading)} · ${esc(item.romaji)}</span><span>${esc(item.pt)}</span><small lang="ja">${jpHTML(item.sentence,item.sentenceReading)}</small></div></div>`).join("")}</div>`).join("");
 const bookSentenceSheet = (items,offset) => header("Livro 1 · frases") + '<h2>Construa uma frase para cada situação</h2><p class="paper-instructions">Leia a situação e escreva a frase em japonês. Compare as partículas e a ordem no gabarito.</p>' +
   items.map((item,index)=>`<section class="paper-question"><strong>${offset+index+1}. ${esc(item.prompt)}</strong><p>${esc(item.pattern)}</p><div class="paper-practice-line"></div></section>`).join("");
 const bookSentenceAnswers = (items,offset) => header("Gabarito · frases") + '<h2>Compare suas frases</h2>' +
   items.map((item,index)=>`<section class="paper-answer"><strong>${offset+index+1}. <span lang="ja">${jpHTML(item.tokens.map(token=>token[0]).join("")+"。",item.tokens.map(token=>token[3]||token[0]).join("")+"。")}</span></strong><p>${esc(item.tokens.map(token=>token[1]).join(" "))} · ${esc(item.hint)}</p></section>`).join("");
 const basicKanjiSheet = (strokes, answers) => header("Final do livro · 10 kanji básicos").replace('<header class="paper-header"', '<header class="paper-header" data-paper-tone="gold" data-book-kanji="true"') +
   '<h2>Seu primeiro encontro com os kanji</h2><section class="paper-book-section" data-paper-anchor="book-kanji"><h3>Um pequeno começo</h3><p>Você já praticou palavras e frases em kana. Agora conheça apenas dez kanji: cada um tem uma forma, um significado e uma leitura para começar. Existem outras leituras; deixe-as para uma próxima etapa.</p><p class="paper-book-tip">Leia o significado, diga a leitura em voz alta, siga os traços numerados e escreva nas casas vazias.</p></section>' +
-  BOOK_KANJI.map(item=>practiceRow(item, strokes, `${item.reading} · ${item.romaji}`)).join("") +
+  BOOK_KANJI.map(item=>`<section class="paper-kanji-study"><div class="paper-kanji-intro"><strong class="paper-kanji-display" lang="ja">${item.char}</strong>${kanjiSketch(item.char)}<div><h3>${esc(item.meaning)}</h3><p lang="ja">${item.reading}</p><small>${item.romaji}</small></div></div>${practiceRow(item, strokes, `${item.reading} · ${item.romaji}`)}</section>`).join("") +
   '<section class="paper-writing-extension"><h3>Confira o que ficou na memória</h3><p class="paper-instructions">Cubra os modelos. Escreva o kanji de cada significado e depois confira.</p><div class="paper-recall-words"><div>1. Montanha</div><div>2. Água</div><div>3. Pessoa</div></div><p class="paper-instructions">Leia os três caracteres em voz alta. Volte aos modelos para revisar os traços que achar difíceis.</p></section>' +
   (answers ? '<section class="paper-book-tip paper-kanji-answers"><strong>Confira depois de tentar:</strong> 1. 山 · やま (yama)　2. 水 · みず (mizu)　3. 人 · ひと (hito)</section>' : '');
 const activityKinds = new Set(["pictures","dialogues","activities"]);
@@ -73,7 +76,7 @@ const activityKinds = new Set(["pictures","dialogues","activities"]);
 export function renderWorksheets(ctx, initialKind = "characters") {
   const controller = new AbortController();
   let kind = initialKind === "book" ? "book" : "characters", script = "hiragana", group = "food", batch = 0, answers = true, models = true;
-  let scope = "recommended", repeatPages = 0;
+  let scope = "recommended", repeatPages = 0, printColor = "color";
   let selected = new Set(KANA.filter(item=>item.script==="hiragana").slice(0,20).map(item=>item.char));
   let strokes = null, printing = false, renderVersion = 0;
   const characterList = () => script === "all" ? [...KANA.filter(item=>item.script==="hiragana"),...KANA.filter(item=>item.script==="katakana"), ...BEGINNER_KANJI] : script === "kanji" ? BEGINNER_KANJI : KANA.filter(item=>item.script===script);
@@ -84,6 +87,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     <div id="worksheet-group-control" hidden><label class="input-label" for="worksheet-group">Tema</label><select class="text-input" id="worksheet-group">${VOCABULARY_GROUPS.filter(([id])=>id!=="all").map(([id,label])=>`<option value="${id}" ${id===group?"selected":""}>${label}</option>`).join("")}</select></div>
     <div id="worksheet-batch-control" hidden><label class="input-label" for="worksheet-batch">Situações</label><select class="text-input" id="worksheet-batch">${chunks(SENTENCES,5).map((items,i)=>`<option value="${i}">${i*5+1} a ${i*5+items.length}</option>`).join("")}</select></div>
     <div><label class="input-label" for="worksheet-repeat-pages">Páginas para repetir</label><select class="text-input" id="worksheet-repeat-pages"><option value="0" ${repeatPages === 0 ? "selected" : ""}>Nenhuma</option><option value="1" ${repeatPages === 1 ? "selected" : ""}>1 página em branco</option><option value="2">2 páginas em branco</option><option value="3">3 páginas em branco</option><option value="5">5 páginas em branco</option><option value="10">10 páginas em branco</option></select></div>
+    <div><label class="input-label" for="worksheet-color">Cor da impressão</label><select class="text-input" id="worksheet-color"><option value="color">Colorida</option><option value="mono">Preto e branco · alto contraste</option></select></div>
     <div><button class="btn btn-primary" id="print-worksheet" disabled>${icon("pen")} Imprimir / salvar PDF</button></div>
     </div><div class="filter-chips"><label><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
     <div id="worksheet-characters" class="worksheet-selection panel" role="group" dir="ltr" aria-label="Caracteres da folha"></div><p class="filter-count" id="worksheet-status" aria-live="polite">Preparando os modelos de traços…</p>
@@ -108,10 +112,11 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     answerOption.disabled = kind === "characters";
     answerOption.parentElement.hidden = answerOption.disabled;
     const preview = ctx.main.querySelector("#worksheet-preview");
+    preview.dataset.printColor = printColor;
     let sheets = [], answerSheets = [], finalSheets = [];
     if (kind === "characters") {
       const kanaScripts = script==="all" ? ["hiragana","katakana"] : script==="kanji" ? [] : [script];
-      const kanaSheets = kanaScripts.map(kanaScript=>kanaSheet(kanaScript,selected,strokes)).filter(Boolean);
+      const kanaSheets = kanaScripts.flatMap(kanaScript=>BOOK_KANA_ORDER.map(family=>kanaSheet(kanaScript,selected,strokes,family))).filter(Boolean);
       const kanjiItems = (script==="kanji" || script==="all" ? BEGINNER_KANJI : []).filter(item=>selected.has(item.char));
       const kanjiSheets = kanjiItems.length ? [ header("Primeiros kanji") +
         '<h2>Observe. Cubra. Experimente.</h2><p class="paper-instructions">O primeiro quadrado mostra os traços numerados. Nos dois seguintes, cubra o desenho. Nas casas vazias, escreva sozinho. Cada número marca o início de um traço: siga a ordem do modelo.</p>' +
@@ -131,13 +136,13 @@ export function renderWorksheets(ctx, initialKind = "characters") {
         items.map((item,i)=>`<section class="paper-question paper-sentence-question"><strong>${i+1}. ${item.prompt}</strong><p>${item.pattern}</p>${models ? `<p class="jp" lang="ja">${item.tokens.map(t=>t[0]).reverse().join(" ／ ")}</p>` : ""}<div class="paper-practice-line"></div></section>`).join("")];
       if(answers) answerSheets = [header("Gabarito · frases")+'<h2>Compare a ordem e as partículas.</h2>'+items.map((item,i)=>`<section class="paper-answer"><strong>${i+1}. <span lang="ja">${item.tokens.map(t=>t[0]).join("")}。</span></strong><p>${item.tokens.map(t=>t[1]).join(" ")}</p><p>${item.hint}</p></section>`).join("")];
     } else if (kind === "book") {
-      const book = book1Pages();
       const everyKana = new Set(KANA.map(item=>item.char));
-      const kanaPages = ["hiragana","katakana"].flatMap(kanaScript=>BOOK_KANA_ORDER.map(family=>kanaSheet(kanaScript,everyKana,strokes,family)));
+      const writingPages = Object.fromEntries(["hiragana","katakana"].map(kanaScript=>[kanaScript, Object.fromEntries(BOOK_KANA_ORDER.map(family=>[family,kanaSheet(kanaScript,everyKana,strokes,family,true)]))]));
+      const book = book1Pages(writingPages);
       const wordPages = [bookWordSheet(VOCABULARY)];
       const sentencePages = [bookSentenceSheet(SENTENCES,0)];
       const particlePages = [particleSheet(PARTICLE_EXERCISES,0)];
-      sheets = [...book.pages,...kanaPages,...wordPages,...sentencePages,...particlePages,...pictureSheets(),...PRINT_DIALOGUES.map(dialogueSheet)];
+      sheets = [...book.pages,...wordPages,...sentencePages,...particlePages,...pictureSheets(),...PRINT_DIALOGUES.map(dialogueSheet)];
       if(answers)answerSheets = [...book.answerPages,bookSentenceAnswers(SENTENCES,0),particleAnswerSheet(PARTICLE_EXERCISES,0),pictureAnswerSheet(),dialogueAnswerSheet()];
       sheets = sheets.map(bookKanaHTML);
       answerSheets = answerSheets.map(bookKanaHTML);
@@ -192,6 +197,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
       drawSelection();
     }
     if(id==="worksheet-repeat-pages")repeatPages=Number(value);
+    if(id==="worksheet-color")printColor=value;
     if(id==="worksheet-group")group=value;
     if(id==="worksheet-batch")batch=Number(value);
     if(id==="worksheet-models")models=checked;

@@ -1,3 +1,5 @@
+import { BOOK_NOTES } from './book-notes.js';
+import { interleaveKanaLesson } from './book-kana.js';
 import { MODULES } from '../../../../shared/curriculum.js';
 import { BEGINNER_KANJI, SENTENCES, PARTICLES, EXPRESSIONS } from '../../../../shared/catalog.js';
 import { VOCABULARY } from '../../../../shared/vocabulary.js';
@@ -11,11 +13,12 @@ export const BOOK_KANJI = [...'一二三人日月山川木水'].map(char => BEGI
 export const BOOK_KANA_ORDER = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', 'ha', 'ba', 'pa', 'ma', 'ya', 'ra', 'wa'];
 export const BOOK_MODULES = MODULES.filter(module => module.id !== 'kanji').map((module, index) => ({
   ...module, number: String(index + 1).padStart(2, '0'),
-  lessons: module.lessons.map(lesson => {
-    if (lesson.id !== 'welcome') return lesson;
+  lessons: module.lessons.map(source => {
+    const lesson = { ...source, sections: source.sections.map((section, index) => ({ ...section, body: BOOK_NOTES[source.id]?.[index] || section.body })) };
+    if (lesson.id !== 'welcome') return interleaveKanaLesson(lesson);
     return { ...lesson, goal: 'Começar pelos sons, pelo hiragana e pelo katakana.', sections: lesson.sections.map((section, index) => {
-      if (index === 1) return { ...section, title: 'Primeiro, hiragana e katakana', body: 'Hiragana e katakana representam sons. Neste livro, você vai usá-los para ler palavras e formar frases. Os primeiros kanji ficam reservados para a última parte, depois das atividades e dos gabaritos.', examples: section.examples.slice(0, 2), tip: 'Aprenda os sons com calma. Romaji é um apoio de leitura em letras latinas.' };
-      if (index === 2) return { ...section, body: 'Conheça os sons, aprenda hiragana e katakana e pratique escrita junto com leitura. Depois, use partículas para formar frases e conversar. Só no final você conhecerá dez kanji básicos.', examples: section.examples.map(example => ({ ...example, note: 'パン está em katakana; をたべます está em hiragana.' })) };
+      if (index === 1) return { ...section, title: 'Primeiro, hiragana e katakana', examples: section.examples.slice(0, 2), tip: 'Aprenda os sons com calma. Romaji é um apoio de leitura em letras latinas.' };
+      if (index === 2) return { ...section, examples: section.examples.map(example => ({ ...example, note: 'パン está em katakana; をたべます está em hiragana.' })) };
       return section;
     }) };
   })

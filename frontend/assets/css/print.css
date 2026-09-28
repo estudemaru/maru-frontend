@@ -100,9 +100,6 @@
 .paper-book-section { font-size: 10pt; line-height: 1.5; padding-bottom: 1mm; margin-bottom: 3mm; }
 .paper-book-section h3 { font-size: 11pt; margin: 0 0 2mm; }
 .paper-book-section > p { margin: 1.5mm 0; }
-.paper-book-example { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: 3mm; align-items: baseline; padding: 1mm 0; }
-.paper-book-example span { font: 11pt/1.8 "Noto Sans JP",sans-serif; overflow-wrap: anywhere; }
-.paper-book-example small { font-size: 8.5pt; }
 .paper-book-tip { font-size: 9pt; padding: 2mm 3mm; border-left: 1pt solid #aaa; background: #f7f7f7; }
 .paper-book-practice-title { font-size: 11pt; border-top: 1pt solid #aaa; padding-top: 3mm; margin: 1mm 0 3mm; }
 .paper-book-question { margin: 0 0 3mm; font-size: 9pt; break-inside: avoid; }
@@ -134,6 +131,72 @@
 .paper-recall-words { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5mm; }
 .paper-recall-words > div { min-height: 11mm; border-bottom: .5pt solid #aaa; font-size: 8pt; }
 .paper-question,.paper-book-question,.paper-answer,.paper-book-answers { overflow-wrap: anywhere; }
+/* Illustrated lessons: the Japanese example is the focal point. */
+.paper-lesson-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 5mm; }
+.paper-learning-image { width: 28mm; height: 28mm; object-fit: contain; display: block; }
+.paper-lesson-heading > .paper-learning-image { width: 30mm; height: 30mm; }
+.paper-learning-steps { font-size: 8pt; margin: 0 0 3mm; letter-spacing: .2pt; }
+.paper-section-label { display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm; }
+.paper-section-label > span { display: grid; place-items: center; width: 7mm; height: 7mm; flex: 0 0 7mm; border-radius: 50%; background: var(--paper-tint); font-size: 8pt; font-weight: 700; }
+.paper-section-label h3 { margin: 0; }
+.paper-explanation { font-size: 9.5pt; line-height: 1.55; }
+.paper-explanation p { margin: 0 0 2mm; }
+.paper-example-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 3mm; margin: 2mm 0 3mm; break-inside: avoid; }
+.paper-example-grid[data-example-layout="word"][data-count="2"],.paper-example-grid[data-example-layout="character"][data-count="2"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="3"] { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="4"] { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="5"] { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.paper-example-card { min-width: 0; padding: 3mm; border: .6pt solid var(--paper-rule); background: var(--paper-tint); border-radius: 3mm; display: grid; grid-template-columns: minmax(0,1fr); align-items: center; gap: 3mm; break-inside: avoid; }
+.paper-example-card:has(> img) { grid-template-columns: 23mm minmax(0,1fr); }
+.paper-example-card > .paper-learning-image { width: 23mm; height: 25mm; }
+.paper-example-copy { min-width: 0; }
+.paper-example-japanese { font: 500 18pt/1.65 "Noto Sans JP",sans-serif; overflow-wrap: anywhere; }
+[data-example-kind="word"] .paper-example-japanese { font-size: 25pt; line-height: 1.45; }
+[data-example-kind="character"] { text-align: center; }
+[data-example-kind="character"] .paper-example-japanese { font-size: 44pt; line-height: 1.35; }
+[data-example-kind="contrast"] .paper-example-japanese { font-size: 30pt; }
+.paper-example-copy p { margin: 1mm 0 0; }
+.paper-example-reading { font-size: 8pt; line-height: 1.4; }
+.paper-example-meaning { font-size: 9.5pt; font-weight: 600; line-height: 1.45; }
+.paper-example-note { font-size: 8pt; line-height: 1.45; padding-top: 2mm; border-top: .5pt solid var(--paper-rule); }
+.paper-kana-strip { display: flex; justify-content: space-around; gap: 2mm; }
+.paper-kana-strip span { font: 500 30pt/1.4 "Noto Sans JP",sans-serif; }
+.paper-book-tip > strong { font-size: 8pt; text-transform: uppercase; letter-spacing: .5pt; margin-right: 2mm; }
+.paper-family-overview { display: flex; justify-content: space-around; gap: 2mm; padding: 2mm; margin-bottom: 3mm; border-radius: 3mm; background: var(--paper-tint); }
+.paper-family-overview strong { display: block; font: 500 28pt/1.25 "Noto Sans JP",sans-serif; }
+.paper-family-overview small { display: block; font-size: 8pt; text-align: center; }
+.paper-vocabulary-card { display: flex; align-items: center; gap: 3mm; }
+.paper-vocabulary-card > div { min-width: 0; }
+.paper-vocabulary-card .paper-learning-image { width: 20mm; height: 22mm; flex: 0 0 20mm; }
+.paper-vocabulary-card strong { font-size: 19pt; overflow-wrap: anywhere; }
+.paper-kanji-study { margin-bottom: 4mm; break-inside: avoid; }
+.paper-kanji-intro { display: grid; grid-template-columns: 28mm 25mm minmax(0,1fr); gap: 5mm; align-items: center; padding: 2mm 3mm; margin-bottom: 2mm; background: var(--paper-tint); border-radius: 3mm; }
+.paper-kanji-intro .paper-kanji-display { font: 500 54pt/1.25 "Noto Sans JP",sans-serif; text-align: center; }
+.paper-kanji-intro h3 { font-size: 13pt; margin: 0 0 1mm; }
+.paper-kanji-intro p { font-size: 15pt; margin: 0; }
+.paper-kanji-intro small { font-size: 9pt; }
+.paper-meaning-sketch { width: 24mm; height: 24mm; fill: #f5d389; stroke: #956620; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.paper-kanji-study .paper-row-label { display: none; }
+/* A family is taught and practised on the same page. Keep the 20 mm writing
+   squares; recover space from duplicated headings, examples and decoration. */
+.paper-kana-study { break-inside: avoid; }
+.paper-kana-study .paper-lesson-heading { display: block; padding: 0; border: 0; margin: 0 0 2mm; }
+.paper-kana-study .paper-lesson-heading h2 { font-size: 14pt; margin: 0 0 1mm; }
+.paper-kana-study .paper-book-goal { padding: 0; border: 0; background: none; margin: 0; font-size: 8.5pt; }
+.paper-kana-study .paper-learning-steps { display: none; }
+.paper-kana-study .paper-book-section { margin-bottom: 1mm; padding: 0; }
+.paper-kana-study .paper-section-label { margin-bottom: 1mm; }
+.paper-kana-study .paper-section-label > span { width: 6mm; height: 6mm; flex-basis: 6mm; }
+.paper-kana-study .paper-explanation { font-size: 9pt; line-height: 1.45; }
+.paper-kana-study .paper-example-grid { margin: 1mm 0 2mm; }
+.paper-kana-study .paper-example-card { padding: 1.5mm 2mm; }
+.paper-kana-study [data-example-kind="character"] .paper-example-japanese { font-size: 36pt; }
+.paper-kana-study .paper-row { margin-bottom: 1.5mm; }
+.paper-kana-study .paper-row-label { margin-bottom: .8mm; line-height: 1.25; }
+.paper-kana-study .paper-writing-extension { margin-top: 2mm; }
+.paper-kana-study .paper-writing-extension h3 { margin-bottom: 1mm; }
+.paper-kana-study .paper-instructions { margin-bottom: 2mm; font-size: 8.5pt; line-height: 1.4; }
+.paper-kana-study .paper-checklist { margin-bottom: 0; }
 /* Colour supports the learning hierarchy while the writing areas stay white. */
 .print-sheet { --paper-accent: #146b70; --paper-tint: #edf8f6; --paper-rule: #aad5d0; }
 .print-sheet[data-paper-tone="coral"] { --paper-accent: #ac4637; --paper-tint: #fff2ed; --paper-rule: #e7b4a4; }
@@ -170,6 +233,23 @@
 .paper-cover-path span:nth-child(3) { background: #f5f0fc; border-color: #cbb8e2; }
 .paper-cover-path span:nth-child(4) { background: #fff7df; border-color: #dec57e; }
 .paper-kanji-answers { margin-top: 4mm; font-size: 9pt; }
+/* Monochrome uses ink-saving white surfaces and explicit dark rules. It does
+   not depend on the printer converting pale coloured backgrounds to grey. */
+.worksheet-preview[data-print-color="mono"] .print-sheet {
+  --paper-accent: #111; --paper-tint: #fff; --paper-rule: #777;
+  background: #fff; color: #111;
+}
+.worksheet-preview[data-print-color="mono"] .print-sheet * {
+  color: #111 !important; background-color: transparent !important;
+  border-color: #777 !important;
+}
+.worksheet-preview[data-print-color="mono"] .print-sheet img { filter: grayscale(1) contrast(1.2); }
+.worksheet-preview[data-print-color="mono"] .paper-box path { stroke: #111; }
+.worksheet-preview[data-print-color="mono"] .paper-box text { fill: #111; }
+.worksheet-preview[data-print-color="mono"] .paper-box.ghost path { stroke: #888; }
+.worksheet-preview[data-print-color="mono"] .paper-box::before,
+.worksheet-preview[data-print-color="mono"] .paper-box::after { border-color: #aaa; }
+.worksheet-preview[data-print-color="mono"] .paper-meaning-sketch { fill: #eee; stroke: #222; }
 .paper-source { visibility: hidden; position: absolute; width: 182mm; height: auto; padding: 0; transform: none; font: 10.5pt/1.55 "DM Sans",sans-serif; }
 @page { size: A4 portrait; margin: 0; }
 @media print {
