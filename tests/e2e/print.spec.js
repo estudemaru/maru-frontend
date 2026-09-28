@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { KANA } from '../../shared/content.js';
 import { BEGINNER_KANJI, SENTENCES } from '../../shared/catalog.js';
-import { BOOK_MODULES as MODULES, BOOK_LESSONS as LESSONS, BOOK_KANJI } from '../../frontend/assets/js/features/book-content.js';
+import { BOOK_MODULES as MODULES, BOOK_LESSONS as LESSONS, BOOK_KANJI, BOOK_KANA_ORDER } from '../../frontend/assets/js/features/book-content.js';
 import { VOCABULARY, VOCABULARY_GROUPS } from '../../shared/vocabulary.js';
 import { PARTICLE_EXERCISES } from '../../shared/exercises.js';
 import { PICTURE_WORDS, PRINT_DIALOGUES } from '../../shared/printActivities.js';
@@ -48,7 +48,7 @@ test('kana flows without unused slots, keeps stroke models and supports optional
   await page.goto('/#/worksheets');
   await ready(page);
   await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(20);
-  await expect(page.locator('.print-sheet')).toHaveCount(3);
+  await expect(page.locator('.print-sheet')).toHaveCount(4);
   await expect(page.locator('#worksheet-repeat-pages')).toHaveValue('0');
   await expect(page.locator('.paper-repeat-grid, .paper-kana-gap')).toHaveCount(0);
   await expect(page.locator('.paper-row').first().locator('.paper-box')).toHaveCount(9);
@@ -71,13 +71,15 @@ test('kana flows without unused slots, keeps stroke models and supports optional
   await expect.poll(() => page.evaluate(() => window.printCalls)).toBe(1);
 });
 
-test('all selected characters remain in order on compact A4 pages in both themes', async ({ page }) => {
+test('all selected characters keep their families on separate A4 pages in both themes', async ({ page }) => {
   await page.goto('/#/worksheets');
   await ready(page);
   await choose(page, '#worksheet-script', 'all');
   await choose(page, '#worksheet-scope', 'all');
-  const expected = [...KANA.filter(item => item.script === 'hiragana'), ...KANA.filter(item => item.script === 'katakana'), ...BEGINNER_KANJI].map(item => item.char);
+  const expected = [...['hiragana', 'katakana'].flatMap(script => BOOK_KANA_ORDER.flatMap(family => KANA.filter(item => item.script === script && (item.row === family || (family === 'wa' && item.row === 'n'))))), ...BEGINNER_KANJI].map(item => item.char);
   expect(await page.locator('.paper-row[data-print-char]').evaluateAll(rows => rows.map(row => row.dataset.printChar))).toEqual(expected);
+  await expect(page.locator('.paper-kana-family')).toHaveCount(30);
+  expect(await page.locator('.print-sheet:has(.paper-kana-family)').evaluateAll(papers => papers.every(paper => paper.querySelectorAll('.paper-kana-family').length === 1))).toBe(true);
   await expect(page.locator('.paper-row[data-print-char="を"]')).toContainText('wo/o');
   for (const theme of ['dojo', 'arcade']) {
     await page.evaluate(theme => document.querySelector(`[data-theme-choice="${theme}"]`).click(), theme);
@@ -85,6 +87,32 @@ test('all selected characters remain in order on compact A4 pages in both themes
     await expect(page.locator('.print-sheet').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
     await checkPaper(page);
   }
+});
+
+test('monochrome printing keeps dark text, visible tracing models and isolated selected families', async ({ page }, testInfo) => {
+  await page.goto('/#/worksheets');
+  await ready(page);
+  await choose(page, '#worksheet-script', 'katakana');
+  await choose(page, '#worksheet-scope', 'all');
+  await checkPaper(page, testInfo.outputPath('katakana.pdf'));
+  await choose(page, '#worksheet-color', 'mono');
+  await expect(page.locator('#worksheet-preview')).toHaveAttribute('data-print-color', 'mono');
+  await expect(page.locator('.print-sheet')).toHaveCount(15);
+  await expect(page.locator('.paper-header strong').first()).toHaveCSS('color', 'rgb(17, 17, 17)');
+  await expect(page.locator('.paper-box.model path').first()).toHaveCSS('stroke', 'rgb(17, 17, 17)');
+  await expect(page.locator('.paper-box.ghost path').first()).toHaveCSS('stroke', 'rgb(136, 136, 136)');
+  await expect(page.locator('.paper-family-overview').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.locator('.print-sheet').first().screenshot({ path: testInfo.outputPath('katakana-mono.png') });
+  await checkPaper(page, testInfo.outputPath('katakana-mono.pdf'));
+  await choose(page, '#worksheet-scope', 'one');
+  await choose(page, '#worksheet-scope', 'custom');
+  for (const char of ['カ', 'ガ']) await page.locator(`.worksheet-char[data-print-char="${char}"]`).click();
+  await ready(page);
+  await expect(page.locator('.print-sheet')).toHaveCount(3);
+  expect(await page.locator('.paper-kana-family').evaluateAll(groups => groups.map(group => group.dataset.family))).toEqual(['a', 'ka', 'ga']);
+  await checkPaper(page);
+  await choose(page, '#worksheet-color', 'color');
+  await expect(page.locator('.paper-header strong').first()).toHaveCSS('color', 'rgb(20, 107, 112)');
 });
 
 test('words and sentences retain all questions, models and separate answer keys', async ({ page }) => {
@@ -165,6 +193,22 @@ test('the complete book preserves every lesson and exercise with a resolved tabl
   await expect(page.locator('[data-book-lesson]')).toHaveCount(LESSONS.length);
   await expect(page.locator('[data-book-section]')).toHaveCount(LESSONS.reduce((sum, lesson) => sum + lesson.sections.length, 0));
   await expect(page.locator('[data-book-question]')).toHaveCount(LESSONS.reduce((sum, lesson) => sum + lesson.quiz.length, 0));
+  await expect(page.locator('[data-book-example]')).toHaveCount(LESSONS.reduce((sum, lesson) => sum + lesson.sections.reduce((total, section) => total + section.examples.length, 0), 0));
+  expect(await page.locator('.paper-example-card .paper-learning-image').count()).toBeGreaterThan(15);
+  expect(await page.locator('.paper-learning-image').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+  expect(await page.locator('[data-example-kind="character"] .paper-example-japanese').evaluateAll(chars => chars.length > 0 && chars.every(char => parseFloat(getComputedStyle(char).fontSize) >= (char.closest('.paper-kana-study') ? 48 : 56)))).toBe(true);
+  await expect(page.locator('.paper-kana-study')).toHaveCount(30);
+  // No explanation-only page between families: every large kana example is
+  // immediately followed by that family's complete grid on the same sheet.
+  expect(await page.locator('.paper-kana-study').evaluateAll(groups => groups.every(group => {
+    const family = group.querySelector('.paper-kana-family');
+    const examples = [...group.querySelectorAll('.paper-example-japanese, .paper-kana-strip')].map(node=>node.textContent.replace(/\s/g,'')).join('');
+    const chars = [...family.querySelectorAll('[data-print-char]')].map(node=>node.dataset.printChar).join('');
+    return examples === chars && group.getBoundingClientRect().bottom <= group.closest('.paper-body').getBoundingClientRect().bottom + 1;
+  }))).toBe(true);
+  await expect(page.locator('.paper-kanji-study')).toHaveCount(BOOK_KANJI.length);
+  expect(await page.locator('.paper-kanji-display').evaluateAll(chars => chars.every(char => parseFloat(getComputedStyle(char).fontSize) >= 70))).toBe(true);
+
   await expect(page.locator('.paper-book-answers')).toHaveCount(LESSONS.length);
   await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(KANA.length + BOOK_KANJI.length);
   // Each complete family gets its own sheet, with marked sounds immediately
@@ -179,14 +223,24 @@ test('the complete book preserves every lesson and exercise with a resolved tabl
       withinPage: group.getBoundingClientRect().bottom <= group.closest('.paper-body').getBoundingClientRect().bottom + 1
     })));
     expect(families.map(group => group.id)).toEqual(familyOrder);
+    const module = MODULES.find(module => module.id === script);
+    const expectedSequence = module.lessons.flatMap(lesson => lesson.sections.flatMap((section,index) => section.practiceFamilies ? [
+      `introduce:${lesson.id}:${index}`, ...section.practiceFamilies.map(family=>`write:${family}`)
+    ] : []));
+    const actualSequence = await page.locator('[data-practice-families], .paper-kana-family').evaluateAll((nodes,script) => nodes.flatMap(node => {
+      if (node.matches('.paper-kana-family')) return node.dataset.script === script ? [`write:${node.dataset.family}`] : [];
+      return node.dataset.bookSection.startsWith(script === 'hiragana' ? 'h-' : 'k-') ? [`introduce:${node.dataset.bookSection}`] : [];
+    }),script);
+    expect(actualSequence).toEqual(expectedSequence);
     for (const [index, family] of families.entries()) {
       expect(family.chars).toEqual(KANA.filter(item => item.script === script && (item.row === family.id || (family.id === 'wa' && item.row === 'n'))).map(item => item.char));
       expect(family.familiesOnPage).toBe(1);
       expect(family.withinPage).toBe(true);
-      if (index) expect(family.page).toBe(families[index - 1].page + 1);
+      if (index) expect(family.page).toBeGreaterThan(families[index - 1].page);
     }
   }
   await page.locator('.paper-kana-family[data-script="hiragana"][data-family="ka"]').locator('xpath=ancestor::article').screenshot({ path: testInfo.outputPath('family-ka.png') });
+  await page.locator('[data-book-section="h-rows:0"]').locator('xpath=ancestor::article').screenshot({ path: testInfo.outputPath('introduce-ka.png') });
   await expect(page.locator('.paper-book-words > div')).toHaveCount(VOCABULARY.length);
   await expect(page.locator('.paper-question')).toHaveCount(SENTENCES.length + PARTICLE_EXERCISES.length);
   await expect(page.locator('.paper-image-card img')).toHaveCount(PICTURE_WORDS.length);
@@ -212,9 +266,20 @@ test('the complete book preserves every lesson and exercise with a resolved tabl
   expect(colors.length).toBeGreaterThanOrEqual(5);
   await page.locator('.print-sheet').first().screenshot({ path: testInfo.outputPath('cover.png') });
   await page.locator('.print-sheet').nth(2).screenshot({ path: testInfo.outputPath('lesson.png') });
+  await page.locator('[data-book-lesson="h-vowels"]').locator('xpath=ancestor::article').screenshot({ path: testInfo.outputPath('vowels.png') });
+  await page.locator('[data-book-lesson="k-lookalikes"]').locator('xpath=ancestor::article').screenshot({ path: testInfo.outputPath('katakana.png') });
+
   await page.locator('.print-sheet[data-book-kanji]').first().screenshot({ path: testInfo.outputPath('kanji.png') });
   const count = await checkPaper(page, testInfo.outputPath('book.pdf'));
-  expect(count).toBeLessThan(120); // Previous layout consumed 150 pages for this content.
+  expect(count).toBeLessThan(130); // Previously 147 pages with separate introductions.
+  await choose(page, '#worksheet-color', 'mono');
+  await expect(page.locator('.paper-book-cover h2')).toHaveCSS('color', 'rgb(17, 17, 17)');
+  await expect(page.locator('.paper-learning-image').first()).toHaveCSS('filter', 'grayscale(1) contrast(1.2)');
+  await expect(page.locator('.paper-meaning-sketch').first()).toHaveCSS('stroke', 'rgb(34, 34, 34)');
+  expect(await checkPaper(page, testInfo.outputPath('book-mono.pdf'))).toBe(count);
+  await page.locator('.print-sheet').nth(2).screenshot({ path: testInfo.outputPath('lesson-mono.png') });
+  await page.locator('.print-sheet[data-book-kanji]').first().screenshot({ path: testInfo.outputPath('kanji-mono.png') });
+  // Larger teaching examples intentionally take more space than the old text layout.
   expect(await page.locator('.paper-section-start').evaluateAll(starts => starts.every(start => start.querySelector('[data-book-lesson]') && start.querySelector('[data-book-section]')))).toBe(true);
   await page.locator('#worksheet-answers').uncheck();
   await ready(page);
