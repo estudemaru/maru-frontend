@@ -263,3 +263,47 @@ html[data-motion="paused"] .play-page * { animation: none !important; }
   .karuta-table { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .karuta-card { min-height: 88px; }
 }
+
+/* Desafio do dia: cartão na home e no Arcade, passos e resultado. */
+.play-daily { display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: center; margin: 0 0 30px; padding: 18px 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.play-daily:hover { transform: translateY(-3px); box-shadow: 0 10px 22px #294c3910; }
+.play-daily-date { display: grid; gap: 4px; padding-right: 22px; border-right: 1px solid var(--line); }
+.play-daily-date small { font-size: 9px; letter-spacing: .1em; color: var(--accent); font-weight: 700; }
+.play-daily-date strong { font-size: 18px; }
+.play-daily-copy { display: grid; gap: 5px; }
+.play-daily-copy strong { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.play-daily-copy > span { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.play-daily-copy .icon { width: 14px; height: 14px; color: #c78348; }
+.play-daily-go { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--accent); }
+.play-daily.is-done { background: var(--success-bg); }
+.daily-stars { display: inline-flex; gap: 3px; font-size: 18px; color: var(--line); }
+.daily-stars .is-on { color: #c78348; }
+.play-result-hero .daily-stars { font-size: 30px; margin: 4px 0 10px; }
+.daily-progress { list-style: none; display: flex; gap: 10px; justify-content: center; margin: 0 0 18px; padding: 0; font-size: 12px; color: var(--muted); }
+.daily-progress li { display: flex; align-items: center; gap: 7px; padding: 7px 14px 7px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.daily-progress li span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--surface-soft); font-size: 11px; font-weight: 700; }
+.daily-progress .is-current { border-color: var(--accent); color: var(--ink); }
+.daily-progress .is-current span { background: var(--accent); color: #fff; }
+.daily-progress .is-right span { background: #4f8a5b; color: #fff; }
+.daily-progress .is-wrong span { background: var(--accent-soft); color: var(--accent); }
+.daily-reading { font-size: 14px; color: var(--muted); margin: -12px 0 18px; }
+.daily-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 560px; margin: 8px auto 0; }
+.daily-choice.play-choice { width: auto; height: auto; min-height: 60px; padding: 12px; font-size: 16px; line-height: 1.4; }
+.daily-choice[lang="ja"] { font-size: 22px; }
+.daily-choice.is-right { border-color: #4f8a5b; background: var(--success-bg); }
+.daily-choice.is-wrong { border-color: var(--accent); background: var(--accent-soft); }
+.daily-choices:has(.daily-choice:nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.daily-gap { display: inline-block; min-width: 2.5em; padding: 0 6px; border-bottom: 2px solid var(--accent); color: var(--accent); }
+#daily-form { display: flex; gap: 12px; margin: 10px auto 0; max-width: 520px; }
+.daily-word { padding: 26px; margin-bottom: 8px; text-align: center; }
+.daily-word-main { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
+.daily-word-jp { font-size: 44px; }
+.daily-word p { margin-top: 10px; font-size: 14px; line-height: 1.8; }
+.daily-sentence small { color: var(--muted); }
+@media (max-width: 600px) {
+  .play-daily { grid-template-columns: 1fr; gap: 12px; padding: 16px 18px; }
+  .play-daily-date { border-right: 0; padding-right: 0; }
+  .daily-progress { gap: 6px; font-size: 11px; } .daily-progress li { padding: 5px 10px 5px 5px; }
+  .daily-choices, .daily-choices:has(.daily-choice:nth-child(3):last-child) { grid-template-columns: 1fr; }
+  #daily-form { flex-wrap: wrap; } #daily-form .btn { width: 100%; justify-content: center; }
+}

@@ -1,4 +1,5 @@
 import { renderArcade, renderArcadeHub, renderArcadeProgress } from "./features/arcade.js";
+import { renderDaily } from "./features/daily.js";
 import { renderExplore } from "./features/hubs.js";
 import { renderVideoLessons } from "./features/video-lessons.js";
 import { NAVIGATION, navigationFor } from "./core/navigation.js";
@@ -126,6 +127,7 @@ function render() {
     home: () => renderDashboard(ctx),
     practice: () => renderArcadeHub(ctx),
     arcade: () => renderArcade(ctx, id),
+    daily: () => renderDaily(ctx),
     progress: () => renderArcadeProgress(ctx),
     challenge: () => renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),
     videos: () => renderVideoLessons(ctx),

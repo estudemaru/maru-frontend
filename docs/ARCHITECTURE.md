@@ -84,10 +84,12 @@ a busca. Nenhuma rota de conteúdo foi removida.
 O schema v2 contém lessons, reviews, activity, preferences e updatedAt, além
 dos campos anteriores progress, kanaStats, xp, streak e stats. Os campos placement
 e restDays registram o diagnóstico e as pausas protegidas sem alterar dados anteriores.
+`arcade` guarda recordes e `daily`, o primeiro resultado de cada desafio do dia.
 
 A normalização limita números, valida estruturas e converte revisões antigas.
 A mesclagem mantém a união das conclusões e os registros de revisão mais
-recentes; contadores históricos preservam o maior valor.
+recentes; contadores históricos preservam o maior valor. No `daily`, vale a
+conclusão mais antiga de cada data.
 
 O navegador grava imediatamente em `maru-learning-v2` para convidados e em
 `maru-account-<id>-v2` para cada conta. A importação anônima é feita uma vez por
