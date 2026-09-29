@@ -131,7 +131,9 @@ O áudio usa `POST /api/audio`. O `speechService.js` do backend valida o texto c
 de estudo, consulta TTS Quest e devolve uma URL de streaming. Só URLs expiráveis
 ficam em memória; o servidor e o frontend não escrevem áudio no disco. O player
 cancela requisições e reprodução ao navegar, respeita a velocidade escolhida e
-trata falhas, limites da API e bloqueio de reprodução automática.
+trata falhas, limites da API e bloqueio de reprodução automática. `preload(texto)`
+prepara uma URL sem tocar (usado pela karuta para a próxima rodada); os erros
+trazem `status` e `retryAfter` para quem precisa esperar um 429.
 
 `core/kanji.js` consulta KanjiAPI ao abrir um caractere. Valida campos, compartilha
 requisições simultâneas, mantém cache de 24 horas e usa a cópia dos 20 caracteres

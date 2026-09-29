@@ -2,10 +2,15 @@ import { GAMES, SCRIPTS, buildPool, acceptsAnswer, makeDeck, reviewPrefix, insig
 import { recordReview } from '/shared/progress.js';
 import { esc, icon, routeLink } from '../core/ui.js';
 import { renderShiritori, shiritoriBestKey } from './shiritori.js';
+import { renderKaruta } from './karuta.js';
 import { LEVELS } from '/shared/shiritori.js';
 
+const cardMeta = game => game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : game.kind === 'listen' ? `<b class="play-new">NOVO</b> ${icon('volume')} Com som <span>·</span> ${icon('clock')} Com tempo` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`;
 export function gameCards() {
-  return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.kind === 'chain' ? 'is-wide' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`}</span></div></a>`).join('');
+  // Jogos por turnos ocupam a linha inteira; um cartão comum sozinho na última linha também.
+  const regular = GAMES.filter(game => game.kind !== 'chain');
+  const span = game => regular.length % 2 === 1 && game === regular.at(-1);
+  return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.kind === 'chain' ? 'is-wide' : span(game) ? 'is-span' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${cardMeta(game)}</span></div></a>`).join('');
 }
 export function renderArcadeHub(ctx) {
   ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">UM POUQUINHO, TODO DIA</p><h1 tabindex="-1">Seu próximo acerto começa aqui.</h1><p>Escolha um jogo. Encontre seu ritmo. Tente mais uma vez.</p></header><div class="play-grid">${gameCards()}</div><div class="play-note">${icon('spark')} Todos os jogos têm prática infinita e desafio com tempo. Seu progresso é salvo a cada resposta.</div></div>`;
@@ -15,6 +20,7 @@ const detailList = items => items.length ? `<ul>${items.map(item => `<li><span>$
 export function renderArcade(ctx, id = 'sentences') {
   const game = GAMES.find(game => game.id === id) || GAMES[0];
   if (game.kind === 'chain') return renderShiritori(ctx, game);
+  if (game.kind === 'listen') return renderKaruta(ctx, game);
   const config = { game: game.id, script: ['sentences', 'translate'].includes(game.id) ? 'all' : game.id === 'difference' ? 'kana' : 'hiragana', duration: 0 };
   const controller = new AbortController();
   let timer, deadline = 0, phase = 'setup', nextItem, item, prefix, pool, attempts = 0, correct = 0, score = 0, streak = 0, bestStreak = 0, feedback = null, imageReady = true;
