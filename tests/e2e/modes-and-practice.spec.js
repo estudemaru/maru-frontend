@@ -25,13 +25,15 @@ test("palette and motion preferences persist",async({page})=>{
   await page.locator('#arcade-answer').fill('あ');
   await page.getByRole('button',{name:'Ativar modo escuro',exact:true}).click();
   await expect(page.locator('#arcade-answer')).toHaveValue('あ');
-  await expect(page.locator('#toast')).toContainText('Estilo Sumi ativado');
+  await expect(page.locator('#toast')).toContainText('Estilo Arcade ativado');
   await expect(page.locator('#arcade-hud')).toBeHidden();
   await expect(page.locator('html')).toHaveCSS('color-scheme','dark');
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme","arcade");
   await go(page,"home");
-  await expect(page.locator(".play-halo")).toHaveCSS("animation-name","halo-turn");
+  await expect(page.locator(".play-hero h1")).toHaveCSS("font-family", /Space Grotesk/);
+  await expect(page.locator(".book-scene")).toBeHidden();
+  await expect(page.locator(".play-halo")).not.toHaveCSS("animation-name","none");
   await page.getByRole("button",{name:"Pausar animações"}).click();
   await expect(page.locator(".play-halo")).toHaveCSS("animation-name","none");
   await expect(page.locator(".play-hero-art > img")).toHaveCSS("animation-name","none");
@@ -42,21 +44,23 @@ test("palette and motion preferences persist",async({page})=>{
   await expect(page.locator(".play-hero-art > img")).toHaveCSS("animation-name","none");
   await page.locator(".play-card-art img").evaluateAll(images => images.forEach(img => { img.loading = "eager"; }));
   await expect.poll(() => page.locator(".play-card-art img").evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
-  await page.screenshot({path:'test-results/sumi-desktop.png',fullPage:true});
+  await page.screenshot({path:'test-results/arcade-night-desktop.png',fullPage:true});
   await page.setViewportSize({width:390,height:844});
   await page.reload();
   await expect(page.locator('.play-hero')).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({path:'test-results/sumi-mobile.png',fullPage:true});
+  await page.screenshot({path:'test-results/arcade-night-mobile.png',fullPage:true});
   await page.getByRole('button',{name:'Ativar modo claro',exact:true}).click();
   await expect(page.locator('html')).toHaveCSS('color-scheme','light');
-  await expect(page.locator('#toast')).toContainText('Estilo Papel ativado');
+  await expect(page.locator(".play-hero h1")).toHaveCSS("font-family", /Shippori Mincho/);
+  await expect(page.locator(".book-scene")).toBeVisible();
+  await expect(page.locator('#toast')).toContainText('Estilo Sumi-e ativado');
   await page.locator('#toast').evaluate(el => { el.hidden = true; });
-  await page.screenshot({path:'test-results/papel-mobile.png',fullPage:true});
+  await page.screenshot({path:'test-results/sumi-book-mobile.png',fullPage:true});
   await page.setViewportSize({width:1440,height:1000});
   await page.reload();
   await expect(page.locator('.play-hero')).toBeVisible();
-  await page.screenshot({path:'test-results/papel-desktop.png',fullPage:true});
+  await page.screenshot({path:'test-results/sumi-book-desktop.png',fullPage:true});
 });
 
 test("API pronunciation plays with no installed voices, respects speed and stops on toggle",async({page})=>{
@@ -157,12 +161,15 @@ test("all themes fit desktop, tablet and small phones",async({page})=>{
     await go(page,"settings");await page.locator('.theme-card[data-theme-choice="'+theme+'"]').click();
     for(const width of [1440,768,390,320]){
       await page.setViewportSize({width,height:900});
-      const routes=theme!=="dojo"?["home","journey","kana","kanji","writing","sentences","particles","expressions","library","review","settings","lesson/welcome","vocabulary","exercises","worksheets","glossary","teacher"]:["vocabulary","exercises","worksheets","glossary","settings"];
+      const routes=theme!=="dojo"?["home","journey","kana","kanji","writing","sentences","particles","expressions","library","review","settings","lesson/welcome","vocabulary","exercises","worksheets","glossary","teacher","account","progress","practice","arcade/sentences","arcade/pictures","arcade/translate","explore"]:["home","account","progress","practice","arcade/sentences","explore","vocabulary","exercises","worksheets","glossary","settings"];
       for(const route of routes){
         await go(page,route);
-        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(16, 26, 44)",dojo:"rgb(243, 234, 215)"}[theme]);
+        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(8, 15, 34)",dojo:"rgb(243, 234, 215)"}[theme]);
         if(route === "worksheets") await expect(page.locator('#worksheet-preview')).toHaveAttribute('data-ready','true');
         await expect.poll(async()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),{message:theme+" "+route+" at "+width}).toBe(false);
+        if ([1440,390].includes(width) && ['settings','explore','arcade/sentences','progress'].includes(route)) {
+          await page.screenshot({path:`test-results/interface-${theme}-${route.replace('/','-')}-${width}.png`,fullPage:true});
+        }
       }
     }
     await page.setViewportSize({width:1440,height:1000});

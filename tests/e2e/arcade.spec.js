@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { buildPool } from '../../shared/arcade.js';
 
 test('home stays compact and usable from 320px to desktop', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   const errors=[]; page.on('pageerror', error=>errors.push(error.message));
   for (const width of [320,390,768,1440]) {
     await page.setViewportSize({width,height:1000});
