@@ -7,11 +7,15 @@ const used = page => page.locator('.shiritori-chain .chain-reading').allTextCont
 async function validWord(page, { n = false } = {}) {
   const required = (await page.locator('.shiritori-kana').textContent()).trim();
   const taken = new Set((await used(page)).map(text => dictionary.lookup(text)?.key));
-  return dictionary.words.find(word => startKana(word.key) === required && !taken.has(word.key) && endsInN(word.key) === n && [...word.key].length <= 4);
+  const options = dictionary.words.filter(word => startKana(word.key) === required && !taken.has(word.key) && endsInN(word.key) === n);
+  // Prefere palavras curtas, mas alguns kana só têm palavras longas terminadas em ん.
+  return options.find(word => [...word.key].length <= 4) || options[0];
 }
 
 test('shiritori chains words, explains invalid moves and records the best chain', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
+  // Maru sorteia as respostas: com uma semente fixa, a partida é sempre a mesma.
+  await page.addInitScript(() => { let seed = 42; Math.random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646; });
   await page.goto('/#/home');
   await page.locator('.play-card.is-wide').click();
   await expect(page.locator('.play-setup h1')).toHaveText('Palavra puxa palavra');
@@ -30,7 +34,14 @@ test('shiritori chains words, explains invalid moves and records the best chain'
   }
   await page.locator('#shiritori-hint').click();
   await expect(page.locator('#shiritori-feedback')).toContainText('Que tal');
-  const losing = await validWord(page, { n: true });
+  // Alguns kana não iniciam nenhuma palavra terminada em ん: segue jogando até haver uma.
+  let losing = await validWord(page, { n: true }), chain = 3;
+  while (!losing && chain < 10) {
+    await page.locator('#shiritori-answer').fill((await validWord(page)).reading);
+    await page.locator('#shiritori-send').click();
+    await expect(page.locator('.play-scoreboard')).toContainText(`SUAS PALAVRAS${++chain}`);
+    losing = await validWord(page, { n: true });
+  }
   await page.locator('#shiritori-answer').fill(losing.reading);
   await page.locator('#shiritori-send').click();
   await expect(page.locator('.play-result-hero')).toContainText('Terminou em ん');
@@ -38,7 +49,7 @@ test('shiritori chains words, explains invalid moves and records the best chain'
   await expect(page.locator('.shiritori-recap .chain-word').last()).toContainText(losing.reading);
   await page.screenshot({ path: 'test-results/shiritori-results.png', fullPage: true });
   await page.goto('/#/progress');
-  await expect(page.locator('.play-progress-card').last()).toContainText('Maru tranquilo: 3 palavras');
+  await expect(page.locator('.play-progress-card').last()).toContainText(`Maru tranquilo: ${chain} palavras`);
   expect(errors).toEqual([]);
 });
 

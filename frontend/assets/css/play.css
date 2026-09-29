@@ -258,6 +258,8 @@ html[data-motion="paused"] .play-page * { animation: none !important; }
 .karuta-card.is-right { border-color: #4f8a5b; background: var(--success-bg); }
 .karuta-card.is-wrong { border-color: var(--accent); background: var(--accent-soft); }
 .karuta-card.is-out { opacity: .45; }
+/* Depois da resposta, a certa e a escolhida ficam nítidas apesar de desabilitadas. */
+:is(.karuta-card, .daily-choice):is(.is-right, .is-wrong):disabled { opacity: 1; }
 .karuta-table:has(.karuta-card:disabled:not(.is-right, .is-wrong, .is-out)) { opacity: .6; }
 @media (max-width: 600px) {
   .karuta-table { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -320,3 +322,13 @@ html[data-motion="paused"] .play-page * { animation: none !important; }
 .lesson-game .karuta-status .text-link { font-size: 13px; }
 .lesson-game-result { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 14px; }
 .lesson-game-result .icon { width: 16px; height: 16px; color: var(--accent); }
+
+/* Romaji → kana: botão ao lado do campo alterna hiragana e katakana. */
+.kana-mode { flex: 0 0 48px; display: grid; place-items: center; width: 48px; min-height: 48px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--accent); font: 600 20px/1 "Noto Sans JP", sans-serif; cursor: pointer; }
+.kana-mode:hover { border-color: var(--accent); }
+.kana-mode[hidden] { display: none; }
+@media (max-width: 600px) {
+  :is(#arcade-answer-form, #shiritori-form, #daily-form) { flex-wrap: wrap; }
+  :is(#arcade-answer-form, #shiritori-form, #daily-form) .play-answer { flex: 1 1 0; min-width: 0; }
+  :is(#arcade-answer-form, #shiritori-form, #daily-form) > .btn { flex: 1 0 100%; justify-content: center; }
+}

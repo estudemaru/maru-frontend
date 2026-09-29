@@ -69,6 +69,7 @@ Nenhum segredo deve ser colocado no frontend. Credenciais SMTP, chave de voz e c
 ```bash
 npm run dev          # frontend local com proxy para /api
 npm run check        # sintaxe dos módulos e imports de CSS
+npm run vendor       # copia ts-fsrs e wanakana de node_modules (sem build)
 npm test             # regras de aprendizado e conteúdo
 npm run test:e2e     # fluxo completo; requer o maru-backend ao lado
 npm run content:new -- --id nova-licao --module everyday --title "Minha lição"
