@@ -47,8 +47,14 @@ test('kana flows without unused slots, keeps stroke models and supports optional
   await page.addInitScript(() => { window.printCalls = 0; window.print = () => window.printCalls++; });
   await page.goto('/#/worksheets');
   await ready(page);
-  await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(20);
-  await expect(page.locator('.print-sheet')).toHaveCount(4);
+  await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(5);
+  await expect(page.locator('.print-sheet')).toHaveCount(1);
+  await expect(page.locator('.worksheet-char')).toHaveCount(5);
+  await choose(page, '#worksheet-family', 'ka');
+  await expect(page.locator('.paper-kana-family')).toHaveAttribute('data-family', 'ka');
+  await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(5);
+  await expect(page.locator('.worksheet-char')).toHaveCount(5);
+  await choose(page, '#worksheet-family', 'a');
   await expect(page.locator('#worksheet-repeat-pages')).toHaveValue('0');
   await expect(page.locator('.paper-repeat-grid, .paper-kana-gap')).toHaveCount(0);
   await expect(page.locator('.paper-row').first().locator('.paper-box')).toHaveCount(9);

@@ -27,7 +27,7 @@ export function createAudio(toast, preferences = () => ({})) {
     return data;
   }
   async function speak(text, button = null) {
-    if (button && activeButton === button) { stop(); return; }
+    if (button && activeButton === button) { stop(); return false; }
     stop();
     const request=sequence;
     requestController=new AbortController();
@@ -45,15 +45,17 @@ export function createAudio(toast, preferences = () => ({})) {
     playbackTimer=setTimeout(()=>{if(request===sequence){stop();toast("A pronúncia está demorando para ficar pronta. Tente ouvir novamente em alguns instantes.");}},30000);
     try{
       const data=await prepare(text,requestController.signal);
-      if(request!==sequence)return;
+      if(request!==sequence)return false;
       player.src=data.url;
       player.defaultPlaybackRate=preferences().audioRate || 1;
       player.playbackRate=player.defaultPlaybackRate;
       await player.play();
+      return request===sequence;
     }catch(error){
-      if(request!==sequence || error.name==="AbortError")return;
+      if(request!==sequence || error.name==="AbortError")return false;
       if(error.name==="NotAllowedError")fail("Áudio pronto. Toque em ouvir novamente para iniciar a reprodução.");
       else fail(error.message || "Não foi possível conectar à API de voz.");
+      return false;
     }
   }
   function feedback(kind) {

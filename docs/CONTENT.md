@@ -81,7 +81,10 @@ selecionados ficam agrupados por família, sem reservar espaços para os demais.
 Cada linha de escrita e cada exercício permanecem inteiros; as continuações
 repetem apenas um cabeçalho curto. Os quadrados têm cerca de 20 mm, com guias
 tracejadas, sem degradês. Páginas extras de repetição são opcionais e vêm
-desativadas inicialmente.
+desativadas inicialmente. A tela abre nas cinco vogais do hiragana; o seletor
+de família permite seguir KA, GA, SA, ZA e as demais, com uma família por folha.
+A seleção de caracteres mostra apenas a família escolhida até a pessoa optar
+pela seleção livre.
 
 No livro, cada etapa começa em uma nova folha e suas lições seguem em sequência.
 Na prática de hiragana e katakana do livro e nas folhas avulsas, cada família ocupa sua própria

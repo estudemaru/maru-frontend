@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { LISTENING_EXERCISES, PARTICLE_EXERCISES } from "../../shared/exercises.js";
+import { bookKanaText } from "../../frontend/assets/js/features/book-content.js";
 import { VOCABULARY } from "../../shared/vocabulary.js";
 
 // Exercise browser playback deterministically without consuming a public API quota.
@@ -104,12 +105,12 @@ test("particle activities explain the selected model and wrong answers enter the
   const prompt=await page.locator(".quiz-character").innerText();
   // Some prompts have a different requested nuance: match both prompt and context.
   const context=await page.locator(".quiz-stage > .muted").innerText();
-  const exact=PARTICLE_EXERCISES.find(item=>item.prompt===prompt && item.context===context);
+  const exact=PARTICLE_EXERCISES.find(item=>(item.reading || bookKanaText(item.prompt))===prompt && bookKanaText(item.context)===context);
   const wrong=exact.choices.find(choice=>choice!==exact.answer);
   await page.getByRole("radio",{name:new RegExp("^[1-4] " + wrong + "$")}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
   await expect(page.locator(".feedback")).toHaveClass(/retry/);
-  await expect(page.locator(".feedback")).toContainText(exact.explanation);
+  await expect(page.locator(".feedback")).toContainText(bookKanaText(exact.explanation));
   const p=await snapshot(page);
   expect(p.reviews[exact.id].correct).toBe(0);
   expect(p.reviews[exact.id].interval).toBe(0);

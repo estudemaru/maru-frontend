@@ -13,10 +13,12 @@ test("email signup, recovery and login are visible without Google", async ({ pag
     if (route.request().url().endsWith("/login")) signed = true;
     return route.fulfill({ json: route.request().url().endsWith("/signup") ? { message: "Confirme seu e-mail." } : { message: "Se houver uma conta, enviaremos um link." } });
   });
-  await page.goto("/#/settings");
+  await page.goto("/#/account");
   await expect(page.locator("#email-account-form")).toBeVisible();
   await expect(page.locator("#google-login")).toHaveCount(0);
   await page.getByRole("button", { name: "Criar conta", exact: true }).click();
+  await expect(page.locator('#email-mode-signup')).toHaveClass(/is-active/);
+  await expect(page.locator('#account-password')).toHaveAttribute('autocomplete','new-password');
   await page.locator("#account-email").fill("pessoa@example.test");
   await page.locator("#account-password").fill("password123");
   await page.locator("#email-submit").click();
