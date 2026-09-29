@@ -21,7 +21,7 @@ function familySection(script, families, originalExamples = []) {
   const label = base === 'a' ? 'as vogais' : base === 'wa' ? 'WA, WO e N' : `${families.length>1 ? 'as famílias' : 'a família'} ${families.map(id=>id.toUpperCase()).join(' / ')}`;
   return {
     title: `Conheça ${label}`,
-    body: (script==='katakana' && base==='a' ? 'Katakana tem 46 caracteres básicos e representa os mesmos sons do hiragana, com outras formas. ' : '') + notes[base],
+    body: (script==='katakana' && base==='a' ? 'Katakana tem 46 formas básicas, para os mesmos sons do hiragana. ' : '') + notes[base],
     practiceFamilies: families,
     examples: families.map(family => {
       const items = KANA.filter(item=>item.script===script && (item.row===family || (family==='wa' && item.row==='n')));
