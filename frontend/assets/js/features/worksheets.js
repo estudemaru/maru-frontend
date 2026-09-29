@@ -4,44 +4,32 @@ import { VOCABULARY, VOCABULARY_GROUPS } from "/shared/vocabulary.js";
 import { PICTURE_WORDS, PICTURE_BANK_ORDER, PRINT_DIALOGUES } from "/shared/printActivities.js";
 import { PARTICLE_EXERCISES } from "/shared/exercises.js";
 import { book1Pages } from "./book1.js";
+import { BOOK_KANJI, BOOK_KANA_ORDER, bookKanaHTML } from "./book-content.js";
+import { bookPicture, bookPictureHTML, kanjiSketch } from "./book-visuals.js";
 import { renderPrintPages, scalePrintPreview } from "./print-layout.js";
 import { pageHeading, esc, icon, routeLink, jpHTML } from "../core/ui.js";
 
 const chunks = (items, size) => Array.from({length:Math.ceil(items.length/size)},(_,i)=>items.slice(i*size,(i+1)*size));
-const balancedChunks = (items, maximum) => {
-  const count = Math.ceil(items.length / maximum), groups = [];
-  let offset = 0;
-  for (let index = 0; index < count; index++) {
-    const size = Math.ceil((items.length - offset) / (count - index));
-    groups.push(items.slice(offset, offset + size)); offset += size;
-  }
-  return groups;
-};
 const blankBox = '<div class="paper-box"></div>';
 const header = title => `<header class="paper-header"><strong>maru.</strong><span>UM POUQUINHO, TODO DIA.<br>${title}</span></header><div class="paper-name"><span>Nome: __________________________________</span><span>Data: ____ / ____ / ______</span></div>`;
-const repeatPage = () => header("Página de repetição") + '<div class="paper-repeat-grid" aria-label="Quadrados vazios para praticar">' + blankBox.repeat(81) + '</div>';
+const repeatPage = () => header("Página de repetição") + '<div class="paper-repeat-grid" aria-label="Quadrados vazios para praticar">' + blankBox.repeat(99) + '</div>';
 const strokeSVG = (char, paths = []) => `<svg viewBox="-4 -4 117 117" role="img" aria-label="Ordem dos traços de ${char}">${paths.map(d=>`<path d="${esc(d)}"/>`).join("")}</svg>`;
-const practiceRow = (item, strokes, reading = item.romaji) => `<section class="paper-row" data-print-char="${item.char}"><div class="paper-row-label"><strong>${item.char} · ${reading}</strong><span>${item.meaning || "Leia em voz alta antes de escrever."}</span></div><div class="paper-boxes"><div class="paper-box model">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div>${blankBox.repeat(6)}</div></section>`;
+const practiceRow = (item, strokes, reading = item.romaji) => `<section class="paper-row" data-print-char="${item.char}"${item.family ? ` data-kana-row="${item.family}" data-script="${item.script}"` : ""}><div class="paper-row-label"><strong>${item.char} · ${reading}</strong><span>${item.meaning || "Leia em voz alta antes de escrever."}</span></div><div class="paper-boxes"><div class="paper-box model">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div><div class="paper-box ghost">${strokeSVG(item.char,strokes?.[item.char])}</div>${blankBox.repeat(6)}</div></section>`;
 const printKanaRows = KANA_ROWS.filter(row=>row.id!=="n");
-const kanaSlots = (row, script) => {
-  const items = KANA.filter(item=>item.script===script && (item.row===row.id || (row.id==="wa" && item.row==="n")));
-  const positions = row.id==="ya" || row.id==="wa" ? [0,2,4] : [0,1,2,3,4];
-  const slots = Array(5).fill(null);
-  positions.forEach((position,index)=>{slots[position]=items[index];});
-  return slots;
-};
-const kanaSheet = (row, script, selected, strokes) => {
-  const slots = kanaSlots(row,script);
-  if(!slots.some(item=>item && selected.has(item.char)))return null;
+const kanaSheet = (script, selected, strokes, family = null, embedded = false) => {
+  const families = family ? printKanaRows.filter(row=>row.id===family) : printKanaRows;
+  const items = families.flatMap(row => KANA.filter(item => item.script===script && (item.row===row.id || (row.id==="wa" && item.row==="n"))).filter(item=>selected.has(item.char)).map(item=>({...item,family:row.id})));
+  if (!items.length) return null;
   const name = script==="hiragana" ? "Hiragana" : "Katakana";
-  const rowName = row.id==="a" ? "vogais" : row.id==="wa" ? "WA · WO/O · N" : row.id.toUpperCase();
-  return header(name) + `<h2>${name} · ${rowName}</h2><p class="paper-instructions">Observe os traços numerados. Cubra os modelos e complete os quadrados vazios.</p>` +
-    `<div class="paper-kana-family" data-kana-row="${row.id}" data-script="${script}" aria-label="Fileira ${rowName}">${slots.map((item,index)=>{
-      const chosen = item && selected.has(item.char);
-      if(!chosen)return `<div class="paper-row paper-kana-gap" data-print-slot="${index}" aria-hidden="true"><div class="paper-row-label"><strong>&nbsp;</strong></div><div class="paper-boxes"></div></div>`;
-      const reading = item.romaji==="wo" ? "wo/o" : item.romaji;
-      return `<div data-print-slot="${index}">${practiceRow(item,strokes,reading)}</div>`;
-    }).join("")}</div>`;
+  const title = !family ? 'do modelo à memória' : family==='a' ? 'vogais' : family==='wa' ? 'WA · WO · N' : `família ${family.toUpperCase()}`;
+  const overview = family && !embedded ? `<div class="paper-family-overview" aria-label="Leia os caracteres desta família">${items.map(item=>`<div><strong lang="ja">${item.char}</strong><small>${item.romaji==="wo" ? "wo/o" : item.romaji}</small></div>`).join('')}</div>` : '';
+  const practice = overview +
+    items.map(item=>practiceRow(item,strokes,item.romaji==="wo" ? "wo/o" : item.romaji)).join("") +
+    (items.length===1 ? `<section class="paper-writing-extension"><h3>Agora, sem olhar o modelo</h3><p class="paper-instructions">Cubra a primeira linha. Repita o caractere, compare com o modelo e circule sua melhor tentativa.</p><div class="paper-recall-grid">${blankBox.repeat(45)}</div></section>` : '') +
+    '<section class="paper-writing-extension"><h3>Teste sua memória</h3><p class="paper-instructions">Cubra os modelos e escreva os caracteres que você consegue lembrar. Depois confira os traços.</p><div class="paper-practice-line"></div>' + (family ? '' : '<div class="paper-practice-line"></div>') + '<div class="paper-checklist"><span>□ Segui a ordem dos traços.</span><span>□ Li em voz alta.</span><span>□ Revisei minhas dúvidas.</span></div></section>';
+  if (embedded) return `<div class="paper-kana-family" data-family="${family}" data-script="${script}">${practice}</div>`;
+  return header(name) + `<h2>${name} · ${title}</h2><p class="paper-instructions">1. Observe a ordem dos traços. 2. Trace por cima dos dois modelos claros. 3. Escreva nas casas vazias e leia em voz alta.</p>` +
+    (family ? `<div class="paper-kana-family" data-family="${family}" data-script="${script}">${practice}</div>` : practice);
 };
 const pictureItems = PICTURE_WORDS.map(item=>({...item,word:VOCABULARY.find(word=>word.id===item.wordId)}));
 // Balance the final group too: 14 images become 5 + 5 + 4.
@@ -59,12 +47,12 @@ const pictureLetter = item => String.fromCharCode(65 + pictureBank(pictureGroups
 const pictureSheets = () => pictureGroups.map((items,groupIndex) => header("Atividade · imagem e palavra · "+(groupIndex+1)) +
   '<h2>Qual palavra combina com a imagem?</h2><p class="paper-instructions">Escreva a letra da palavra japonesa correspondente. Use o banco desta folha e confira o gabarito só depois de tentar.</p>' +
   `<div class="paper-image-grid" data-count="${items.length}">${items.map(item=>`<div class="paper-image-card"><span class="paper-image-number">${pictureItems.indexOf(item)+1}</span><img src="/assets/img/irasutoya-${item.id}.png" alt="Ilustração de ${esc(item.word.pt)}" width="120" height="120"><span class="paper-image-answer">Letra: ______</span></div>`).join("")}</div>` +
-  `<section class="paper-word-bank"><h3>Banco de palavras desta folha</h3><div>${pictureBank(items).map((item,index)=>`<span><b>${String.fromCharCode(65+index)}.</b> <span lang="ja">${item.word.jp}</span> <small>${item.word.reading}</small></span>`).join("")}</div></section><p class="paper-art-credit">Ilustrações: Mifune Takashi / Irasutoya · www.irasutoya.com</p>`);
+  `<section class="paper-word-bank"><h3>Banco de palavras desta folha</h3><div>${pictureBank(items).map((item,index)=>`<span><b>${String.fromCharCode(65+index)}.</b> <span lang="ja">${item.word.jp}</span> <small>${item.word.reading}</small></span>`).join("")}</div></section><section class="paper-writing-extension"><h3>Do reconhecimento à escrita</h3><p class="paper-instructions">Escolha três imagens. Cubra o banco e escreva cada palavra em kana. Confira e corrija depois.</p><div class="paper-recall-words"><div>Imagem nº ____</div><div>Imagem nº ____</div><div>Imagem nº ____</div></div></section><p class="paper-art-credit">Ilustrações: Mifune Takashi / Irasutoya · www.irasutoya.com</p>`);
 const pictureAnswerSheet = () => header("Gabarito · imagens") + '<h2>Confira suas associações.</h2><p class="paper-instructions">A numeração acompanha as imagens. As letras correspondem ao banco de palavras de cada folha.</p>' +
   `<div class="paper-picture-answers">${pictureItems.map((item,index)=>`<div><strong>${index+1}. ${pictureLetter(item)} · <span lang="ja">${item.word.jp}</span></strong><span>${item.word.reading} · ${item.word.pt}</span></div>`).join("")}</div>`;
 const dialogueSheet = dialogue => header("Atividade · diálogos") + `<h2>${dialogue.title}</h2><p class="paper-instructions">${dialogue.setting} Leia as falas e complete as respostas em japonês. As dicas em português ajudam; escreva antes de olhar o gabarito.</p>` +
   `<div class="paper-dialogue">${dialogue.turns.map(turn=>`<div class="paper-dialogue-turn"><strong>${turn.speaker}</strong><div>${turn.text ? `<p lang="ja">${jpHTML(turn.text,turn.reading)}</p>` : `<small>Dica: ${turn.cue}</small><div class="paper-practice-line"></div><div class="paper-practice-line"></div>`}</div></div>`).join("")}</div>` +
-  `<section class="paper-dialogue-questions"><h3>Entenda a conversa</h3>${dialogue.questions.map((question,index)=>`<div><strong>${index+1}. ${question.prompt}</strong><div class="paper-practice-line"></div></div>`).join("")}</section>`;
+  `<section class="paper-dialogue-questions"><h3>Entenda a conversa</h3>${dialogue.questions.map((question,index)=>`<div><strong>${index+1}. ${question.prompt}</strong><div class="paper-practice-line"></div></div>`).join("")}</section><section class="paper-writing-extension"><h3>Pratique a conversa</h3><p class="paper-instructions">Escreva uma fala de A e uma resposta de B para essa situação. Use as expressões que acabou de estudar. Depois leia as duas falas em voz alta.</p><div class="paper-practice-line">A:</div><div class="paper-practice-line">B:</div><p class="paper-art-credit">Resposta pessoal. Use o diálogo acima como referência.</p></section>`;
 const dialogueAnswerSheet = () => header("Gabarito · diálogos") + '<h2>Compare suas respostas.</h2>' +
   PRINT_DIALOGUES.map(dialogue=>`<section class="paper-dialogue-answer"><h3>${dialogue.title}</h3>${dialogue.turns.filter(turn=>turn.answer).map(turn=>`<p><strong>${turn.speaker} · ${turn.cue}</strong> <span lang="ja">${jpHTML(turn.answer,turn.answerReading)}</span></p>`).join("")}${dialogue.questions.map((question,index)=>`<p><strong>${index+1}. ${question.prompt}</strong> ${question.answer}</p>`).join("")}</section>`).join("");
 const particleSheet = (items, offset) => header("Atividade · partículas") +
@@ -73,34 +61,42 @@ const particleSheet = (items, offset) => header("Atividade · partículas") +
 const particleAnswerSheet = (items, offset) => header("Gabarito · partículas") + '<h2>Compare suas respostas.</h2>' +
   items.map((item,index)=>`<section class="paper-answer"><strong>${offset+index+1}. <span lang="ja">${jpHTML(item.speech,item.reading&&item.reading.replace("＿",item.answer))}</span></strong><p>${esc(item.explanation)}</p></section>`).join("");
 const bookWordSheet = items => header("Livro 1 · primeiras palavras") + '<h2>Palavras para reconhecer e usar</h2>' +
-  `<div class="paper-book-words">${items.map(item=>`<div><strong lang="ja">${esc(item.jp)}</strong><span>${esc(item.reading)} · ${esc(item.romaji)}</span><span>${esc(item.pt)}</span><small lang="ja">${jpHTML(item.sentence,item.sentenceReading)}</small></div>`).join("")}</div>`;
+  chunks(items,2).map(pair=>`<div class="paper-book-words">${pair.map(item=>`<div class="paper-vocabulary-card">${bookPictureHTML(bookPicture(item))}<div><strong lang="ja">${esc(item.jp)}</strong><span>${esc(item.reading)} · ${esc(item.romaji)}</span><span>${esc(item.pt)}</span><small lang="ja">${jpHTML(item.sentence,item.sentenceReading)}</small></div></div>`).join("")}</div>`).join("");
 const bookSentenceSheet = (items,offset) => header("Livro 1 · frases") + '<h2>Construa uma frase para cada situação</h2><p class="paper-instructions">Leia a situação e escreva a frase em japonês. Compare as partículas e a ordem no gabarito.</p>' +
   items.map((item,index)=>`<section class="paper-question"><strong>${offset+index+1}. ${esc(item.prompt)}</strong><p>${esc(item.pattern)}</p><div class="paper-practice-line"></div></section>`).join("");
 const bookSentenceAnswers = (items,offset) => header("Gabarito · frases") + '<h2>Compare suas frases</h2>' +
   items.map((item,index)=>`<section class="paper-answer"><strong>${offset+index+1}. <span lang="ja">${jpHTML(item.tokens.map(token=>token[0]).join("")+"。",item.tokens.map(token=>token[3]||token[0]).join("")+"。")}</span></strong><p>${esc(item.tokens.map(token=>token[1]).join(" "))} · ${esc(item.hint)}</p></section>`).join("");
+const basicKanjiSheet = (strokes, answers) => header("Final do livro · 10 kanji básicos").replace('<header class="paper-header"', '<header class="paper-header" data-paper-tone="gold" data-book-kanji="true"') +
+  '<h2>Seu primeiro encontro com os kanji</h2><section class="paper-book-section" data-paper-anchor="book-kanji"><h3>Um pequeno começo</h3><p>Você já praticou palavras e frases em kana. Agora conheça apenas dez kanji: cada um tem uma forma, um significado e uma leitura para começar. Existem outras leituras; deixe-as para uma próxima etapa.</p><p class="paper-book-tip">Leia o significado, diga a leitura em voz alta, siga os traços numerados e escreva nas casas vazias.</p></section>' +
+  BOOK_KANJI.map(item=>`<section class="paper-kanji-study"><div class="paper-kanji-intro"><strong class="paper-kanji-display" lang="ja">${item.char}</strong>${kanjiSketch(item.char)}<div><h3>${esc(item.meaning)}</h3><p lang="ja">${item.reading}</p><small>${item.romaji}</small></div></div>${practiceRow(item, strokes, `${item.reading} · ${item.romaji}`)}</section>`).join("") +
+  '<section class="paper-writing-extension"><h3>Confira o que ficou na memória</h3><p class="paper-instructions">Cubra os modelos. Escreva o kanji de cada significado e depois confira.</p><div class="paper-recall-words"><div>1. Montanha</div><div>2. Água</div><div>3. Pessoa</div></div><p class="paper-instructions">Leia os três caracteres em voz alta. Volte aos modelos para revisar os traços que achar difíceis.</p></section>' +
+  (answers ? '<section class="paper-book-tip paper-kanji-answers"><strong>Confira depois de tentar:</strong> 1. 山 · やま (yama)　2. 水 · みず (mizu)　3. 人 · ひと (hito)</section>' : '');
 const activityKinds = new Set(["pictures","dialogues","activities"]);
 
 export function renderWorksheets(ctx, initialKind = "characters") {
   const controller = new AbortController();
   let kind = initialKind === "book" ? "book" : "characters", script = "hiragana", group = "food", batch = 0, answers = true, models = true;
-  let scope = "recommended", repeatPages = kind === "book" ? 0 : 1;
-  let selected = new Set(KANA.filter(item=>item.script==="hiragana").slice(0,20).map(item=>item.char));
+  let scope = "family", family = "a", repeatPages = 0, printColor = "color";
+  let selected = new Set(KANA.filter(item=>item.script==="hiragana" && item.row==='a').map(item=>item.char));
   let strokes = null, printing = false, renderVersion = 0;
   const characterList = () => script === "all" ? [...KANA.filter(item=>item.script==="hiragana"),...KANA.filter(item=>item.script==="katakana"), ...BEGINNER_KANJI] : script === "kanji" ? BEGINNER_KANJI : KANA.filter(item=>item.script===script);
   ctx.main.innerHTML = `<div class="worksheets-page">${pageHeading("LEVE O APRENDIZADO PARA O PAPEL", "Seu caderno, pronto para imprimir.", "Escolha a atividade, confira a folha e imprima em A4. Você também pode salvar em PDF na janela de impressão.",routeLink("writing","Abrir caderno digital " + icon("pen"),"btn btn-ghost"))}<div class="no-print"><div class="panel worksheet-toolbar">
     <div><label class="input-label" for="worksheet-kind">Atividade</label><select class="text-input" id="worksheet-kind"><option value="characters">Traços e caracteres</option><option value="words">Escrever palavras</option><option value="sentences">Formar frases no papel</option><option value="particles">Complete partículas</option><option value="pictures">Imagens e palavras</option><option value="dialogues">Complete diálogos</option><option value="activities">Pacote de atividades</option><option value="book" ${kind === "book" ? "selected" : ""}>Livro 1 · volume completo</option></select></div>
     <div id="worksheet-script-control"><label class="input-label" for="worksheet-script">Escrita</label><select class="text-input" id="worksheet-script"><option value="hiragana">Hiragana</option><option value="katakana">Katakana</option><option value="kanji">Primeiros kanji</option><option value="all">Todos os caracteres</option></select></div>
-    <div id="worksheet-scope-control"><label class="input-label" for="worksheet-scope">Quantidade</label><select class="text-input" id="worksheet-scope"><option value="one">1 caractere</option><option value="recommended" selected>20 caracteres · recomendado</option><option value="all">Todos</option><option value="custom">Escolher livremente</option></select></div>
+    <div id="worksheet-scope-control"><label class="input-label" for="worksheet-scope">O que praticar</label><select class="text-input" id="worksheet-scope"><option value="family" selected>Uma família por vez</option><option value="one">1 caractere</option><option value="recommended">Primeiros 20 caracteres</option><option value="all">Todos</option><option value="custom">Escolher livremente</option></select></div>
+    <div id="worksheet-family-control"><label class="input-label" for="worksheet-family">Família</label><select class="text-input" id="worksheet-family">${BOOK_KANA_ORDER.map(id=>`<option value="${id}">${id==='a'?'Vogais · comece aqui':id==='wa'?'WA, WO e N':id.toUpperCase()}</option>`).join('')}</select></div>
     <div id="worksheet-group-control" hidden><label class="input-label" for="worksheet-group">Tema</label><select class="text-input" id="worksheet-group">${VOCABULARY_GROUPS.filter(([id])=>id!=="all").map(([id,label])=>`<option value="${id}" ${id===group?"selected":""}>${label}</option>`).join("")}</select></div>
     <div id="worksheet-batch-control" hidden><label class="input-label" for="worksheet-batch">Situações</label><select class="text-input" id="worksheet-batch">${chunks(SENTENCES,5).map((items,i)=>`<option value="${i}">${i*5+1} a ${i*5+items.length}</option>`).join("")}</select></div>
     <div><label class="input-label" for="worksheet-repeat-pages">Páginas para repetir</label><select class="text-input" id="worksheet-repeat-pages"><option value="0" ${repeatPages === 0 ? "selected" : ""}>Nenhuma</option><option value="1" ${repeatPages === 1 ? "selected" : ""}>1 página em branco</option><option value="2">2 páginas em branco</option><option value="3">3 páginas em branco</option><option value="5">5 páginas em branco</option><option value="10">10 páginas em branco</option></select></div>
+    <div><label class="input-label" for="worksheet-color">Cor da impressão</label><select class="text-input" id="worksheet-color"><option value="color">Colorida</option><option value="mono">Preto e branco · alto contraste</option></select></div>
     <div><button class="btn btn-primary" id="print-worksheet" disabled>${icon("pen")} Imprimir / salvar PDF</button></div>
     </div><div class="filter-chips"><label><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
     <div id="worksheet-characters" class="worksheet-selection panel" role="group" dir="ltr" aria-label="Caracteres da folha"></div><p class="filter-count" id="worksheet-status" aria-live="polite">Preparando os modelos de traços…</p>
-    <aside class="tip-box">${icon("pen")}<p>Recomendamos começar com 20 caracteres, mas você pode escolher só um, mais de 20 ou todos de uma vez. As páginas de repetição têm quadrados vazios com guias tracejadas para preencher à mão. Na impressão, escolha A4, escala 100% e desative os cabeçalhos do navegador.</p></aside></div><div id="worksheet-preview" class="worksheet-preview"></div></div>`;
+    <aside class="tip-box">${icon("pen")}<p>As folhas aproveitam o A4 com espaço para escrever à mão. Páginas extras de repetição são opcionais, e os gabaritos ficam no final. Na impressão, escolha A4, escala 100% e desative os cabeçalhos e rodapés do navegador.</p></aside></div><div id="worksheet-preview" class="worksheet-preview"></div></div>`;
   const previewScale = scalePrintPreview(ctx.main.querySelector("#worksheet-preview"));
   const drawSelection = () => {
-    ctx.main.querySelector("#worksheet-characters").innerHTML = characterList().map(item=>`<button class="worksheet-char" data-print-char="${item.char}" aria-pressed="${selected.has(item.char)}" aria-label="${item.char}, ${item.romaji}">${item.char}</button>`).join("");
+    const choices = scope === "family" ? characterList().filter(item=>item.row===family || (family==='wa' && item.row==='n')) : characterList();
+    ctx.main.querySelector("#worksheet-characters").innerHTML = choices.map(item=>`<button class="worksheet-char" data-print-char="${item.char}" aria-pressed="${selected.has(item.char)}" aria-label="${item.char}, ${item.romaji}">${item.char}</button>`).join("");
   };
   async function draw() {
     const version = ++renderVersion;
@@ -108,6 +104,8 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     ctx.main.querySelector("#print-worksheet").disabled = true;
     ctx.main.querySelector("#worksheet-script-control").hidden = kind !== "characters";
     ctx.main.querySelector("#worksheet-scope-control").hidden = kind !== "characters";
+    ctx.main.querySelector("#worksheet-family-control").hidden = kind !== "characters" || scope !== "family";
+    ctx.main.querySelector('#worksheet-scope option[value="family"]').disabled = script === 'kanji';
     ctx.main.querySelector("#worksheet-group-control").hidden = kind !== "words";
     ctx.main.querySelector("#worksheet-batch-control").hidden = kind !== "sentences";
     ctx.main.querySelector("#worksheet-characters").hidden = kind !== "characters";
@@ -118,40 +116,43 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     answerOption.disabled = kind === "characters";
     answerOption.parentElement.hidden = answerOption.disabled;
     const preview = ctx.main.querySelector("#worksheet-preview");
-    let sheets = [], answerSheets = [];
+    preview.dataset.printColor = printColor;
+    let sheets = [], answerSheets = [], finalSheets = [];
     if (kind === "characters") {
       const kanaScripts = script==="all" ? ["hiragana","katakana"] : script==="kanji" ? [] : [script];
-      const kanaSheets = kanaScripts.flatMap(kanaScript=>printKanaRows.map(row=>kanaSheet(row,kanaScript,selected,strokes)).filter(Boolean));
+      const kanaSheets = kanaScripts.flatMap(kanaScript=>BOOK_KANA_ORDER.map(family=>kanaSheet(kanaScript,selected,strokes,family))).filter(Boolean);
       const kanjiItems = (script==="kanji" || script==="all" ? BEGINNER_KANJI : []).filter(item=>selected.has(item.char));
-      const kanjiSheets = chunks(kanjiItems,5).map(page => header("Primeiros kanji") +
+      const kanjiSheets = kanjiItems.length ? [ header("Primeiros kanji") +
         '<h2>Observe. Cubra. Experimente.</h2><p class="paper-instructions">O primeiro quadrado mostra os traços numerados. Nos dois seguintes, cubra o desenho. Nas casas vazias, escreva sozinho. Cada número marca o início de um traço: siga a ordem do modelo.</p>' +
-        page.map(item=>practiceRow(item,strokes)).join("") +
-        '<div class="paper-checklist"><span>□ Segui a ordem dos traços.</span><span>□ Observei os espaços.</span><span>□ Tentei sem o modelo.</span></div><p class="paper-instructions">Cubra os modelos acima. De quais caracteres você se lembra? Escreva aqui e depois confira.</p><div class="paper-practice-line"></div><div class="paper-practice-line"></div>');
+        kanjiItems.map(item=>practiceRow(item,strokes)).join("") +
+        '<section class="paper-writing-extension"><div class="paper-checklist"><span>□ Segui a ordem dos traços.</span><span>□ Observei os espaços.</span><span>□ Tentei sem o modelo.</span></div><p class="paper-instructions">Cubra os modelos acima. De quais caracteres você se lembra? Escreva aqui e depois confira.</p><div class="paper-practice-line"></div><div class="paper-practice-line"></div></section>'] : [];
       sheets = [...kanaSheets,...kanjiSheets];
     } else if (kind === "words") {
       const words = VOCABULARY.filter(item=>item.group===group);
-      sheets = balancedChunks(words,5).map(page=>header("Palavras · "+VOCABULARY_GROUPS.find(([id])=>id===group)[1])+
+      sheets = [header("Palavras · "+VOCABULARY_GROUPS.find(([id])=>id===group)[1])+
         '<h2>Escreva e dê significado.</h2><p class="paper-instructions">'+(models ? "Leia o modelo, copie em kana nas casas vazias e diga o significado. Depois cubra o modelo e tente novamente." : "Leia o significado em português e tente escrever a palavra em kana. Use o gabarito apenas depois de tentar.")+'</p>'+
-        page.map(item=>`<section class="paper-row"><div class="paper-row-label"><strong>${item.pt}</strong>${models ? `<span class="paper-word jp" lang="ja">${item.reading}</span><span>${item.romaji}</span>` : ""}</div><div class="paper-boxes">${blankBox.repeat(9)}</div></section>`).join("")+
-        '<section class="paper-writing-extension"><p class="paper-instructions">Escolha duas palavras e escreva uma frase simples com cada uma.</p><div class="paper-practice-line"></div><div class="paper-practice-line"></div></section>');
-      if(answers) answerSheets = chunks(words,Math.ceil(words.length / Math.ceil(words.length / 10))).map(answerPage => header("Gabarito · palavras")+'<h2>Confira depois de tentar.</h2>'+answerPage.map(item=>`<div class="paper-answer"><strong>${item.pt} → <span lang="ja">${item.jp} (${item.reading})</span> · ${item.romaji}</strong><span lang="ja">${item.sentence}</span><br>${item.translation}</div>`).join(""));
+        words.map(item=>`<section class="paper-row"><div class="paper-row-label"><strong>${item.pt}</strong>${models ? `<span class="paper-word jp" lang="ja">${item.reading}</span><span>${item.romaji}</span>` : ""}</div><div class="paper-boxes">${blankBox.repeat(9)}</div></section>`).join("")+
+        '<section class="paper-writing-extension"><p class="paper-instructions">Escolha duas palavras e escreva uma frase simples com cada uma.</p><div class="paper-practice-line"></div><div class="paper-practice-line"></div></section>'];
+      if(answers) answerSheets = [ header("Gabarito · palavras")+'<h2>Confira depois de tentar.</h2>'+words.map(item=>`<div class="paper-answer"><strong>${item.pt} → <span lang="ja">${item.jp} (${item.reading})</span> · ${item.romaji}</strong><span lang="ja">${item.sentence}</span><br>${item.translation}</div>`).join("")];
     } else if (kind === "sentences") {
       const items = chunks(SENTENCES,5)[batch] || [];
       sheets = [header("Frases · situações "+(batch*5+1)+" a "+(batch*5+items.length))+'<h2>Uma ideia, palavra por palavra.</h2><p class="paper-instructions">'+(models ? "Leia a situação, observe os blocos e escreva a frase na ordem pedida. Os blocos estão separados para você perceber suas funções." : "Escreva em japonês ou kana, seguindo o padrão de cada situação. Tente antes de consultar o gabarito.")+'</p>'+
-        items.map((item,i)=>`<section class="paper-question"><strong>${i+1}. ${item.prompt}</strong><p>${item.pattern}</p>${models ? `<p class="jp" lang="ja">${item.tokens.map(t=>t[0]).reverse().join(" ／ ")}</p>` : ""}<div class="paper-practice-line"></div><div class="paper-practice-line"></div></section>`).join("")];
+        items.map((item,i)=>`<section class="paper-question paper-sentence-question"><strong>${i+1}. ${item.prompt}</strong><p>${item.pattern}</p>${models ? `<p class="jp" lang="ja">${item.tokens.map(t=>t[0]).reverse().join(" ／ ")}</p>` : ""}<div class="paper-practice-line"></div></section>`).join("")];
       if(answers) answerSheets = [header("Gabarito · frases")+'<h2>Compare a ordem e as partículas.</h2>'+items.map((item,i)=>`<section class="paper-answer"><strong>${i+1}. <span lang="ja">${item.tokens.map(t=>t[0]).join("")}。</span></strong><p>${item.tokens.map(t=>t[1]).join(" ")}</p><p>${item.hint}</p></section>`).join("")];
     } else if (kind === "book") {
-      const book = book1Pages();
       const everyKana = new Set(KANA.map(item=>item.char));
-      const kanaPages = ["hiragana","katakana"].flatMap(kanaScript=>printKanaRows.map(row=>kanaSheet(row,kanaScript,everyKana,strokes)).filter(Boolean));
-      const kanjiPages = chunks(BEGINNER_KANJI,5).map(items=>header("Livro 1 · primeiros kanji")+'<h2>Observe, cubra e escreva.</h2>'+items.map(item=>practiceRow(item,strokes)).join(""));
-      const wordPages = balancedChunks(VOCABULARY,10).map(bookWordSheet);
-      const sentencePages = chunks(SENTENCES,5).map((items,index)=>bookSentenceSheet(items,index*5));
-      const particlePages = chunks(PARTICLE_EXERCISES,6).map((items,index)=>particleSheet(items,index*6));
-      sheets = [...book.pages,...kanaPages,...kanjiPages,...wordPages,...sentencePages,...particlePages,...pictureSheets(),...PRINT_DIALOGUES.map(dialogueSheet)];
+      const writingPages = Object.fromEntries(["hiragana","katakana"].map(kanaScript=>[kanaScript, Object.fromEntries(BOOK_KANA_ORDER.map(family=>[family,kanaSheet(kanaScript,everyKana,strokes,family,true)]))]));
+      const book = book1Pages(writingPages);
+      const wordPages = [bookWordSheet(VOCABULARY)];
+      const sentencePages = [bookSentenceSheet(SENTENCES,0)];
+      const particlePages = [particleSheet(PARTICLE_EXERCISES,0)];
+      sheets = [...book.pages,...wordPages,...sentencePages,...particlePages,...pictureSheets(),...PRINT_DIALOGUES.map(dialogueSheet)];
       if(answers)answerSheets = [...book.answerPages,bookSentenceAnswers(SENTENCES,0),particleAnswerSheet(PARTICLE_EXERCISES,0),pictureAnswerSheet(),dialogueAnswerSheet()];
+      sheets = sheets.map(bookKanaHTML);
+      answerSheets = answerSheets.map(bookKanaHTML);
+      finalSheets = [basicKanjiSheet(strokes, answers)];
     } else if (kind === "particles") {
-      sheets = chunks(PARTICLE_EXERCISES,6).map((items,index)=>particleSheet(items,index*6));
+      sheets = [particleSheet(PARTICLE_EXERCISES,0)];
       if(answers)answerSheets = [particleAnswerSheet(PARTICLE_EXERCISES,0)];
     } else if (activityKinds.has(kind)) {
       if (kind === "pictures" || kind === "activities") {
@@ -163,7 +164,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
         if(answers)answerSheets.push(dialogueAnswerSheet());
       }
     }
-    if (sheets.length) sheets.push(...Array.from({length:repeatPages}, repeatPage), ...answerSheets);
+    if (sheets.length) sheets.push(...Array.from({length:repeatPages}, repeatPage), ...answerSheets, ...finalSheets);
     let pageCount;
     try {
       pageCount = await renderPrintPages(preview, sheets, isCurrent);
@@ -191,20 +192,19 @@ export function renderWorksheets(ctx, initialKind = "characters") {
   ctx.main.addEventListener("change",event=>{
     const {id,value,checked}=event.target;
     if(id==="worksheet-kind"){
-      const wasActivity=activityKinds.has(kind);
       kind=value;
-      if(wasActivity!==activityKinds.has(kind) || kind === "book"){
-        repeatPages=activityKinds.has(kind) || kind === "book" ? 0:1;
-        ctx.main.querySelector("#worksheet-repeat-pages").value=String(repeatPages);
-      }
     }
-    if(id==="worksheet-script"){script=value;scope="recommended";selected=new Set(characterList().slice(0,20).map(item=>item.char));ctx.main.querySelector("#worksheet-scope").value=scope;drawSelection();}
+    if(id==="worksheet-script"){script=value;scope=script==='kanji'?'recommended':'family';ctx.main.querySelector("#worksheet-scope").value=scope;}
+    if(id==="worksheet-family")family=value;
     if(id==="worksheet-scope"){
       scope=value;
-      if(scope!=="custom") selected=new Set((scope==="one" ? characterList().slice(0,1) : scope==="recommended" ? characterList().slice(0,20) : characterList()).map(item=>item.char));
+    }
+    if(['worksheet-script','worksheet-family','worksheet-scope'].includes(id)) {
+      if(scope!=='custom') selected=new Set((scope==='family' ? characterList().filter(item=>item.row===family || (family==='wa' && item.row==='n')) : scope==='one' ? characterList().slice(0,1) : scope==='recommended' ? characterList().slice(0,20) : characterList()).map(item=>item.char));
       drawSelection();
     }
     if(id==="worksheet-repeat-pages")repeatPages=Number(value);
+    if(id==="worksheet-color")printColor=value;
     if(id==="worksheet-group")group=value;
     if(id==="worksheet-batch")batch=Number(value);
     if(id==="worksheet-models")models=checked;

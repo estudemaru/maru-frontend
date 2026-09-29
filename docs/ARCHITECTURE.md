@@ -46,13 +46,13 @@ montado entre telas. Alterações de progresso atualizam seus contadores sem
 reconstruir uma atividade em andamento. Na navegação móvel, as regiões
 inativas recebem inert; foco e Escape são tratados pelo shell.
 
-A barra lateral contém cinco destinos: Início, Minha trilha, Praticar, Revisão
-e Explorar. core/navigation.js centraliza os destinos, os recursos e a relação
+A barra lateral contém sete destinos: Início, Minha trilha, Jogos e prática,
+Revisão, Explorar, Imprimir e Aulas gratuitas. core/navigation.js centraliza os destinos, os recursos e a relação
 de cada tela com sua seção. Essa relação mantém o destaque do menu e o link de
 retorno no cabeçalho, inclusive ao abrir uma URL diretamente. O seletor de tema
 e Meu ritmo ficam no rodapé da barra, separados da navegação de estudo.
 
-Praticar reúne exercícios/escuta, escrita e frases. Explorar organiza as consultas
+Jogos e prática reúne desafios por tempo, exercícios/escuta, escrita e frases. Explorar organiza as consultas
 por fundamentos, cultura e materiais de apoio, com busca sem distinção de acentos.
 Os filtros são guardados por aba em sessionStorage; voltar de um material restaura
 a busca. Nenhuma rota de conteúdo foi removida.
@@ -68,7 +68,7 @@ a busca. Nenhuma rota de conteúdo foi removida.
 - Sentences: blocos e digitação para situações específicas.
 - Reference: kanji, partículas, expressões, biblioteca e revisão.
 - Study: palavras por tema, exercícios, escuta e glossário.
-- Worksheets/Book 1: folhas avulsas e volume de impressão compilado do currículo existente, sem conteúdo paralelo.
+- Worksheets/Book 1: folhas avulsas e volume colorido adaptado do currículo existente; `book-content.js` define a progressão impressa em kana e a seleção de dez kanji básicos exclusiva da seção final, sem alterar o curso online.
 - Teacher/Package: seleção de etapa ou tema codificada no link público; não há tabela de turmas, contas de aluno nem acesso ao progresso individual.
 - Worksheets: folhas A4 de caracteres, palavras e frases com gabaritos opcionais; seleção livre de caracteres e páginas extras de repetição vazias.
 - Settings: modo visual, áudio, romaji, meta diária, indicadores e conquistas.
@@ -228,3 +228,35 @@ Um único dia sem estudo pode ser protegido por semana de segunda a domingo.
 A proteção só é registrada quando a pessoa volta no dia seguinte à pausa e não
 gera atividades ou XP. Lacunas maiores ou uma segunda pausa na semana reiniciam
 a sequência. A contagem continua medindo dias em que houve estudo.
+
+
+## Jogos e leitura para iniciantes
+
+`#/challenge` oferece hiragana, katakana, frases e escuta em rodadas de até cinco
+itens. `shared/challenge.js` controla as fases e compara prazos absolutos: uma
+resposta no limite do prazo já conta como tempo esgotado, mesmo se a aba dormiu.
+Uma tentativa é encerrada uma única vez. O tempo é de 15, 30 ou 60 segundos por
+item, com opção sem cronômetro. Na escuta, a contagem começa somente quando o
+player consegue iniciar; uma falha de preparação não registra erro.
+
+Resultados usam `recordReview` e os identificadores já existentes. Acertos de
+frases também atualizam `sentencesWritten`. A tela final agrupa erros por família
+ou padrão de frase, mostra os modelos e leva ao conteúdo correspondente. A lista
+da rodada é temporária; acertos, erros e revisões integram o snapshot sincronizado.
+
+`core/beginner.js` verifica a conclusão de pelo menos 80% das lições de hiragana
+**e** katakana. Antes disso, `jpHTML` privilegia a leitura em kana e as explicações
+usam as leituras editoriais do livro. Consultas e lições explícitas de kanji
+continuam disponíveis. As alternativas mantêm seus valores e índices originais
+para não mudar a correção das atividades.
+
+`#/account` dá acesso direto à conta por e-mail. O formulário continua disponível
+em configurações para preservar links anteriores. A API de produção já oferece
+cadastro, login, recuperação e troca de senha no Supabase Auth; o adaptador Node
+local não oferece esses endpoints. O funcionamento público depende das URLs
+permitidas e do SMTP descritos na documentação de publicação do backend.
+
+`#/videos` usa links externos de professores, sem carregar players incorporados.
+Os links do 123 Japonês vêm de seu Linktree oficial; o vídeo e a playlist do
+Programa Japonês Online vêm da página de hiragana do professor. As referências
+ficam visíveis em cada cartão. `beginner.css` contém os layouts destas telas.

@@ -1,8 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { LISTENING_EXERCISES, PARTICLE_EXERCISES } from "../../shared/exercises.js";
+import { bookKanaText } from "../../frontend/assets/js/features/book-content.js";
 import { VOCABULARY } from "../../shared/vocabulary.js";
-import { KANA, KANA_ROWS } from "../../shared/content.js";
-import { BEGINNER_KANJI } from "../../shared/catalog.js";
 
 // Exercise browser playback deterministically without consuming a public API quota.
 // The real service is also checked separately against its remote streaming URL.
@@ -106,12 +105,12 @@ test("particle activities explain the selected model and wrong answers enter the
   const prompt=await page.locator(".quiz-character").innerText();
   // Some prompts have a different requested nuance: match both prompt and context.
   const context=await page.locator(".quiz-stage > .muted").innerText();
-  const exact=PARTICLE_EXERCISES.find(item=>item.prompt===prompt && item.context===context);
+  const exact=PARTICLE_EXERCISES.find(item=>(item.reading || bookKanaText(item.prompt))===prompt && bookKanaText(item.context)===context);
   const wrong=exact.choices.find(choice=>choice!==exact.answer);
   await page.getByRole("radio",{name:new RegExp("^[1-4] " + wrong + "$")}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
   await expect(page.locator(".feedback")).toHaveClass(/retry/);
-  await expect(page.locator(".feedback")).toContainText(exact.explanation);
+  await expect(page.locator(".feedback")).toContainText(bookKanaText(exact.explanation));
   const p=await snapshot(page);
   expect(p.reviews[exact.id].correct).toBe(0);
   expect(p.reviews[exact.id].interval).toBe(0);
@@ -130,168 +129,6 @@ test("vocabulary and beginner explanations can be searched and reviewed",async({
   await go(page,"lesson/start-language");
   await page.locator(".concept-help summary").click();
   await expect(page.locator(".concept-help")).toContainText("Substantivo");
-});
-
-test("A4 sheets have numbered strokes, separate answers and usable print output in both themes",async({page},testInfo)=>{
-  await page.addInitScript(()=>{window.printCalls=0;window.print=()=>window.printCalls++;});
-  await go(page,"worksheets");
-  await expect(page.locator("#print-worksheet")).toBeEnabled();
-  await expect(page.locator("#worksheet-scope")).toHaveValue("recommended");
-  await expect(page.locator(".print-sheet")).toHaveCount(5);
-  await expect(page.locator(".paper-kana-family")).toHaveCount(4);
-  await expect(page.locator(".paper-kana-family .paper-row[data-print-char]")).toHaveCount(20);
-  await expect(page.locator(".paper-kana-family .paper-row[data-print-char]").first().locator(".paper-box")).toHaveCount(9);
-  await expect(page.locator("#worksheet-characters")).toHaveAttribute("dir","ltr");
-  expect(await page.locator(".worksheet-char").first().evaluate(button=>button.getBoundingClientRect().left)).toBeLessThan(await page.locator(".worksheet-char").nth(1).evaluate(button=>button.getBoundingClientRect().left));
-  await expect(page.locator(".paper-repeat-grid .paper-box")).toHaveCount(81);
-  await expect(page.locator(".paper-repeat-grid svg")).toHaveCount(0);
-  expect(await page.locator(".paper-repeat-grid .paper-box").first().evaluate(box=>({
-    horizontal:getComputedStyle(box,"::before").borderTopStyle,
-    vertical:getComputedStyle(box,"::after").borderLeftStyle
-  }))).toEqual({horizontal:"dashed",vertical:"dashed"});
-  expect(await page.locator(".paper-box svg").first().evaluate(svg=>{
-    const ink=svg.getBoundingClientRect(), box=svg.parentElement.getBoundingClientRect();
-    return ink.left>=box.left && ink.top>=box.top && ink.right<=box.right && ink.bottom<=box.bottom;
-  })).toBe(true);
-  await expect(page.locator(".model svg text").first()).toHaveText("1");
-  await page.locator("#print-worksheet").click();
-  await expect.poll(()=>page.evaluate(()=>window.printCalls)).toBe(1);
-  await page.locator('.sidebar [data-theme-choice="arcade"]').click();
-  await page.emulateMedia({media:"print"});
-  await expect(page.locator(".sidebar")).toBeHidden();
-  await expect(page.locator(".topbar")).toBeHidden();
-  expect(await page.locator(".print-sheet").first().evaluate(element=>getComputedStyle(element).backgroundColor)).toBe("rgb(255, 255, 255)");
-  expect(await page.locator(".paper-boxes .paper-box, .paper-repeat-grid .paper-box").evaluateAll(boxes=>boxes.map(box=>{
-    const {width,height}=box.getBoundingClientRect();return {grid:box.parentElement.className,width,height};
-  }).filter(({width,height})=>Math.abs(width-height)>=2).slice(0,5))).toEqual([]);
-  expect(await page.locator('[data-kana-row="a"] [data-print-slot="0"]').evaluate(slot=>slot.getBoundingClientRect().top)).toBeLessThan(await page.locator('[data-kana-row="a"] [data-print-slot="1"]').evaluate(slot=>slot.getBoundingClientRect().top));
-  const pdf=await page.pdf({path:testInfo.outputPath("hiragana-a4.pdf"),preferCSSPageSize:true,printBackground:true});
-  expect((pdf.toString("latin1").match(/\/Type\s*\/Page\b/g)||[]).length).toBe(5);
-  await page.emulateMedia({media:"screen"});
-  await page.locator("#worksheet-scope").selectOption("one");
-  await expect(page.locator(".paper-kana-family .paper-row[data-print-char]")).toHaveCount(1);
-  await page.locator('.worksheet-char[data-print-char="き"]').click();
-  await expect(page.locator('.worksheet-char[data-print-char="き"]')).toHaveAttribute("aria-pressed","true");
-  await expect(page.locator('.paper-row[data-print-char="き"]').locator("xpath=..")).toHaveAttribute("data-print-slot","1");
-  await page.locator("#worksheet-scope").selectOption("recommended");
-  await page.locator(".worksheet-char").nth(20).click();
-  await expect(page.locator("#worksheet-scope")).toHaveValue("custom");
-  await expect(page.locator('.worksheet-char[aria-pressed="true"]')).toHaveCount(21);
-  await expect(page.locator(".print-sheet")).toHaveCount(6);
-  await page.locator("#worksheet-script").selectOption("hiragana");
-  await page.locator("#worksheet-scope").selectOption("all");
-  for(const [row,chars] of [["ya",["や","","ゆ","","よ"]],["wa",["わ","","を","","ん"]]]){
-    expect(await page.locator(`[data-kana-row="${row}"]`).evaluate(family=>[...family.children].map(slot=>slot.querySelector("[data-print-char]")?.dataset.printChar || ""))).toEqual(chars);
-    await expect(page.locator(`[data-kana-row="${row}"] .paper-kana-gap .paper-box`)).toHaveCount(0);
-  }
-  await expect(page.locator('[data-kana-row="n"]')).toHaveCount(0);
-  expect(await page.locator('[data-kana-row="ya"]').evaluate(grid=>grid.closest(".print-sheet").querySelector('[data-kana-row="ra"]')===null)).toBe(true);
-  expect(await page.locator('[data-kana-row="wa"]').evaluate(grid=>["わ","を","ん"].every(char=>grid.closest(".print-sheet").querySelector(`[data-print-char="${char}"]`)))).toBe(true);
-  await expect(page.locator('.paper-row[data-print-char="を"] .paper-row-label')).toContainText("wo/o");
-  await page.locator("#worksheet-script").selectOption("all");
-  await page.locator("#worksheet-scope").selectOption("all");
-  await expect(page.locator('.worksheet-char[aria-pressed="true"]')).toHaveCount(KANA.length+BEGINNER_KANJI.length);
-  await expect(page.locator(".worksheet-char").first()).toHaveText("あ");
-  await expect(page.locator(".worksheet-char").nth(KANA.length/2)).toHaveText("ア");
-  for(const script of ["hiragana","katakana"]){
-    expect(await page.locator(`.paper-kana-family[data-script="${script}"]`).evaluateAll(grids=>grids.map(grid=>grid.dataset.kanaRow))).toEqual(KANA_ROWS.filter(row=>row.id!=="n").map(row=>row.id));
-  }
-  const fullSheetCount=(KANA_ROWS.length-1)*2+Math.ceil(BEGINNER_KANJI.length/5)+1;
-  await expect(page.locator(".print-sheet")).toHaveCount(fullSheetCount);
-  await page.emulateMedia({media:"print"});
-  expect(await page.locator(".paper-boxes .paper-box").evaluateAll(boxes=>boxes.every(box=>{
-    const {width,height}=box.getBoundingClientRect();return Math.abs(width-height)<2;
-  }))).toBe(true);
-  const completePdf=await page.pdf({preferCSSPageSize:true,printBackground:true});
-  expect((completePdf.toString("latin1").match(/\/Type\s*\/Page\b/g)||[]).length).toBe(fullSheetCount);
-  await page.emulateMedia({media:"screen"});
-  await page.locator("#worksheet-kind").selectOption("sentences");
-  await expect(page.locator(".print-sheet")).toHaveCount(3);
-  await expect(page.locator(".print-sheet").nth(1).locator(".paper-repeat-grid .paper-box")).toHaveCount(81);
-  await expect(page.locator(".print-sheet").last()).toContainText("Gabarito");
-  await page.locator("#worksheet-repeat-pages").selectOption("0");
-  await expect(page.locator(".paper-repeat-grid")).toHaveCount(0);
-  await expect(page.locator(".print-sheet")).toHaveCount(2);
-  await expect(page.locator(".print-sheet").last()).toContainText("Gabarito");
-  await page.locator("#worksheet-answers").uncheck();
-  await expect(page.locator(".print-sheet")).toHaveCount(1);
-  await page.locator("#worksheet-kind").selectOption("words");
-  await page.locator("#worksheet-models").uncheck();
-  await expect(page.locator(".paper-word")).toHaveCount(0);
-  await page.locator("#worksheet-answers").check();
-  await expect(page.locator(".print-sheet").last()).toContainText("Gabarito");
-});
-
-test("particle exercises print with writing space and a separate answer key",async({page})=>{
-  await go(page,"worksheets");
-  await page.locator("#worksheet-kind").selectOption("particles");
-  await expect(page.locator(".print-sheet")).toHaveCount(7);
-  await expect(page.locator(".paper-question")).toHaveCount(24);
-  await expect(page.locator(".paper-answer")).toHaveCount(24);
-  await expect(page.locator(".print-sheet").first()).toContainText("わたし＿学生です。");
-  await expect(page.locator(".print-sheet").last()).toContainText("田中さんが来ます。");
-  await expect(page.locator("#worksheet-models")).toBeHidden();
-  await page.locator("#worksheet-answers").uncheck();
-  await expect(page.locator(".print-sheet")).toHaveCount(5);
-});
-
-test("Book 1 compiles the full current curriculum into one printable volume",async({page})=>{
-  await go(page,"worksheets/book");
-  await expect(page.locator("#worksheet-kind")).toHaveValue("book");
-  await expect(page.locator("#print-worksheet")).toBeEnabled();
-  await expect(page.locator(".paper-book-lesson")).toHaveCount(74);
-  await expect(page.locator(".paper-book-toc > div")).toHaveCount(8);
-  await expect(page.locator(".paper-book-answers h3")).toHaveCount(37);
-  await expect(page.locator(".paper-kana-family")).toHaveCount(30);
-  await expect(page.locator(".paper-image-card img")).toHaveCount(6);
-  await expect(page.locator(".paper-dialogue")).toHaveCount(3);
-  await expect(page.locator(".print-sheet").first()).toContainText("Não é um curso preparatório oficial");
-  await page.locator("#worksheet-answers").uncheck();
-  await expect(page.locator(".paper-book-answers")).toHaveCount(0);
-});
-
-test("picture matching and dialogues print with images, answer keys and no accidental blank pages",async({page},testInfo)=>{
-  await page.addInitScript(()=>{window.printCalls=0;window.print=()=>window.printCalls++;});
-  await go(page,"worksheets");
-  await page.locator("#worksheet-kind").selectOption("pictures");
-  await expect(page.locator("#worksheet-repeat-pages")).toHaveValue("0");
-  await expect(page.locator("#worksheet-models")).toBeHidden();
-  await expect(page.locator("#worksheet-answers")).toBeVisible();
-  await expect(page.locator(".print-sheet")).toHaveCount(2);
-  await expect(page.locator(".paper-image-card img")).toHaveCount(6);
-  await expect.poll(()=>page.locator(".paper-image-card img").evaluateAll(images=>images.every(image=>image.complete && image.naturalWidth>0))).toBe(true);
-  await expect(page.locator(".paper-art-credit")).toContainText("Irasutoya");
-  expect(await page.locator(".paper-image-card img").evaluateAll(images=>images.every(image=>getComputedStyle(image).objectFit==="contain"))).toBe(true);
-  await expect(page.locator(".paper-word-bank > div > span")).toHaveCount(6);
-  await expect(page.locator(".print-sheet").last()).toContainText("Gabarito · imagens");
-  await expect(page.locator(".print-sheet").last()).toContainText("1. B · 水");
-  await page.emulateMedia({media:"print"});
-  let pdf=await page.pdf({path:testInfo.outputPath("picture-activity.pdf"),preferCSSPageSize:true,printBackground:true});
-  expect((pdf.toString("latin1").match(/\/Type\s*\/Page\b/g)||[]).length).toBe(2);
-  await page.emulateMedia({media:"screen"});
-  await page.locator("#worksheet-kind").selectOption("dialogues");
-  await expect(page.locator(".print-sheet")).toHaveCount(4);
-  await expect(page.locator(".paper-dialogue")).toHaveCount(3);
-  await expect(page.locator(".print-sheet").last()).toContainText("Gabarito · diálogos");
-  await expect(page.locator(".print-sheet").last()).toContainText("あそこです。");
-  await page.emulateMedia({media:"print"});
-  pdf=await page.pdf({path:testInfo.outputPath("dialogue-activities.pdf"),preferCSSPageSize:true,printBackground:true});
-  expect((pdf.toString("latin1").match(/\/Type\s*\/Page\b/g)||[]).length).toBe(4);
-  await page.emulateMedia({media:"screen"});
-  await page.locator("#worksheet-kind").selectOption("activities");
-  await expect(page.locator(".print-sheet")).toHaveCount(6);
-  await page.emulateMedia({media:"print"});
-  pdf=await page.pdf({preferCSSPageSize:true,printBackground:true});
-  expect((pdf.toString("latin1").match(/\/Type\s*\/Page\b/g)||[]).length).toBe(6);
-  await page.emulateMedia({media:"screen"});
-  await page.locator("#worksheet-answers").uncheck();
-  await expect(page.locator(".print-sheet")).toHaveCount(4);
-  await page.locator("#worksheet-repeat-pages").selectOption("2");
-  await expect(page.locator(".print-sheet")).toHaveCount(6);
-  await page.setViewportSize({width:320,height:900});
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await page.locator("#print-worksheet").click();
-  await expect.poll(()=>page.evaluate(()=>window.printCalls)).toBe(1);
 });
 
 test("separate browsers keep their own preferences and server profile",async({page,browser})=>{

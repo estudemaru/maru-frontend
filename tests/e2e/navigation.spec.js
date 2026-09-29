@@ -31,19 +31,19 @@ test("home shows the learning, practice and printable paths", async ({ page }) =
 
 test("resource search combines categories, ignores accents and keeps its state on return", async ({ page }) => {
   await page.goto("/#/explore");
-  await expect(page.locator('.hub-card')).toHaveCount(10);
+  await expect(page.locator('.hub-card')).toHaveCount(RESOURCES.length);
   await page.getByRole('button', { name: 'Materiais de apoio', exact: true }).click();
   await page.locator('#resource-search').fill('impressao');
   await expect(page.locator('.hub-card')).toHaveCount(1);
   await page.getByRole('link', { name: 'Atividades para imprimir', exact: true }).click();
-  await expect(page.locator('.paper-row')).toHaveCount(20);
+  await expect(page.locator('.paper-row')).toHaveCount(5);
   await page.goBack();
   await expect(page.locator('#resource-search')).toHaveValue('impressao');
   await expect(page.getByRole('button', { name: 'Materiais de apoio', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#resource-search').fill('nada-com-este-nome');
   await expect(page.locator('.hub-empty')).toBeVisible();
   await page.getByRole('button', { name: 'Limpar filtros', exact: false }).click();
-  await expect(page.locator('.hub-card')).toHaveCount(10);
+  await expect(page.locator('.hub-card')).toHaveCount(RESOURCES.length);
   await expect(page.locator('#resource-search')).toBeFocused();
   await page.locator('#resource-search').fill('girias');
   await expect(page.locator('.hub-card')).toHaveCount(1);

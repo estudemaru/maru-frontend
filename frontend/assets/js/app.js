@@ -1,4 +1,6 @@
 import { renderPracticeHub, renderExplore } from "./features/hubs.js";
+import { renderChallenge } from "./features/challenge.js";
+import { renderVideoLessons } from "./features/video-lessons.js";
 import { NAVIGATION, navigationFor } from "./core/navigation.js";
 import { renderThematic } from "./features/thematic.js";
 import { renderPlacement } from "./features/placement.js";
@@ -17,7 +19,9 @@ import { renderWriting } from "./features/writing.js";
 import { renderSentences } from "./features/sentences.js";
 import { renderKanji, renderParticles, renderExpressions, renderLibrary, renderReview, addToReview } from "./features/reference.js";
 import { renderSettings } from "./features/settings.js";
-import { emptyState, routeLink } from "./core/ui.js";
+import { emptyState, routeLink, setReaderMode } from "./core/ui.js";
+import { hasKanaFoundation } from './core/beginner.js';
+import { getLesson } from '/shared/curriculum.js';
 import { applyTheme, themeSwitcher } from "./core/theme.js";
 import { playerLevel, ACHIEVEMENTS } from "/shared/gamification.js";
 import { completeEmailLink } from "./api.js";
@@ -62,7 +66,7 @@ app.innerHTML = `
     <nav aria-label="Navegação principal"><p class="nav-label">SEU JAPONÊS</p>${NAVIGATION.map(({route, icon: symbol, title}) => `<a class="nav-link" href="#/${route}" data-nav="${route}">${icon(symbol)}<span>${title}</span>${route === "review" ? '<span class="nav-count" id="review-count" hidden></span>' : ""}</a>`).join("")}</nav>
     <div class="sidebar-bottom"><p class="sidebar-mode-label">Seu ambiente</p>${themeSwitcher()}<a class="profile-link" href="#/settings" data-nav="settings"><span class="profile-avatar">M</span><span><strong>Meu ritmo</strong><small id="save-status">${statusLabels[status]}</small></span>${icon("settings")}</a></div>
   </aside>
-  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><a href="#/settings" class="topbar-avatar" aria-label="Conta e preferências">Conta</a></div></header>
+  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><a href="#/account" class="topbar-avatar" aria-label="Entrar ou ver minha conta">${store.account.user ? "Minha conta" : "Entrar"}</a></div></header>
   <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer></div>
 `;
 const main = document.querySelector("#main");
@@ -108,6 +112,7 @@ function render() {
   let route = "home", id = "";
   try { [route = "home", id = ""] = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/"); } catch { route = "missing"; }
   if (!route) route = "home";
+  setReaderMode(!hasKanaFoundation(ctx.progress) && route!=='kanji' && route!=='worksheets' && !(route==='lesson' && getLesson(id)?.moduleId==='kanji'));
   const params = routeParams || {}; routeParams = null;
   const locationInfo = navigationFor(route);
   document.querySelectorAll("[data-nav]").forEach(link => {
@@ -126,6 +131,8 @@ function render() {
   const views = {
     home: () => renderDashboard(ctx),
     practice: () => renderPracticeHub(ctx),
+    challenge: () => renderChallenge(ctx, id),
+    videos: () => renderVideoLessons(ctx),
     explore: () => renderExplore(ctx),
     journey: () => renderJourney(ctx, id),
     lesson: () => renderLesson(ctx, id),
@@ -145,7 +152,8 @@ function render() {
     package: () => renderTeacher(ctx, id),
     themes: () => renderThematic(ctx, id),
     placement: () => renderPlacement(ctx),
-    settings: () => renderSettings(ctx, id)
+    settings: () => renderSettings(ctx, id),
+    account: () => renderSettings(ctx, id, true)
   };
   if (views[route]) cleanup = views[route]();
   else main.innerHTML = emptyState("Este caminho ainda não existe.", "Volte para seu espaço de aprendizado.", routeLink("home", "Meu aprendizado", "btn btn-primary"));
