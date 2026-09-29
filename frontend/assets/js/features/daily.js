@@ -2,6 +2,7 @@ import { DAILY_STEPS, dailySteps, dailyWord, checkWrite, recordDaily, dailyStrea
 import { localDay } from '/shared/progress.js';
 import { esc, icon, routeLink, audioButton } from '../core/ui.js';
 import { getPronunciation } from '/shared/pronunciation.js';
+import { kanaModeButton } from '../core/kanaInput.js';
 
 const dateLabel = day => new Date(`${day}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
 const stars = score => `<span class="daily-stars" aria-label="${score} de ${DAILY_STEPS} passos certos">${Array.from({ length: DAILY_STEPS }, (_, i) => `<span class="${i < score ? 'is-on' : ''}" aria-hidden="true">★</span>`).join('')}</span>`;
@@ -38,7 +39,7 @@ export function renderDaily(ctx) {
     const body = step.kind === 'meaning'
       ? `<p class="play-prompt play-prompt-short" lang="ja">${esc(step.prompt)}</p>${step.prompt !== step.reading ? `<p class="daily-reading" lang="ja">${esc(step.reading)}</p>` : ''}<div class="daily-choices">${step.choices.map(choice).join('')}</div>`
       : step.kind === 'write'
-        ? `<p class="play-prompt">${esc(step.prompt)}</p>${hinted ? `<p class="daily-reading">Dica: ${esc(step.hint)}</p>` : ''}<form id="daily-form" autocomplete="off"><label class="sr-only" for="daily-answer">Sua resposta em japonês</label><input class="text-input play-answer" id="daily-answer" name="answer" placeholder="Escreva em japonês…" lang="ja" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40" ${answered ? 'disabled' : ''}><button class="btn btn-primary" ${answered ? 'disabled' : ''}>Conferir ${icon('arrow')}</button></form>${!answered && !hinted ? '<button class="text-link play-skip" id="daily-hint" type="button">Mostrar o romaji · o passo não conta ponto</button>' : ''}`
+        ? `<p class="play-prompt">${esc(step.prompt)}</p>${hinted ? `<p class="daily-reading">Dica: ${esc(step.hint)}</p>` : ''}<form id="daily-form" autocomplete="off"><label class="sr-only" for="daily-answer">Sua resposta em japonês</label><input class="text-input play-answer" id="daily-answer" name="answer" placeholder="Escreva em japonês ou romaji…" lang="ja" data-kana autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40" ${answered ? 'disabled' : ''}>${answered ? '' : kanaModeButton()}<button class="btn btn-primary" ${answered ? 'disabled' : ''}>Conferir ${icon('arrow')}</button></form>${!answered && !hinted ? '<button class="text-link play-skip" id="daily-hint" type="button">Mostrar o romaji · o passo não conta ponto</button>' : ''}`
         : `<p class="play-prompt daily-blank" lang="ja">${esc(step.before)}<span class="daily-gap">${answered ? esc(step.answer) : '＿＿'}</span>${esc(step.after)}</p><p class="daily-reading">${esc(step.translation)}</p><div class="daily-choices">${step.choices.map(choice).join('')}</div>`;
     const next = index + 1 < steps.length ? `Próximo passo ${icon('arrow')}` : `Ver resultado ${icon('arrow')}`;
     ctx.main.innerHTML = `<div class="play-page play-session daily">${header()}<ol class="daily-progress" aria-label="Passos do desafio">${steps.map((item, i) => `<li class="${i < index ? (results[i] ? 'is-right' : 'is-wrong') : i === index ? 'is-current' : ''}" ${i === index ? 'aria-current="step"' : ''}><span>${i + 1}</span> ${item.title}</li>`).join('')}</ol>
