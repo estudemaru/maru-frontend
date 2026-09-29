@@ -1,25 +1,23 @@
 // One catalogue connects the sidebar, hub cards and breadcrumbs.
 export const NAVIGATION = [
   { route: "home", icon: "home", title: "Início" },
-  { route: "journey", icon: "path", title: "Minha trilha" },
-  { route: "practice", icon: "target", title: "Jogos e prática" },
-  { route: "review", icon: "repeat", title: "Revisão" },
-  { route: "explore", icon: "book", title: "Explorar" },
-  { route: "worksheets", icon: "pen", title: "Imprimir" },
-  { route: "videos", icon: "volume", title: "Aulas gratuitas" }
+  { route: "practice", icon: "target", title: "Arcade" },
+  { route: "progress", icon: "spark", title: "Meu desempenho" },
+  { route: "worksheets", icon: "pen", title: "Papel e lápis" },
+  { route: "explore", icon: "book", title: "Consultar" }
 ];
 export const PRACTICE_TOOLS = [
   { route: "challenge", icon: "clock", title: "Desafios de repetição", description: "Escreva kana e frases em rodadas curtas, com tempo ou no seu ritmo. Descubra o que revisar.", detail: "Começar pelas vogais", color: "lavender" },
   { route: "exercises", icon: "volume", title: "Exercícios e escuta", description: "Reconheça os sons, escolha palavras e pratique partículas com explicações a cada resposta.", detail: "Ouvir e responder", color: "sage" },
   { route: "writing", icon: "pen", title: "Caderno de escrita", description: "Comece por あ, acompanhe os traços e repita à mão. Os kanji ficam para depois dos kana.", detail: "Ver e desenhar", color: "peach" },
-  { route: "sentences", icon: "chat", title: "Formar frases", description: "Organize palavras, entenda a função das partículas e digite suas primeiras frases.", detail: "Montar e entender", color: "sky" }
+  { route: "sentences", icon: "chat", title: "Transcrever frases", description: "Leia a frase em japonês e copie os caracteres, sem romaji.", detail: "Montar e entender", color: "sky" }
 ];
 export const RESOURCE_GROUPS = [
   { id: "basics", title: "Fundamentos", description: "Consulte a base do idioma no seu ritmo." },
   { id: "culture", title: "Cultura e situações", description: "Encontre o japonês nas coisas que fazem parte da sua vida." },
   { id: "materials", title: "Materiais de apoio", description: "Tire dúvidas, conheça outras fontes e leve a escrita para o papel." }
 ];
-export const RESOURCES = [
+const ALL_RESOURCES = [
   { route: "videos", group: "materials", icon: "volume", title: "Aulas gratuitas", description: "Vídeos em português do 123 Japonês e de outros professores, com prática depois de assistir.", keywords: "youtube aula video online professor 123 japones", color: "sage" },
   { route: "kana", group: "basics", icon: "あ", title: "Hiragana e katakana", description: "As duas tabelas de kana, com sons, combinações e prática.", keywords: "alfabeto vogais silabas letras leitura", color: "sage" },
   { route: "kanji", group: "basics", icon: "日", title: "Primeiros kanji", description: "Significados, leituras e exemplos dos seus primeiros caracteres.", keywords: "ideogramas simbolos", color: "sand" },
@@ -32,7 +30,10 @@ export const RESOURCES = [
   { route: "teacher", group: "materials", icon: "path", title: "Para professores", description: "Escolha uma etapa ou tema e compartilhe um pacote de estudo com sua turma.", keywords: "professor professora aula turma livro material", color: "sage" },
   { route: "library", group: "materials", icon: "external", title: "Biblioteca", description: "Fontes e recursos selecionados para continuar descobrindo.", keywords: "referencias sites livros materiais", color: "sky" }
 ];
+export const RESOURCES = ALL_RESOURCES.filter(item => !["themes", "teacher"].includes(item.route)).map(item => item.route === "worksheets" ? { ...item, title: "Folhas de repetição", description: "Modelos e quadrados para repetir caracteres à mão." } : item);
 const pages = [
+  { route: "arcade", title: "Jogar", section: "practice" },
+  { route: "journey", title: "Trilha em pausa", section: "home" },
   ...NAVIGATION.map(item => ({ ...item, section: item.route })),
   ...PRACTICE_TOOLS.map(item => ({ ...item, section: "practice" })),
   ...RESOURCES.map(item => ({ ...item, section: "explore" })),

@@ -1,3 +1,9 @@
+# Estado atual · 29/09/2026
+
+A experiência está concentrada no Arcade; trilha e atividades impressas estão
+em pausa. Consulte [a documentação da fase Arcade](./ARCADE-2026-09-29.md).
+As seções abaixo registram também módulos preservados para reativação futura.
+
 # Arquitetura do Maru
 
 O produto começa com uma trilha para quem ainda não conhece japonês. Conteúdo

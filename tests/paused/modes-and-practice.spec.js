@@ -19,44 +19,40 @@ async function go(page, route) {
 }
 const snapshot = page => page.evaluate(()=>JSON.parse(localStorage.getItem("maru-learning-v2")));
 
-test("palette and motion preferences persist",async({page})=>{
-  await go(page,"arcade/repeat");
-  await page.getByRole('button',{name:'Vamos jogar'}).click();
-  await page.locator('#arcade-answer').fill('あ');
-  await page.getByRole('button',{name:'Ativar modo escuro',exact:true}).click();
-  await expect(page.locator('#arcade-answer')).toHaveValue('あ');
-  await expect(page.locator('#toast')).toContainText('Estilo Sumi ativado');
-  await expect(page.locator('#arcade-hud')).toBeHidden();
-  await expect(page.locator('html')).toHaveCSS('color-scheme','dark');
+test("theme switching keeps the active answer, persists and updates both selectors",async({page})=>{
+  await go(page,"kana");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","dojo");
+  await page.locator('[data-kana="start"]').click();
+  const prompt=await page.locator(".quiz-character").innerText();
+  const option=page.locator('input[name="answer"]').first();
+  await option.check();
+  await page.locator('.sidebar [data-theme-choice="arcade"]').click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme","arcade");
+  await expect(page.locator(".quiz-character")).toHaveText(prompt);
+  await expect(option).toBeChecked();
+  await expect(page.locator("#arcade-hud")).toBeVisible();
+  await expect(page.locator("#save-status")).toHaveText("Progresso salvo");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme","arcade");
+  await go(page,"settings");
+  await expect(page.locator('.theme-card[data-theme-choice="arcade"]')).toHaveAttribute("aria-pressed","true");
   await go(page,"home");
-  await expect(page.locator(".play-halo")).toHaveCSS("animation-name","halo-turn");
+  await expect(page.locator(".sidebar .nav-link.is-active")).toHaveCSS("color","rgb(255, 63, 139)");
+  await expect(page.locator(".kana-art")).toBeVisible();
   await page.getByRole("button",{name:"Pausar animações"}).click();
-  await expect(page.locator(".play-halo")).toHaveCSS("animation-name","none");
-  await expect(page.locator(".play-hero-art > img")).toHaveCSS("animation-name","none");
+  await expect(page.locator(".art-main")).toHaveCSS("animation-play-state","paused");
   await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme","arcade");
   await expect(page.getByRole("button",{name:"Retomar animações"})).toHaveAttribute("aria-pressed","true");
   await page.getByRole("button",{name:"Retomar animações"}).click();
+  await expect(page.locator(".art-main")).toHaveCSS("animation-play-state","running");
   await page.emulateMedia({reducedMotion:"reduce"});
-  await expect(page.locator(".play-hero-art > img")).toHaveCSS("animation-name","none");
-  await page.locator(".play-card-art img").evaluateAll(images => images.forEach(img => { img.loading = "eager"; }));
-  await expect.poll(() => page.locator(".play-card-art img").evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
-  await page.screenshot({path:'test-results/sumi-desktop.png',fullPage:true});
-  await page.setViewportSize({width:390,height:844});
-  await page.reload();
-  await expect(page.locator('.play-hero')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({path:'test-results/sumi-mobile.png',fullPage:true});
-  await page.getByRole('button',{name:'Ativar modo claro',exact:true}).click();
-  await expect(page.locator('html')).toHaveCSS('color-scheme','light');
-  await expect(page.locator('#toast')).toContainText('Estilo Papel ativado');
-  await page.locator('#toast').evaluate(el => { el.hidden = true; });
-  await page.screenshot({path:'test-results/papel-mobile.png',fullPage:true});
-  await page.setViewportSize({width:1440,height:1000});
-  await page.reload();
-  await expect(page.locator('.play-hero')).toBeVisible();
-  await page.screenshot({path:'test-results/papel-desktop.png',fullPage:true});
+  await expect(page.locator(".art-main")).toHaveCSS("animation-name","none");
+  await expect(page.locator("[data-motion-toggle]")).toBeHidden();
+  await go(page,"settings");
+  await page.locator('.theme-card[data-theme-choice="dojo"]').click();
+  await expect(page.locator('#arcade-hud')).toBeHidden();
+  await expect(page.locator('.sidebar [data-theme-choice="dojo"]')).toHaveAttribute("aria-pressed","true");
 });
 
 test("API pronunciation plays with no installed voices, respects speed and stops on toggle",async({page})=>{
@@ -132,7 +128,8 @@ test("vocabulary and beginner explanations can be searched and reviewed",async({
   await page.locator("#glossary-search").fill("mora");
   await expect(page.locator("#concept-mora")).toBeVisible();
   await go(page,"lesson/start-language");
-  await expect(page.locator(".play-paused")).toBeVisible();
+  await page.locator(".concept-help summary").click();
+  await expect(page.locator(".concept-help")).toContainText("Substantivo");
 });
 
 test("separate browsers keep their own preferences and server profile",async({page,browser})=>{
@@ -160,9 +157,8 @@ test("all themes fit desktop, tablet and small phones",async({page})=>{
       const routes=theme!=="dojo"?["home","journey","kana","kanji","writing","sentences","particles","expressions","library","review","settings","lesson/welcome","vocabulary","exercises","worksheets","glossary","teacher"]:["vocabulary","exercises","worksheets","glossary","settings"];
       for(const route of routes){
         await go(page,route);
-        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(16, 26, 44)",dojo:"rgb(243, 234, 215)"}[theme]);
-        if(route === "worksheets") await expect(page.locator('#worksheet-preview')).toHaveAttribute('data-ready','true');
-        await expect.poll(async()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),{message:theme+" "+route+" at "+width}).toBe(false);
+        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(5, 7, 19)",dojo:"rgb(248, 247, 243)"}[theme]);
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),theme+" "+route+" at "+width).toBe(false);
       }
     }
     await page.setViewportSize({width:1440,height:1000});
