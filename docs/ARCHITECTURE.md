@@ -1,7 +1,9 @@
 # Estado atual · 29/09/2026
 
-A experiência está concentrada no Arcade; trilha e atividades impressas estão
-em pausa. Consulte [a documentação da fase Arcade](./ARCADE-2026-09-29.md).
+A experiência combina o Arcade e a trilha, reativada com um jogo no fim de cada
+lição. Trilhas temáticas, material para professores e atividades impressas
+(exceto as folhas de repetição) seguem em pausa. Consulte
+[a documentação da fase Arcade](./ARCADE-2026-09-29.md).
 As seções abaixo registram também módulos preservados para reativação futura.
 
 # Arquitetura do Maru
@@ -111,6 +113,9 @@ recuperação de dados.
 
 Uma lição exige responder corretamente a todas as perguntas. As erradas são
 explicadas e retornam antes da conclusão. Os 30 XP são concedidos uma vez.
+Depois das perguntas, a lição termina num jogo curto com os próprios exemplos
+(`shared/lessonGame.js`, tela em `features/lessonGame.js`); a conclusão já está
+registrada quando ele começa, então sair ou pular o jogo não desfaz a lição.
 
 Rodadas usam no máximo dez itens. Cada resposta verificada é registrada uma
 vez antes do avanço. Distratores são distintos e pertencem ao mesmo tipo de

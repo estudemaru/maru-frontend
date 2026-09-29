@@ -1,5 +1,8 @@
 import { renderArcade, renderArcadeHub, renderArcadeProgress } from "./features/arcade.js";
 import { renderDaily } from "./features/daily.js";
+import { renderJourney } from "./features/journey.js";
+import { renderLesson } from "./features/lesson.js";
+import { renderPlacement } from "./features/placement.js";
 import { renderExplore } from "./features/hubs.js";
 import { renderVideoLessons } from "./features/video-lessons.js";
 import { NAVIGATION, navigationFor } from "./core/navigation.js";
@@ -128,6 +131,9 @@ function render() {
     practice: () => renderArcadeHub(ctx),
     arcade: () => renderArcade(ctx, id),
     daily: () => renderDaily(ctx),
+    journey: () => renderJourney(ctx, id),
+    lesson: () => renderLesson(ctx, id),
+    placement: () => renderPlacement(ctx),
     progress: () => renderArcadeProgress(ctx),
     challenge: () => renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),
     videos: () => renderVideoLessons(ctx),
@@ -147,8 +153,8 @@ function render() {
     settings: () => renderSettings(ctx, id),
     account: () => renderSettings(ctx, id, true)
   };
-  const paused = ["journey", "lesson", "placement", "themes", "teacher", "package"].includes(route) || (route === "worksheets" && id && id !== "characters");
-  if (paused) main.innerHTML = `<section class="play-paused panel"><span class="play-tag">EM PAUSA</span><h1 tabindex="-1">Um intervalo para preparar o próximo passo.</h1><p>A trilha de ensino e as atividades impressas estão temporariamente fechadas. Seu progresso anterior está preservado.</p><div class="play-actions">${routeLink("practice", "Ir para os jogos", "btn btn-primary")}${routeLink("worksheets", "Imprimir repetições", "btn btn-ghost")}</div></section>`;
+  const paused = ["themes", "teacher", "package"].includes(route) || (route === "worksheets" && id && id !== "characters");
+  if (paused) main.innerHTML = `<section class="play-paused panel"><span class="play-tag">EM PAUSA</span><h1 tabindex="-1">Um intervalo para preparar o próximo passo.</h1><p>As trilhas temáticas, o material para professores e as atividades impressas estão temporariamente fechados. Seu progresso anterior está preservado.</p><div class="play-actions">${routeLink("journey", "Seguir a trilha", "btn btn-primary")}${routeLink("practice", "Ir para os jogos", "btn btn-ghost")}${routeLink("worksheets", "Imprimir repetições", "btn btn-ghost")}</div></section>`;
   else if (views[route]) cleanup = views[route]();
   else main.innerHTML = emptyState("Este caminho ainda não existe.", "Volte para seu espaço de aprendizado.", routeLink("home", "Meu aprendizado", "btn btn-primary"));
   // Animate only the route entrance. Answering or moving through a lesson keeps the workspace still.

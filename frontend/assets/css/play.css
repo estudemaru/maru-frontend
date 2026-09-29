@@ -307,3 +307,16 @@ html[data-motion="paused"] .play-page * { animation: none !important; }
   .daily-choices, .daily-choices:has(.daily-choice:nth-child(3):last-child) { grid-template-columns: 1fr; }
   #daily-form { flex-wrap: wrap; } #daily-form .btn { width: 100%; justify-content: center; }
 }
+
+/* Jogo no fim de cada lição: reaproveita a mesa da karuta dentro do leitor da lição. */
+.lesson-game { text-align: center; }
+.lesson-game .step-label { display: block; text-align: left; }
+.lesson-game-intro { text-align: left; }
+.lesson-game-intro p { margin-top: 10px; line-height: 1.8; }
+.lesson-game-prompt { font-size: clamp(26px, 4vw, 40px); line-height: 1.6; margin: 18px 0 4px; overflow-wrap: anywhere; }
+.lesson-game-table { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; }
+.lesson-game-table .karuta-card { min-height: 84px; font-size: clamp(17px, 2.4vw, 24px); }
+.lesson-game .feedback { text-align: left; margin-top: 18px; }
+.lesson-game .karuta-status .text-link { font-size: 13px; }
+.lesson-game-result { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 14px; }
+.lesson-game-result .icon { width: 16px; height: 16px; color: var(--accent); }

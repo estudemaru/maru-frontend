@@ -132,7 +132,7 @@ test("vocabulary and beginner explanations can be searched and reviewed",async({
   await page.locator("#glossary-search").fill("mora");
   await expect(page.locator("#concept-mora")).toBeVisible();
   await go(page,"lesson/start-language");
-  await expect(page.locator(".play-paused")).toBeVisible();
+  await expect(page.locator(".lesson-reader")).toBeVisible();
 });
 
 test("separate browsers keep their own preferences and server profile",async({page,browser})=>{
