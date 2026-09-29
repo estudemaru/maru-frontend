@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { PLACEMENT_QUESTIONS } from "../../shared/placement.js";
 import { normalizeSnapshot } from "../../shared/progress.js";
+import { LESSONS } from "../../shared/curriculum.js";
 
 const saved = page => page.evaluate(()=>JSON.parse(localStorage.getItem("maru-learning-v2")));
 async function answer(page, question, correct=true) {
@@ -31,7 +32,7 @@ test("placement resumes, preserves XP, accepts a suggestion and can be reset",as
   await page.getByRole("button",{name:"Começar pela etapa sugerida",exact:false}).click();
   await expect(page.locator(".journey-module[open]")).toContainText("Sugerido para você");
   await expect(page.locator(".journey-module[open]")).toContainText("Japonês no dia a dia");
-  await expect(page.locator(".journey-summary")).toContainText("0 de 37");
+  await expect(page.locator(".journey-summary")).toContainText(`0 de ${LESSONS.length}`);
   await page.goto("/#/settings");
   await page.getByRole("link",{name:"Refazer diagnóstico",exact:true}).click();
   await page.getByRole("button",{name:"Refazer diagnóstico",exact:true}).click();
