@@ -1,9 +1,11 @@
 import { GAMES, SCRIPTS, buildPool, acceptsAnswer, makeDeck, reviewPrefix, insights, personalBest, activeReviews } from '/shared/arcade.js';
 import { recordReview } from '/shared/progress.js';
 import { esc, icon, routeLink } from '../core/ui.js';
+import { renderShiritori, shiritoriBestKey } from './shiritori.js';
+import { LEVELS } from '/shared/shiritori.js';
 
 export function gameCards() {
-  return GAMES.map((game, i) => `<a class="play-card ${game.color}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">∞ Livre <span>·</span> ${icon('clock')} Com tempo</span></div></a>`).join('');
+  return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.kind === 'chain' ? 'is-wide' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`}</span></div></a>`).join('');
 }
 export function renderArcadeHub(ctx) {
   ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">UM POUQUINHO, TODO DIA</p><h1 tabindex="-1">Seu próximo acerto começa aqui.</h1><p>Escolha um jogo. Encontre seu ritmo. Tente mais uma vez.</p></header><div class="play-grid">${gameCards()}</div><div class="play-note">${icon('spark')} Todos os jogos têm prática infinita e desafio com tempo. Seu progresso é salvo a cada resposta.</div></div>`;
@@ -12,6 +14,7 @@ const options = (items, current) => items.map(([value, label]) => `<option value
 const detailList = items => items.length ? `<ul>${items.map(item => `<li><span>${esc(item.label)}</span><strong>${item.accuracy}% <small>· ${item.attempts} tentativas</small></strong></li>`).join('')}</ul>` : '<p class="muted">Ainda estamos conhecendo seu ritmo. Responda cada item pelo menos 3 vezes.</p>';
 export function renderArcade(ctx, id = 'sentences') {
   const game = GAMES.find(game => game.id === id) || GAMES[0];
+  if (game.kind === 'chain') return renderShiritori(ctx, game);
   const config = { game: game.id, script: ['sentences', 'translate'].includes(game.id) ? 'all' : game.id === 'difference' ? 'kana' : 'hiragana', duration: 0 };
   const controller = new AbortController();
   let timer, deadline = 0, phase = 'setup', nextItem, item, prefix, pool, attempts = 0, correct = 0, score = 0, streak = 0, bestStreak = 0, feedback = null, imageReady = true;
@@ -96,10 +99,18 @@ export function renderArcade(ctx, id = 'sentences') {
 }
 
 export function renderArcadeProgress(ctx) {
-  const records = activeReviews(ctx.progress.reviews);
+  // O shiritori só registra palavras usadas (sempre acertos); fica fora da taxa geral.
+  const records = activeReviews(ctx.progress.reviews).filter(([key]) => !GAMES.some(game => game.kind === 'chain' && key.startsWith(`arcade:${game.id}:`)));
   const total = records.reduce((sum, [, item]) => sum + item.attempts, 0);
   const correct = records.reduce((sum, [, item]) => sum + item.correct, 0);
   const sections = GAMES.map(game => {
+    if (game.kind === 'chain') {
+      const words = activeReviews(ctx.progress.reviews).filter(([key]) => key.startsWith(`arcade:${game.id}:`));
+      const labels = new Map(buildPool({ game: game.id }).map(item => [item.id, item.label]));
+      const bests = LEVELS.map(([level, label]) => [label.split(' · ')[0], Math.max(...[0, 20].map(duration => ctx.progress.arcade?.[shiritoriBestKey(level, duration)]?.score || 0))]);
+      const used = words.sort(([, a], [, b]) => b.attempts - a.attempts).slice(0, 6).map(([key, item]) => `<li><span lang="ja">${esc(labels.get(key.split(':').slice(4).join(':')) || 'Palavra do Maru')}</span><strong>${item.attempts}× <small>usada em partidas</small></strong></li>`).join('');
+      return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.png" width="64" height="64" alt=""><h2>${game.title}</h2><span>${bests.some(([, score]) => score) ? bests.map(([label, score]) => `${label}: ${score} palavras`).join(' · ') : 'Sua primeira partida está esperando'}</span></div><details><summary>Vocabulário do Maru que você já usou</summary>${used ? `<ul>${used}</ul>` : '<p class="muted">Use palavras do vocabulário do Maru numa partida para vê-las aqui.</p>'}</details>${routeLink('arcade/' + game.id, 'Jogar →', 'text-link')}</section>`;
+    }
     const rows = records.filter(([key]) => key.startsWith(`arcade:${game.id}:`));
     const attempts = rows.reduce((sum, [, item]) => sum + item.attempts, 0);
     const correct = rows.reduce((sum, [, item]) => sum + item.correct, 0);
