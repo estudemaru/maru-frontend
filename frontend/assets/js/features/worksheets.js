@@ -75,13 +75,13 @@ const activityKinds = new Set(["pictures","dialogues","activities"]);
 
 export function renderWorksheets(ctx, initialKind = "characters") {
   const controller = new AbortController();
-  let kind = initialKind === "book" ? "book" : "characters", script = "hiragana", group = "food", batch = 0, answers = true, models = true;
+  let kind = "characters", script = "hiragana", group = "food", batch = 0, answers = true, models = true;
   let scope = "family", family = "a", repeatPages = 0, printColor = "color";
   let selected = new Set(KANA.filter(item=>item.script==="hiragana" && item.row==='a').map(item=>item.char));
   let strokes = null, printing = false, renderVersion = 0;
   const characterList = () => script === "all" ? [...KANA.filter(item=>item.script==="hiragana"),...KANA.filter(item=>item.script==="katakana"), ...BEGINNER_KANJI] : script === "kanji" ? BEGINNER_KANJI : KANA.filter(item=>item.script===script);
-  ctx.main.innerHTML = `<div class="worksheets-page">${pageHeading("LEVE O APRENDIZADO PARA O PAPEL", "Seu caderno, pronto para imprimir.", "Escolha a atividade, confira a folha e imprima em A4. Você também pode salvar em PDF na janela de impressão.",routeLink("writing","Abrir caderno digital " + icon("pen"),"btn btn-ghost"))}<div class="no-print"><div class="panel worksheet-toolbar">
-    <div><label class="input-label" for="worksheet-kind">Atividade</label><select class="text-input" id="worksheet-kind"><option value="characters">Traços e caracteres</option><option value="words">Escrever palavras</option><option value="sentences">Formar frases no papel</option><option value="particles">Complete partículas</option><option value="pictures">Imagens e palavras</option><option value="dialogues">Complete diálogos</option><option value="activities">Pacote de atividades</option><option value="book" ${kind === "book" ? "selected" : ""}>Livro 1 · volume completo</option></select></div>
+  ctx.main.innerHTML = `<div class="worksheets-page">${pageHeading("LEVE O APRENDIZADO PARA O PAPEL", "Seu caderno, pronto para imprimir.", "Escolha os caracteres, confira a folha e imprima em A4. Você também pode salvar em PDF na janela de impressão.",routeLink("writing","Abrir caderno digital " + icon("pen"),"btn btn-ghost"))}<div class="no-print"><div class="panel worksheet-toolbar">
+    <div><label class="input-label" for="worksheet-kind">Atividade</label><select class="text-input" id="worksheet-kind"><option value="characters">Repetição de caracteres</option></select></div>
     <div id="worksheet-script-control"><label class="input-label" for="worksheet-script">Escrita</label><select class="text-input" id="worksheet-script"><option value="hiragana">Hiragana</option><option value="katakana">Katakana</option><option value="kanji">Primeiros kanji</option><option value="all">Todos os caracteres</option></select></div>
     <div id="worksheet-scope-control"><label class="input-label" for="worksheet-scope">O que praticar</label><select class="text-input" id="worksheet-scope"><option value="family" selected>Uma família por vez</option><option value="one">1 caractere</option><option value="recommended">Primeiros 20 caracteres</option><option value="all">Todos</option><option value="custom">Escolher livremente</option></select></div>
     <div id="worksheet-family-control"><label class="input-label" for="worksheet-family">Família</label><select class="text-input" id="worksheet-family">${BOOK_KANA_ORDER.map(id=>`<option value="${id}">${id==='a'?'Vogais · comece aqui':id==='wa'?'WA, WO e N':id.toUpperCase()}</option>`).join('')}</select></div>
@@ -90,7 +90,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     <div><label class="input-label" for="worksheet-repeat-pages">Páginas para repetir</label><select class="text-input" id="worksheet-repeat-pages"><option value="0" ${repeatPages === 0 ? "selected" : ""}>Nenhuma</option><option value="1" ${repeatPages === 1 ? "selected" : ""}>1 página em branco</option><option value="2">2 páginas em branco</option><option value="3">3 páginas em branco</option><option value="5">5 páginas em branco</option><option value="10">10 páginas em branco</option></select></div>
     <div><label class="input-label" for="worksheet-color">Cor da impressão</label><select class="text-input" id="worksheet-color"><option value="color">Colorida</option><option value="mono">Preto e branco · alto contraste</option></select></div>
     <div><button class="btn btn-primary" id="print-worksheet" disabled>${icon("pen")} Imprimir / salvar PDF</button></div>
-    </div><div class="filter-chips"><label><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
+    </div><p class="play-paused-note">Atividades e Livro 1 em pausa. As folhas de repetição continuam disponíveis.</p><div class="filter-chips"><label><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label hidden><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
     <div id="worksheet-characters" class="worksheet-selection panel" role="group" dir="ltr" aria-label="Caracteres da folha"></div><p class="filter-count" id="worksheet-status" aria-live="polite">Preparando os modelos de traços…</p>
     <aside class="tip-box">${icon("pen")}<p>As folhas aproveitam o A4 com espaço para escrever à mão. Páginas extras de repetição são opcionais, e os gabaritos ficam no final. Na impressão, escolha A4, escala 100% e desative os cabeçalhos e rodapés do navegador.</p></aside></div><div id="worksheet-preview" class="worksheet-preview"></div></div>`;
   const previewScale = scalePrintPreview(ctx.main.querySelector("#worksheet-preview"));
@@ -192,7 +192,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
   ctx.main.addEventListener("change",event=>{
     const {id,value,checked}=event.target;
     if(id==="worksheet-kind"){
-      kind=value;
+      kind="characters";
     }
     if(id==="worksheet-script"){script=value;scope=script==='kanji'?'recommended':'family';ctx.main.querySelector("#worksheet-scope").value=scope;}
     if(id==="worksheet-family")family=value;
@@ -237,7 +237,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
   },{signal:controller.signal});
   fetch("/assets/data/strokes.json",{signal:controller.signal}).then(response=>{if(!response.ok)throw new Error("Modelos indisponíveis");return response.json();}).then(data=>{
     if(controller.signal.aborted)return;strokes=data.characters;draw();
-  }).catch(()=>{if(!controller.signal.aborted)ctx.main.querySelector("#worksheet-status").textContent="Não foi possível carregar os traços. Reabra a página para tentar novamente; palavras e frases continuam disponíveis.";});
+  }).catch(()=>{if(!controller.signal.aborted)ctx.main.querySelector("#worksheet-status").textContent="Não foi possível carregar os traços. Reabra a página para tentar novamente.";});
   drawSelection();draw();
   return ()=>{controller.abort();previewScale.disconnect();};
 }

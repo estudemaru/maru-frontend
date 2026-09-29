@@ -60,7 +60,7 @@ export function createAudio(toast, preferences = () => ({})) {
   }
   function feedback(kind) {
     const prefs = preferences();
-    if (prefs.theme !== "arcade" || !prefs.soundEffects) return;
+    if (!prefs.soundEffects) return;
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     try {
@@ -70,7 +70,7 @@ export function createAudio(toast, preferences = () => ({})) {
       const start = effectContext.currentTime;
       notes.forEach((frequency,index) => {
         const oscillator = effectContext.createOscillator(), gain = effectContext.createGain();
-        oscillator.type = "square"; oscillator.frequency.value = frequency;
+        oscillator.type = "sine"; oscillator.frequency.value = frequency;
         const time = start + index * .10;
         gain.gain.setValueAtTime(0,time); gain.gain.linearRampToValueAtTime(.022,time+.008); gain.gain.exponentialRampToValueAtTime(.0001,time+.10);
         oscillator.connect(gain); gain.connect(effectContext.destination);

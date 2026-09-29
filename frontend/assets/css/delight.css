@@ -1,0 +1,66 @@
+/* Small, deliberate motion: illustrations breathe, controls respond, reading stays still. */
+.play-hero { position: relative; }
+.play-hero-art { perspective: 700px; }
+.play-halo { position: absolute; width: 315px; height: 315px; border: 1px dashed var(--line); border-radius: 50%; z-index: -1; pointer-events: none; }
+.play-star { position: absolute; color: var(--accent); font-size: 21px; pointer-events: none; }
+.star-one { top: 8%; right: 27%; }
+.star-two { bottom: 23%; right: 9%; font-size: 29px; }
+.star-three { top: 40%; left: 4%; font-size: 14px; }
+.play-card { position: relative; }
+.play-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.play-card-art::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 30%, #ffffff25 49%, transparent 65%); opacity: 0; pointer-events: none; }
+.play-arrow { border: 1px solid var(--line); }
+.play-scoreboard { position: sticky; top: 12px; z-index: 3; box-shadow: 0 8px 24px #00000008; }
+.play-feedback { position: relative; overflow: hidden; }
+.play-feedback.correct::after { content: '✦'; position: absolute; top: 12px; right: 20px; font-size: 30px; color: var(--success); pointer-events: none; }
+.play-time-track { height: 3px; background: var(--line); border-radius: 999px; overflow: hidden; margin: -8px 16px 20px; }
+.play-time-track > span { display: block; height: 100%; background: var(--accent); transform-origin: left; scale: var(--remaining, 1) 1; }
+.play-typing-hint { text-align: center; font-size: 11px; color: var(--muted); margin-top: 12px; }
+html[data-theme="arcade"] .play-art-circle { background: radial-gradient(circle at 30% 25%, #335981, #20314d 65%); border-color: #42618a; box-shadow: 0 0 85px #4478bb19; }
+html[data-theme="arcade"] .play-halo { border-color: #6388b65c; }
+html[data-theme="arcade"] .play-star { color: #a8c8f0; text-shadow: 0 0 20px #9dc6ff70; }
+html[data-theme="arcade"] .play-hero { background-image: radial-gradient(ellipse at 85% 40%, #284b781c, transparent 60%); }
+html[data-theme="arcade"] .play-card, html[data-theme="arcade"] .play-question, html[data-theme="arcade"] .play-setup { box-shadow: 0 8px 30px #050b1620; }
+html[data-theme="arcade"] .play-card:hover { border-color: #6485b0; box-shadow: 0 12px 32px #030a1850, 0 0 0 1px #6d9fda16; }
+html[data-theme="arcade"] .play-scoreboard { box-shadow: 0 8px 28px #050c1950; }
+html[data-theme="arcade"] .play-result-hero { background: radial-gradient(ellipse at center, #284b7830, transparent 70%); }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="paused"]) .play-card { animation: card-unfold .65s both; }
+  html:not([data-motion="paused"]) .play-card:nth-child(2) { animation-delay: .07s; }
+  html:not([data-motion="paused"]) .play-card:nth-child(3) { animation-delay: .14s; }
+  html:not([data-motion="paused"]) .play-card:nth-child(4) { animation-delay: .21s; }
+  html:not([data-motion="paused"]) .play-card:nth-child(5) { animation-delay: .28s; }
+  html:not([data-motion="paused"]) .play-orbit { animation: kana-drift 6s ease-in-out infinite; }
+  html:not([data-motion="paused"]) .play-orbit.orbit-two { animation-delay: -2s; animation-direction: reverse; }
+  html:not([data-motion="paused"]) .play-orbit.orbit-three { animation-delay: -4s; }
+  html:not([data-motion="paused"]) .play-star { animation: star-breathe 5s ease-in-out infinite; }
+  html:not([data-motion="paused"]) .star-two { animation-delay: -2s; }
+  html:not([data-motion="paused"]) .star-three { animation-delay: -3s; }
+  html:not([data-motion="paused"]) .play-halo { animation: halo-turn 80s linear infinite; }
+  html:not([data-motion="paused"]) .play-art-circle { animation: circle-breathe 9s ease-in-out infinite; }
+  html:not([data-motion="paused"]) .play-feedback { animation: feedback-arrive .25s ease-out both; }
+  html:not([data-motion="paused"]) .play-feedback.correct::after { animation: mark-arrive .6s ease-out both; }
+  html:not([data-motion="paused"]) .play-results-stats > div { animation: card-unfold .45s both; }
+  html:not([data-motion="paused"]) .play-results-stats > div:nth-child(2) { animation-delay: .08s; }
+  html:not([data-motion="paused"]) .play-results-stats > div:nth-child(3) { animation-delay: .16s; }
+  html:not([data-motion="paused"]) .play-results-stats > div:nth-child(4) { animation-delay: .24s; }
+  .play-time-track > span { transition: scale .2s linear; }
+  .play-arrow { transition: rotate .25s, background .25s; }
+  .play-card:hover .play-arrow { rotate: 45deg; background: var(--accent-soft); }
+  .play-choice:active { scale: .94; }
+  #theme-toggle:active { rotate: 25deg; }
+  @media (hover: hover) and (pointer: fine) {
+    html:not([data-motion="paused"]) .play-card:hover .play-card-art::after { animation: paper-shine .8s ease-out both; }
+    html:not([data-motion="paused"]) .play-card:hover .play-card-art img { animation: image-hello .65s ease-in-out; }
+  }
+}
+@keyframes card-unfold { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+@keyframes kana-drift { 0%,100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+@keyframes star-breathe { 0%,100% { scale: .9; opacity: .45; } 50% { scale: 1.15; opacity: .9; } }
+@keyframes halo-turn { to { rotate: 360deg; } }
+@keyframes circle-breathe { 0%,100% { scale: 1; } 50% { scale: 1.035; } }
+@keyframes paper-shine { from { translate: -45% 0; opacity: 0; } 40% { opacity: 1; } to { translate: 45% 0; opacity: 0; } }
+@keyframes image-hello { 0%,100% { rotate: 0deg; } 35% { rotate: -5deg; } 70% { rotate: 3deg; } }
+@media (max-width:600px) { .play-halo { width: 225px; height: 225px; } .play-scoreboard { top: 8px; } .star-one { right: 27%; top: 0; } .star-two { right: 8%; bottom: 20%; } }
+html[data-motion="paused"] .play-page *, html[data-motion="paused"] .play-page *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion:reduce) { .play-page *, .play-page *::after { animation: none !important; transition: none !important; } }
