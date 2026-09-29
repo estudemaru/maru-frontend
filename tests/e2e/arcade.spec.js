@@ -82,9 +82,14 @@ test('absolute deadline rejects late answers and records personal best once', as
   await expect(page.locator('.play-session-note')).toContainText('Recorde pessoal: 100');
 });
 test('paused areas cannot be opened via direct routes and repetition still prints', async ({ page }) => {
-  for(const route of ['journey','lesson/welcome','placement','themes/anime','teacher','package/test','worksheets/book','worksheets/activities']) {
+  for(const route of ['themes/anime','teacher','package/test','worksheets/book','worksheets/activities']) {
     await page.goto('/#/'+route);
     await expect(page.locator('.play-paused')).toBeVisible();
+  }
+  for(const route of ['journey','lesson/welcome','placement']) {
+    await page.goto('/#/'+route);
+    await expect(page.locator('main h1')).toBeVisible();
+    await expect(page.locator('.play-paused')).toHaveCount(0);
   }
   await page.goto('/#/worksheets');
   await expect(page.locator('#worksheet-kind option')).toHaveCount(1);

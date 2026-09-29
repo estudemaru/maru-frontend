@@ -2,6 +2,7 @@ import { hasKanaFoundation } from "../core/beginner.js";
 import { placementResult } from "/shared/placement.js";
 import { nextLesson, moduleReadiness } from "/shared/learningPath.js";
 import { MODULES, LESSONS } from "/shared/curriculum.js";
+import { lessonGameKey } from "/shared/lessonGame.js";
 import { pageHeading, routeLink, icon, progressBar, beginnerText } from "../core/ui.js";
 
 export function renderJourney(ctx, moduleId) {
@@ -9,7 +10,7 @@ export function renderJourney(ctx, moduleId) {
   const next = nextLesson(ctx.progress);
   const completed = LESSONS.filter(lesson => ctx.progress.lessons[lesson.id]?.completedAt).length;
   const readiness = moduleReadiness(ctx.progress);
-  ctx.main.innerHTML = pageHeading("SUA TRILHA", "Do zero, com direção.", "Siga a ordem sugerida ou explore uma etapa. Todas as lições estão abertas.") +
+  ctx.main.innerHTML = pageHeading("SUA TRILHA", "Do zero, com direção.", "Siga a ordem sugerida ou explore uma etapa. Todas as lições estão abertas, e cada uma termina num jogo com os exemplos que você acabou de ver.") +
     `<div class="journey-summary panel"><span class="summary-symbol jp">あ</span><div><strong>${completed} de ${LESSONS.length} lições concluídas</strong><p>8 etapas para construir sua base no japonês.</p>${progressBar(completed / LESSONS.length * 100)}</div>${routeLink(next ? "lesson/" + next.id : "review", (completed ? "Continuar" : "Dar o primeiro passo") + icon("arrow"), "btn btn-primary")}</div>
     <div class="journey-list">${MODULES.map(module => {
       const done = module.lessons.filter(lesson => ctx.progress.lessons[lesson.id]?.completedAt).length;
@@ -20,7 +21,7 @@ export function renderJourney(ctx, moduleId) {
       const open = moduleId ? moduleId === module.id : next?.moduleId === module.id;
       return `<details class="journey-module" ${open ? "open" : ""}><summary><span class="module-symbol ${module.color} jp" lang="ja">${kanaReady || !/\p{Script=Han}/u.test(module.symbol) ? module.symbol : module.number}</span><div><span class="eyebrow">ETAPA ${module.number}</span><h2>${module.title}${suggested ? `<span class="pill small-pill">${suggestionLabel}</span>` : ""}${notReadyMessage ? `<span class="pill small-pill caution-pill">Recomendado depois</span>` : ""}</h2><p>${prior ? "Revisão rápida, se quiser · " : ""}${module.subtitle}</p>${notReadyMessage ? `<p class="muted small">${notReadyMessage}</p>` : ""}</div><span class="module-count">${done}/${module.lessons.length}</span>${done === module.lessons.length ? `<span class="hanko small-hanko jp" aria-label="Etapa concluída">${kanaReady || !/\p{Script=Han}/u.test(module.symbol) ? module.symbol : module.number}</span>` : ""}${icon("down")}</summary><div class="lesson-list">${module.lessons.map((lesson, index) => {
         const complete = ctx.progress.lessons[lesson.id]?.completedAt;
-        return `<a class="lesson-row ${next?.id === lesson.id ? "is-next" : ""}" href="#/lesson/${lesson.id}"><span class="lesson-state ${complete ? "is-done" : ""}">${complete ? icon("check") : String(index + 1).padStart(2, "0")}</span><div><h3>${lesson.title}${next?.id === lesson.id ? '<span class="pill small-pill">Próximo passo</span>' : ""}</h3><p>${beginnerText(lesson.goal)}</p></div><span class="lesson-duration">${icon("clock")} ${lesson.minutes} min</span>${icon("chevron")}</a>`;
+        return `<a class="lesson-row ${next?.id === lesson.id ? "is-next" : ""}" href="#/lesson/${lesson.id}"><span class="lesson-state ${complete ? "is-done" : ""}">${complete ? icon("check") : String(index + 1).padStart(2, "0")}</span><div><h3>${lesson.title}${next?.id === lesson.id ? '<span class="pill small-pill">Próximo passo</span>' : ""}</h3><p>${beginnerText(lesson.goal)}</p></div><span class="lesson-duration">${ctx.progress.arcade?.[lessonGameKey(lesson.id)] ? `${icon("target")} ${ctx.progress.arcade[lessonGameKey(lesson.id)].score} no jogo · ` : ""}${icon("clock")} ${lesson.minutes} min</span>${icon("chevron")}</a>`;
       }).join("")}</div></details>`;
     }).join("")}</div>`;
 }

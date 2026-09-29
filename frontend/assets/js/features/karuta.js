@@ -2,6 +2,7 @@ import { buildPool, makeDeck, reviewPrefix, personalBest, insights } from '/shar
 import { KARUTA_SCRIPTS, createRounds, roundScore } from '/shared/karuta.js';
 import { recordReview } from '/shared/progress.js';
 import { esc, icon, routeLink } from '../core/ui.js';
+import { createVoiceGate } from './voice.js';
 
 const options = (items, current) => items.map(([value, label]) => `<option value="${value}" ${value === current ? 'selected' : ''}>${label}</option>`).join('');
 const detailList = items => items.length ? `<ul>${items.map(item => `<li><span lang="ja">${esc(item.label)}</span><strong>${item.accuracy}% <small>· ${item.attempts} tentativas</small></strong></li>`).join('')}</ul>` : '<p class="muted">Ainda estamos conhecendo seu ritmo. Responda cada item pelo menos 3 vezes.</p>';
@@ -13,10 +14,16 @@ export function renderKaruta(ctx, game) {
   const controller = new AbortController();
   let phase = 'setup', rounds, round, pool, prefix, feedback = null;
   let attempts = 0, correct = 0, score = 0, streak = 0, bestStreak = 0;
-  let audio = 'idle', retryAt = 0, retryTimer = null, token = 0, timer = null, deadline = 0, pausedAt = 0;
+  let audio = 'idle', timer = null, deadline = 0, pausedAt = 0;
+  const voice = createVoiceGate(ctx, state => {
+    if (phase !== 'playing') return;
+    if (state === 'ready') resumeClock();
+    setAudio(state);
+    if (state === 'ready') ctx.audio.speak(round.target.speak, ctx.main.querySelector('#karuta-replay'));
+  });
   const bestKey = () => `${prefix}${config.duration}`;
   const header = () => `<div class="play-session-heading">${routeLink('practice', '← Todos os jogos', 'text-link')}<span class="play-tag">${game.subtitle}</span></div>`;
-  const stopTimers = () => { clearInterval(timer); clearInterval(retryTimer); timer = retryTimer = null; };
+  const stopTimers = () => { clearInterval(timer); timer = null; voice.cancel(); };
   const remaining = () => Math.max(0, Math.ceil((deadline - (pausedAt || Date.now())) / 1000));
 
   function setup() {
@@ -52,40 +59,20 @@ export function renderKaruta(ctx, game) {
     if (!pausedAt && !left) finish(true);
   }
 
-  async function listen() {
-    const request = ++token;
-    clearInterval(retryTimer); retryTimer = null;
-    setAudio('loading'); pauseClock();
-    try { await ctx.audio.preload(round.target.speak); }
-    catch (error) {
-      if (request !== token || phase !== 'playing') return;
-      if (error.status === 429) { retryAt = Date.now() + Math.max(1, error.retryAfter || 15) * 1000; setAudio('waiting'); retryTimer = setInterval(waitTick, 250); }
-      else setAudio('failed');
-      return;
-    }
-    if (request !== token || phase !== 'playing') return;
-    resumeClock(); setAudio('ready');
-    ctx.audio.speak(round.target.speak, ctx.main.querySelector('#karuta-replay'));
-    // Com a voz desta rodada garantida, a próxima é preparada em segundo plano.
-    // Uma falha aqui é silenciosa: a próxima rodada tenta de novo e trata o 429.
-    const upcoming = rounds.upcoming.target.speak;
-    if (upcoming !== round.target.speak) ctx.audio.preload(upcoming).catch(() => {});
-  }
-  function waitTick() {
-    const left = Math.max(0, Math.ceil((retryAt - Date.now()) / 1000));
-    const count = ctx.main.querySelector('#karuta-wait');
-    if (count) count.textContent = String(left);
-    if (!left) { clearInterval(retryTimer); retryTimer = null; listen(); }
-  }
+  // Sem voz pronta, as cartas ficam bloqueadas; a próxima rodada já é pedida quando esta fica pronta.
+  function listen() { pauseClock(); voice.load(round.target.speak, rounds.upcoming.target.speak); }
 
   const statusText = () => ({
     loading: 'Preparando a voz do Maru…',
     ready: feedback ? '' : 'Qual carta você ouviu?',
-    waiting: `A API de voz pediu uma pausa. Tentamos de novo em <b id="karuta-wait">${Math.max(0, Math.ceil((retryAt - Date.now()) / 1000))}</b> s. ${deadline ? 'O relógio está parado.' : ''}`,
+    waiting: `A API de voz pediu uma pausa. Tentamos de novo em <b id="karuta-wait">${voice.secondsLeft()}</b> s. ${deadline ? 'O relógio está parado.' : ''}`,
     failed: 'Não foi possível preparar a voz desta rodada. Nenhuma resposta foi registrada.'
   })[audio] || '';
   function setAudio(state) {
+    const same = audio === state;
     audio = state;
+    const count = ctx.main.querySelector('#karuta-wait');
+    if (same && state === 'waiting' && count) { count.textContent = String(voice.secondsLeft()); return; }
     const status = ctx.main.querySelector('#karuta-status');
     if (status) status.innerHTML = statusText();
     ctx.main.querySelectorAll('.karuta-card').forEach(card => { card.disabled = Boolean(feedback) || audio !== 'ready'; });
@@ -121,7 +108,7 @@ export function renderKaruta(ctx, game) {
 
   function finish(expired = false) {
     if (phase !== 'playing') return;
-    phase = 'results'; token++; stopTimers(); ctx.audio.stop();
+    phase = 'results'; stopTimers(); ctx.audio.stop();
     const newBest = config.duration > 0 && personalBest(ctx.progress, bestKey(), score);
     ctx.save();
     const analysis = insights(pool, ctx.progress.reviews, prefix);
@@ -141,7 +128,7 @@ export function renderKaruta(ctx, game) {
     const button = event.target.closest('button'); if (!button) return;
     if (button.dataset.card) answer(button.dataset.card);
     if (button.id === 'karuta-replay' && audio === 'ready') ctx.audio.speak(round.target.speak, button);
-    if (button.id === 'karuta-retry' && phase === 'playing') listen();
+    if (button.id === 'karuta-retry' && phase === 'playing') voice.retry();
     if (button.id === 'karuta-next') next();
     if (button.id === 'karuta-finish') finish();
     if (button.id === 'karuta-restart') start();
@@ -154,5 +141,5 @@ export function renderKaruta(ctx, game) {
   }, { signal: controller.signal });
   document.addEventListener('visibilitychange', tick, { signal: controller.signal });
   setup();
-  return () => { token++; stopTimers(); controller.abort(); };
+  return () => { stopTimers(); controller.abort(); };
 }

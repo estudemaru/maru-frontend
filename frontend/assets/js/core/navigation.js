@@ -1,6 +1,7 @@
 // One catalogue connects the sidebar, hub cards and breadcrumbs.
 export const NAVIGATION = [
   { route: "home", icon: "home", title: "Início" },
+  { route: "journey", icon: "path", title: "Minha trilha" },
   { route: "practice", icon: "target", title: "Arcade" },
   { route: "progress", icon: "spark", title: "Meu desempenho" },
   { route: "worksheets", icon: "pen", title: "Papel e lápis" },
@@ -34,7 +35,6 @@ export const RESOURCES = ALL_RESOURCES.filter(item => !["themes", "teacher"].inc
 const pages = [
   { route: "arcade", title: "Jogar", section: "practice" },
   { route: "daily", title: "Desafio do dia", section: "practice" },
-  { route: "journey", title: "Trilha em pausa", section: "home" },
   ...NAVIGATION.map(item => ({ ...item, section: item.route })),
   ...PRACTICE_TOOLS.map(item => ({ ...item, section: "practice" })),
   ...RESOURCES.map(item => ({ ...item, section: "explore" })),
