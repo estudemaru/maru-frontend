@@ -52,20 +52,39 @@ test("lesson completion awards experience and activity once", () => {
   assert.equal(p.activity[localDay()], 1);
 });
 
-test("incorrect attempts reset the interval, correct attempts space out reviews", () => {
+test("reviews use FSRS: misses return in ten minutes, successes space out by memory stability", () => {
   const now = Date.now();
   const p = normalizeSnapshot();
   recordReview(p, "h-a-0", false, now);
   assert.equal(p.reviews["h-a-0"].due, now + 600000);
+  assert.equal(p.reviews["h-a-0"].lapses, 0, "errar um item novo não é esquecimento");
   assert.equal(p.kanaStats["h-a-0"].wrong, 1);
   assert.deepEqual(dueReviews(p, now), []);
   assert.deepEqual(dueReviews(p, now + 600000), ["h-a-0"]);
   recordReview(p, "h-a-0", true, now + 600000);
-  assert.equal(p.reviews["h-a-0"].interval, 1);
-  recordReview(p, "h-a-0", true, now + 1200000);
-  assert.equal(p.reviews["h-a-0"].interval, 2);
-  assert.equal(scheduleReview(p.reviews["h-a-0"], false, now).interval, 0);
-  assert.equal(scheduleReview({ ...p.reviews["h-a-0"], interval: 40 }, true, now).interval, 60);
+  const first = p.reviews["h-a-0"];
+  assert.ok(first.interval >= 1 && first.stability > 0 && first.difficulty > 0);
+  recordReview(p, "h-a-0", true, first.due);
+  recordReview(p, "h-a-0", true, p.reviews["h-a-0"].due);
+  assert.ok(p.reviews["h-a-0"].stability > first.stability * 5, "acertar no vencimento fortalece a memória");
+  assert.ok(p.reviews["h-a-0"].interval > first.interval);
+  const again = scheduleReview(p.reviews["h-a-0"], false, p.reviews["h-a-0"].due);
+  assert.equal(again.interval, 0);
+  assert.equal(again.lapses, 1);
+  assert.ok(again.stability < p.reviews["h-a-0"].stability);
+  const repeat = scheduleReview(first, true, first.updatedAt + 60000);
+  assert.ok(Math.abs(repeat.stability - first.stability) < 0.01, "repetir na mesma sessão não infla a memória");
+  assert.ok(scheduleReview({ ...first, stability: 5000, interval: 3000, due: now, updatedAt: now - 3000 * 86400000 }, true, now).interval <= 365);
+});
+
+test("reviews saved before FSRS keep their spacing and gain memory fields", () => {
+  const now = Date.UTC(2026, 8, 29);
+  const legacy = normalizeSnapshot({ reviews: { "h-a-0": { due: now, interval: 8, attempts: 4, correct: 4, streak: 4, updatedAt: now - 8 * 86400000 } } }).reviews["h-a-0"];
+  assert.deepEqual([legacy.stability, legacy.state, legacy.lapses], [0, 0, 0]);
+  const next = scheduleReview(legacy, true, now);
+  assert.ok(next.interval > 8, "um item antigo e sólido continua se espaçando");
+  assert.equal(next.attempts, 5);
+  assert.equal(normalizeSnapshot({ reviews: { x: { stability: -1, difficulty: 99, state: 7 } } }).reviews.x.difficulty, 10);
 });
 
 test("streak permits one weekly rest day and expires after a longer gap", () => {
