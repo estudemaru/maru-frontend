@@ -1,41 +1,58 @@
 # estudemaru.com.br
 
-Conferido em 29/09/2026 pela API e CLI da Vercel. Os dois nomes já pertencem ao
-projeto `maru-frontend`, equipe `toque-de-mulher`, e estão verificados. Não há
-redirecionamento entre eles. A publicação atual também tem o endereço
-`maru-frontend-murex.vercel.app`. Esta revisão de interface ainda não foi publicada.
+## Estado conferido em 29/09/2026
 
-## Registro.br
+O domínio principal já responde por HTTPS: a consulta pública de
+`https://estudemaru.com.br/api/account` retornou HTTP 200. O endereço alternativo
+`https://maru-frontend-murex.vercel.app/api/account` também respondeu HTTP 200.
 
-O domínio usa `a.auto.dns.br` e `b.auto.dns.br`. Nenhum A/CNAME foi encontrado
-na consulta; a Vercel informa `misconfigured: true`.
-
-No painel do domínio, abra DNS → Editar zona (modo avançado) e cadastre:
+Registros DNS observados nesta revisão:
 
 | Tipo | Nome | Valor |
 | --- | --- | --- |
-| A | raiz / em branco (`estudemaru.com.br`) | `76.76.21.21` |
-| CNAME | `www` | `25096aaefd457a8a.vercel-dns-017.com.` |
+| A | `estudemaru.com.br` | `216.198.79.1` |
+| CNAME | `www.estudemaru.com.br` | `25096aaefd457a8a.vercel-dns-017.com` |
+| NS | `estudemaru.com.br` | `b.sec.dns.br`, `c.sec.dns.br` |
 
-O A é a opção confirmada pelo `vercel domains inspect` e aceita pela API
-(rank 2); o CNAME é a recomendação específica de rank 1 para este domínio.
-Não é necessário trocar os servidores DNS. Preserve registros de e-mail,
-TXT e outros serviços. Depois de salvar, aguarde a propagação e confira o
-status na Vercel; o certificado HTTPS depende do apontamento válido.
+Os apontamentos mudaram desde a consulta anterior, que ainda não encontrava
+A/CNAME. Não é preciso substituir os registros que já estão funcionando pelas
+recomendações antigas. Esta revisão não alterou DNS nem publicou o site.
 
-Referência: https://vercel.com/docs/domains/set-up-custom-domain
+Na inspeção anterior da Vercel, os dois nomes estavam associados ao projeto
+`maru-frontend`, equipe `toque-de-mulher`, sem redirecionamento entre eles. Essa
+configuração administrativa não foi alterada nesta revisão.
 
-## Supabase — pendente por solicitação
+Referência: [domínios na Vercel](https://vercel.com/docs/domains/set-up-custom-domain).
 
-O arquivo local `maru-backend/supabase/config.toml` já declara o endereço desejado.
-Depois que o DNS estiver funcionando, aplicar remotamente:
+## Supabase
+
+A responsável informou ter configurado Google e Discord no próprio Supabase.
+A API publicada ainda retorna `googleEnabled: false` e não informa
+`emailEnabled` ou `discordEnabled`, indicando uma versão anterior à integração
+local. O código atualizado consulta os provedores habilitados no Supabase e
+mostra Google, Discord e e-mail conforme a resposta.
+
+O CLI ainda não está autenticado nesta máquina. Não foi possível confirmar
+SMTP, Site URL ou Redirect URLs no painel remoto; a configuração remota e a
+publicação permanecem pendentes. Nenhuma credencial ou política foi alterada.
+
+A configuração local desejada está em `maru-backend/supabase/config.toml`:
 
 - Site URL: `https://estudemaru.com.br`.
-- Redirect URLs: `https://estudemaru.com.br`, `https://www.estudemaru.com.br` e
+- Redirect URLs: cada origem abaixo, mais seus caminhos
+  `/api/auth/google/callback` e `/api/auth/discord/callback`:
+  `https://estudemaru.com.br`, `https://www.estudemaru.com.br` e
   `https://maru-frontend-murex.vercel.app`.
-- Secret da Edge Function: `MARU_PUBLIC_ORIGIN=https://estudemaru.com.br`.
-- Configurar SMTP próprio e verificar confirmação e recuperação com e-mail real.
-- Publicar o bundle da Edge Function e o frontend em conjunto.
+- `MARU_PUBLIC_ORIGIN`: `https://estudemaru.com.br`. O fallback local já usa
+  esse domínio; conferir se um secret remoto antigo está sobrescrevendo-o.
+- SMTP: conferir envio para e-mails externos, confirmação e recuperação.
+- Publicar a Edge Function e o frontend correspondentes juntos.
 
-Nenhuma alteração foi aplicada ao Supabase remoto. O fallback da função
-continua o endereço anterior até a definição do secret no ambiente remoto.
+O callback cadastrado no Google/Discord é o do Supabase:
+`https://qxtgaalmyzyldmcpwooo.supabase.co/auth/v1/callback`. Os caminhos do
+aplicativo acima devem estar na lista de redirecionamento do Supabase.
+
+Procedimento e validações: `maru-backend/docs/DEPLOYMENT.md`.
+Referências: [Discord e PKCE](https://supabase.com/docs/guides/auth/social-login/auth-discord),
+[Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls) e
+[SMTP próprio](https://supabase.com/docs/guides/auth/auth-smtp).

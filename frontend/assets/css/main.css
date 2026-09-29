@@ -13,4 +13,7 @@
 @import "./play.css";
 @import "./themes/sumi.css";
 @import "./delight.css";
+@import "./interface.css";
+@import "./themes/sumi-book.css";
+@import "./themes/arcade-world.css";
 @import "./print.css";
