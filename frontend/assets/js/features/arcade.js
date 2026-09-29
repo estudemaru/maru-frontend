@@ -3,6 +3,7 @@ import { recordReview } from '/shared/progress.js';
 import { esc, icon, routeLink } from '../core/ui.js';
 import { renderShiritori, shiritoriBestKey } from './shiritori.js';
 import { renderKaruta } from './karuta.js';
+import { dailyBanner } from './daily.js';
 import { LEVELS } from '/shared/shiritori.js';
 
 const cardMeta = game => game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : game.kind === 'listen' ? `<b class="play-new">NOVO</b> ${icon('volume')} Com som <span>·</span> ${icon('clock')} Com tempo` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`;
@@ -13,7 +14,7 @@ export function gameCards() {
   return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.kind === 'chain' ? 'is-wide' : span(game) ? 'is-span' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${cardMeta(game)}</span></div></a>`).join('');
 }
 export function renderArcadeHub(ctx) {
-  ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">UM POUQUINHO, TODO DIA</p><h1 tabindex="-1">Seu próximo acerto começa aqui.</h1><p>Escolha um jogo. Encontre seu ritmo. Tente mais uma vez.</p></header><div class="play-grid">${gameCards()}</div><div class="play-note">${icon('spark')} Todos os jogos têm prática infinita e desafio com tempo. Seu progresso é salvo a cada resposta.</div></div>`;
+  ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">UM POUQUINHO, TODO DIA</p><h1 tabindex="-1">Seu próximo acerto começa aqui.</h1><p>Escolha um jogo. Encontre seu ritmo. Tente mais uma vez.</p></header>${dailyBanner(ctx.progress)}<div class="play-grid">${gameCards()}</div><div class="play-note">${icon('spark')} Todos os jogos têm prática infinita e desafio com tempo. Seu progresso é salvo a cada resposta.</div></div>`;
 }
 const options = (items, current) => items.map(([value, label]) => `<option value="${value}" ${value === current ? 'selected' : ''}>${label}</option>`).join('');
 const detailList = items => items.length ? `<ul>${items.map(item => `<li><span>${esc(item.label)}</span><strong>${item.accuracy}% <small>· ${item.attempts} tentativas</small></strong></li>`).join('')}</ul>` : '<p class="muted">Ainda estamos conhecendo seu ritmo. Responda cada item pelo menos 3 vezes.</p>';
