@@ -1,12 +1,12 @@
 // Keep the stored IDs so existing account preferences remain compatible.
 export const THEMES = [
-  { id: "dojo", title: "Papel", subtitle: "Claro · tinta e papel antigo.", description: "Papel amarelado, textura washi e vermelho de selo. Um caderno para voltar todos os dias.", symbol: "道" },
-  { id: "arcade", title: "Sumi", subtitle: "Escuro · azul da noite.", description: "Azul profundo, luz suave e detalhes em coral para praticar à noite.", symbol: "墨" }
+  { id: "dojo", title: "Sumi-e", subtitle: "Claro · caderno de tinta e papel.", description: "Papel amarelado, textura washi e vermelho de selo. Um caderno para voltar todos os dias.", symbol: "道", tag: "PAPEL & VERMELHO" },
+  { id: "arcade", title: "Arcade", subtitle: "Escuro · pixels e neon.", description: "O mesmo caderno à noite: azul profundo, blocos de pixel e brilho de fliperama.", symbol: "遊", tag: "PIXEL & NEON" }
 ];
 export function applyTheme(theme) {
   const selected = THEMES.some(item => item.id === theme) ? theme : "dojo";
   document.documentElement.dataset.theme = selected;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#101a2c" : "#f3ead7");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#080f22" : "#f3ead7");
   const mark = "maru-mark.svg";
   document.querySelector('link[rel="icon"]')?.setAttribute("href", "/assets/img/" + mark);
   document.querySelector(".brand img")?.setAttribute("src", "/assets/img/" + mark);

@@ -94,3 +94,33 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   html[data-theme] .settings-panel { padding: 23px; }
   html[data-theme] .play-section-title > .play-tag { font-size: 10px; }
 }
+
+/* Movimento fluido: só transform e opacity animam; curvas com desaceleração suave.
+   Levantar cartões ao passar o mouse só vale para mouse: no toque, o "hover" grudaria. */
+:root { --ease-out: cubic-bezier(.22, 1, .36, 1); --ease-spring: cubic-bezier(.34, 1.4, .64, 1); }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="paused"]) :is(.play-card, .play-daily) { transition: transform .34s var(--ease-out), box-shadow .34s var(--ease-out), border-color .2s ease; }
+  html:not([data-motion="paused"]) :is(.karuta-card, .play-choice, .daily-choice, .kana-mode) { transition: transform .22s var(--ease-out), border-color .18s ease, background-color .18s ease, opacity .2s ease; }
+  html:not([data-motion="paused"]) .btn { transition: translate .22s var(--ease-out), scale .16s var(--ease-out), background-color .2s ease, border-color .2s ease, box-shadow .22s var(--ease-out); }
+  html:not([data-motion="paused"]) :is(.karuta-card, .play-choice, .daily-choice):active:not(:disabled) { transform: scale(.96); }
+  html:not([data-motion="paused"]) :is(.play-halo, .play-orbit, .play-star, .play-art-circle, .play-hero-art > img) { will-change: transform; }
+  html:not([data-motion="paused"]) .page-entry { animation-timing-function: var(--ease-out); }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .38s; animation-timing-function: var(--ease-out); }
+}
+@media (hover: none), (pointer: coarse) {
+  :is(.play-card, .play-daily, .karuta-card, .play-choice):hover:not(:disabled) { transform: none; }
+}
+
+/* Celular: toque sem atraso, alvos de 44 px, teclado virtual e áreas seguras. */
+:is(a, button, .karuta-card, .play-choice, label.switch) { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.play-scoreboard :is(.text-link, button) { min-height: 44px; padding-inline: 6px; }
+:is(.play-answer, #shiritori-answer, #daily-answer) { scroll-margin-block: 140px 24px; }
+.toast { bottom: max(25px, calc(env(safe-area-inset-bottom) + 14px)); }
+@media (max-width: 600px) {
+  html[data-theme] .topbar { padding-inline: max(17px, env(safe-area-inset-left)) max(17px, env(safe-area-inset-right)); }
+  .play-scoreboard { top: max(8px, env(safe-area-inset-top)); }
+  .play-question :is(.eyebrow, .step-label) { letter-spacing: .06em; }
+  .karuta-listen .btn, .play-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .play-actions { width: 100%; }
+  .toast { left: 16px; right: 16px; transform: none; width: auto; max-width: none; }
+}
