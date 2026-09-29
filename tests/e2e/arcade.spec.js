@@ -6,7 +6,7 @@ test('home stays compact and usable from 320px to desktop', async ({ page }) => 
   for (const width of [320,390,768,1440]) {
     await page.setViewportSize({width,height:1000});
     await page.goto('/#/home');
-    await expect(page.locator('.play-card')).toHaveCount(4);
+    await expect(page.locator('.play-card')).toHaveCount(5);
     await expect(page.locator('.play-hero h1')).toBeVisible();
     await page.locator('.play-card-art img').evaluateAll(images => images.forEach(img => { img.loading = 'eager'; }));
     await expect.poll(() => page.locator('.play-card-art img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
