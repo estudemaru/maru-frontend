@@ -17,15 +17,25 @@ export function createAudio(toast, preferences = () => ({})) {
     if (media) { media.pause(); media.removeAttribute("src"); media.load(); media = null; }
     mark(activeButton, "idle"); activeButton = null;
   }
+  const pending = new Map();
+  // Erros levam status e retryAfter (segundos) para quem precisa esperar o 429 da API de voz.
+  async function request(text, signal) {
+    const response=await fetch("/api/audio",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({text}),signal});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw Object.assign(new Error(data.error || "A pronúncia está indisponível. Tente novamente."),{status:response.status,retryAfter:Math.max(0,Number(data.retryAfter || response.headers.get("Retry-After")) || 0)});
+    return data;
+  }
   async function prepare(text, signal) {
     const key=audioKey(text), cached=cache.get(key);
     if(cached?.expiresAt>Date.now())return cached;
-    const response=await fetch("/api/audio",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({text}),signal});
-    const data=await response.json();
-    if(!response.ok)throw new Error(data.error || "A pronúncia está indisponível. Tente novamente.");
-    cache.set(key,data);
-    return data;
+    // Um pré-carregamento em andamento é reaproveitado em vez de gerar outro pedido.
+    if(pending.has(key))return pending.get(key);
+    const job=request(text,signal).then(data=>{cache.set(key,data);return data;});
+    if(!signal){pending.set(key,job);job.finally(()=>pending.delete(key)).catch(()=>{});}
+    return job;
   }
+  // Prepara a URL sem tocar, para a próxima rodada de um jogo já estar pronta.
+  const preload = text => prepare(text);
   async function speak(text, button = null) {
     if (button && activeButton === button) { stop(); return false; }
     stop();
@@ -79,5 +89,5 @@ export function createAudio(toast, preferences = () => ({})) {
       });
     } catch { /* Feedback sounds are optional; scoring does not depend on Web Audio. */ }
   }
-  return { speak, stop, feedback };
+  return { speak, stop, feedback, preload };
 }
