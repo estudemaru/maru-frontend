@@ -3,6 +3,7 @@ import { personalBest } from '/shared/arcade.js';
 import { recordReview, recordActivity } from '/shared/progress.js';
 import { getPronunciation } from '/shared/pronunciation.js';
 import { esc, icon, routeLink, audioButton } from '../core/ui.js';
+import { kanaModeButton } from '../core/kanaInput.js';
 
 // A lista (~18 mil palavras) só é baixada quando alguém abre o jogo, e uma única vez.
 let dictionaryRequest;
@@ -76,7 +77,7 @@ export function renderShiritori(ctx, game) {
     ctx.main.innerHTML = `<div class="play-page play-session shiritori">${header()}<div class="play-scoreboard"><span><small>SUAS PALAVRAS</small><strong>${match.chain}</strong></span><span><small>RECORDE</small><strong>${best()}</strong></span><span><small>${deadline ? 'TEMPO' : 'RITMO'}</small><strong id="shiritori-clock" role="timer">${deadline ? Math.max(0, Math.ceil((deadline - Date.now()) / 1000)) + 's' : '∞'}</strong></span><button class="text-link" id="shiritori-giveup">Desistir</button></div>
       <section class="play-question"><h1 class="sr-only" tabindex="-1">${game.title}</h1><ol class="shiritori-chain" aria-label="Palavras da partida">${history.map((word, i) => chainWord(word, i === history.length - 1)).join('')}</ol>
       <p class="shiritori-turn">Sua vez. Comece com <span class="shiritori-kana" lang="ja">${esc(required)}</span></p>
-      <form id="shiritori-form" autocomplete="off"><label class="sr-only" for="shiritori-answer">Sua palavra começando com ${esc(required)}</label><input class="text-input play-answer" id="shiritori-answer" name="answer" placeholder="${esc(required)}…" lang="ja" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40"><button class="btn btn-primary" id="shiritori-send">Jogar ${icon('arrow')}</button></form>
+      <form id="shiritori-form" autocomplete="off"><label class="sr-only" for="shiritori-answer">Sua palavra começando com ${esc(required)}</label><input class="text-input play-answer" id="shiritori-answer" name="answer" placeholder="${esc(required)}…" lang="ja" data-kana autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40">${kanaModeButton()}<button class="btn btn-primary" id="shiritori-send">Jogar ${icon('arrow')}</button></form>
       <div id="shiritori-feedback" role="status" aria-live="polite">${message ? `<p class="shiritori-message">${message}</p>` : ''}${hint ? `<p class="shiritori-hint">Que tal <b lang="ja">${esc(hint.reading)}</b>${hint.written !== hint.reading ? ` <span lang="ja">(${esc(hint.written)})</span>` : ''}${hint.pt ? ` · ${esc(hint.pt)}` : ''}?</p>` : ''}</div>
       <button class="text-link play-skip" id="shiritori-hint" ${hintsUsed >= MAX_HINTS ? 'disabled' : ''}>Me dá uma dica · ${MAX_HINTS - hintsUsed} restantes</button></section>
       <p class="play-session-note">${config.level === 'calm' ? 'Maru tranquilo' : 'Maru esperto'} · ${dictionary.size.toLocaleString('pt-BR')} palavras na lista · respostas que não valem não contam como erro</p></div>`;

@@ -20,9 +20,10 @@ import { renderSettings } from "./features/settings.js";
 import { emptyState, routeLink, setReaderMode } from "./core/ui.js";
 import { hasKanaFoundation } from './core/beginner.js';
 import { getLesson } from '/shared/curriculum.js';
-import { applyTheme, syncMotion, toggleMotion } from "./core/theme.js";
+import { applyTheme, syncMotion, toggleMotion, THEMES } from "./core/theme.js";
 import { playerLevel, ACHIEVEMENTS } from "/shared/gamification.js";
 import { completeEmailLink } from "./api.js";
+import { setupKanaInput } from "./core/kanaInput.js";
 
 // Supabase sends confirmation/recovery tokens in the fragment for implicit links.
 // Clear the fragment before any further work so the credentials leave the URL quickly.
@@ -68,6 +69,7 @@ app.innerHTML = `
   <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Arte: Irasutoya / Mifune Takashi · Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer></div>
 `;
 const main = document.querySelector("#main");
+const kanaInput = setupKanaInput(main, () => store.snapshot.preferences.kanaInput !== false);
 let cleanup;
 let routeParams = null;
 const ctx = {
@@ -76,8 +78,14 @@ const ctx = {
   flush: () => store.flush(),
   logout: () => store.logout(),
   get progress() { return store.snapshot; },
-  save() { store.save(); updateStats(); },
-  setTheme(theme) { store.snapshot.preferences.theme = theme; applyTheme(theme); store.save(); updateStats(); },
+  save() { store.save(); updateStats(); kanaInput.rescan(); },
+  setTheme(theme) {
+    store.snapshot.preferences.theme = theme;
+    // Troca de tema com transição suave onde o navegador permite; sem ela, a troca é imediata.
+    const still = document.documentElement.dataset.motion === "paused" || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !still) document.startViewTransition(() => applyTheme(theme)); else applyTheme(theme);
+    store.save(); updateStats();
+  },
   navigate(route, params = null) {
     routeParams = params;
     const hash = "#/" + route;
@@ -180,7 +188,7 @@ document.addEventListener("keydown", event => {
 document.addEventListener("click", event => {
   if (event.target.closest("[data-motion-toggle]")) toggleMotion();
   const theme = event.target.closest("[data-theme-choice]");
-  if (theme) { const choice = theme.dataset.themeChoice; ctx.setTheme(choice); toast("Estilo " + ({ dojo: "Papel", arcade: "Sumi" }[choice] || "Papel") + " ativado. Seu progresso continua o mesmo."); }
+  if (theme) { const choice = theme.dataset.themeChoice; ctx.setTheme(choice); toast("Estilo " + (THEMES.find(item => item.id === choice) || THEMES[0]).title + " ativado. Seu progresso continua o mesmo."); }
   const speaker = event.target.closest("[data-speak]");
   if (speaker) { event.preventDefault(); audio.speak(speaker.dataset.speak, speaker); }
   const review = event.target.closest("[data-add-review]");
