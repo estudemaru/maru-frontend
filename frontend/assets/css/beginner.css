@@ -1,0 +1,48 @@
+.challenge-setup,.challenge-stage,.challenge-results { padding: clamp(20px,4vw,36px); max-width: 840px; margin-inline: auto; }
+.challenge-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-block: 24px; }
+.challenge-options label,.challenge-stage form { display: grid; gap: 10px; }
+.challenge-round,.challenge-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+#challenge-clock { font-weight: 700; font-variant-numeric: tabular-nums; border: 1px solid currentColor; border-radius: 20px; padding: 6px 14px; }
+.challenge-prompt { font-size: clamp(24px,5vw,40px); line-height: 1.35; text-wrap: balance; }
+.challenge-input { font-size: 24px; min-height: 58px; }
+.challenge-model { font-size: 28px; overflow-wrap: anywhere; }
+.challenge-keyboard { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 10px; max-height: 230px; overflow-y: auto; }
+.challenge-keyboard button { min-width: 48px; min-height: 48px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 24px; touch-action: manipulation; }
+.challenge-keyboard button:hover { border-color: currentColor; }
+.challenge-keyboard button:disabled { opacity: .55; cursor: default; }
+.challenge-advice { padding: 16px 0; border-top: 1px solid var(--line); }
+.challenge-review-items { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.challenge-review-items span { overflow-wrap: anywhere; }
+.challenge-review-items b { font-size: 1.3rem; }
+.challenge-results .challenge-actions { margin-top: 24px; justify-content: flex-start; }
+.study-routine { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-block: 24px; }
+.study-routine li { display: grid; gap: 6px; border: 1px solid var(--line); padding: 20px; border-radius: 16px; }
+.study-routine span { font-size: .9rem; color: var(--muted); }
+.video-lesson-grid,.quick-practice-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-block: 24px; }
+.video-lesson-card { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 24px; min-width: 0; }
+.video-lesson-card h2,.video-lesson-card p { margin: 0; }
+.video-lesson-card .btn { margin-top: auto; }
+.quick-practice-card { display: grid; gap: 10px; padding: 24px; color: inherit; text-decoration: none; min-width: 0; }
+.quick-practice-card:hover { border-color: var(--accent); }
+.quick-practice-card strong { font-size: 1.2rem; }
+.quick-practice-card p { margin: 0; color: var(--muted); }
+.quick-practice-card > .icon { width: 28px; height: 28px; }
+.account-form input { min-width: 0; width: 100%; }
+.account-tabs .is-active { border-color: var(--accent); }
+.account-page { max-width: 760px; margin-inline: auto; }
+.worksheet-toolbar > div { min-width: 0; }
+.worksheet-toolbar select { width: 100%; }
+.worksheet-toolbar { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); }
+.worksheet-selection { max-height: 260px; overflow-y: auto; }
+.worksheet-selection .worksheet-char { flex: 0 0 44px; }
+.worksheet-toolbar #print-worksheet { width: 100%; }
+.worksheet-preview { scroll-margin-top: 90px; }
+.beginner-note { margin-block: 20px; padding: 20px; }
+@media(max-width:640px) {
+  .challenge-options,.study-routine,.video-lesson-grid,.quick-practice-grid { grid-template-columns: minmax(0,1fr); }
+  .challenge-stage form .btn,.challenge-setup > .btn { width: 100%; }
+  .challenge-keyboard { max-height: 200px; }
+}
+
+.practice-hub-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+@media(max-width:640px) { .practice-hub-grid { grid-template-columns: minmax(0,1fr); } }

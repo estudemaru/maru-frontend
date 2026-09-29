@@ -12,18 +12,18 @@
 .paper-heading { flex: 0 0 auto; }
 .paper-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
 .paper-body > * { flex-shrink: 0; }
-.paper-header { display: flex; justify-content: space-between; align-items: center; gap: 6mm; border-bottom: 1.5pt solid #333; padding-bottom: 3mm; margin-bottom: 4mm; }
-.paper-header strong { font: 700 22pt/1 "DM Sans",sans-serif; letter-spacing: -1px; }
+.paper-header { display: flex; justify-content: space-between; align-items: center; gap: 6mm; border-bottom: 1pt solid #333; padding-bottom: 2.5mm; margin-bottom: 3mm; }
+.paper-header strong { font: 700 20pt/1 "DM Sans",sans-serif; letter-spacing: -1px; }
 .paper-header span { font-size: 8pt; line-height: 1.5; text-align: right; max-width: 115mm; }
-.paper-name { display: flex; justify-content: space-between; gap: 5mm; font-size: 8.5pt; margin: 0 0 5mm; }
-.print-sheet h2 { font: 700 17pt/1.3 "DM Sans",sans-serif; margin: 2mm 0 3mm; }
-.paper-instructions { font-size: 9pt; line-height: 1.6; margin: 0 0 5mm; }
+.paper-name { display: flex; justify-content: space-between; gap: 5mm; font-size: 8.5pt; margin: 0 0 3mm; }
+.print-sheet h2 { font: 700 16pt/1.3 "DM Sans",sans-serif; margin: 2mm 0 3mm; }
+.paper-instructions { font-size: 9pt; line-height: 1.6; margin: 0 0 3mm; }
 .paper-continuation { text-transform: uppercase; letter-spacing: 1px; font-size: 7.5pt; margin: 0 0 3mm; }
-.paper-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; flex: 0 0 10mm; margin-top: 4mm; padding-top: 2mm; border-top: .5pt solid #aaa; font-size: 7.5pt; line-height: 1.5; }
+.paper-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; flex: 0 0 10mm; margin-top: 3mm; padding-top: 2mm; border-top: .5pt solid #aaa; font-size: 7.5pt; line-height: 1.5; }
 .paper-footer small { display: block; font-size: 6.5pt; }
 .paper-page-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.paper-row { margin: 0 0 4mm; break-inside: avoid; }
-.paper-row-label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3mm; margin-bottom: 2mm; font-size: 8.5pt; }
+.paper-row { margin: 0 0 3mm; break-inside: avoid; }
+.paper-row-label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3mm; margin-bottom: 1.5mm; font-size: 8.5pt; }
 .paper-row-label strong { font-size: 11pt; }
 .paper-row-label .paper-word { font: 16pt "Noto Sans JP",sans-serif; }
 .paper-boxes { display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); grid-template-rows: minmax(0,1fr); aspect-ratio: 9 / 1; border-left: .5pt solid #999; }
@@ -34,38 +34,38 @@
 .paper-box svg { width: 100%; height: 100%; display: block; position: relative; z-index: 1; overflow: hidden; }
 .paper-box path { fill: none; stroke: #222; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .paper-box text { fill: #444; font: 8px sans-serif; }
-.paper-box.ghost path { stroke: #ccc; }
+.paper-box.ghost path { stroke: #b7b7b7; }
 .paper-box.ghost text { display: none; }
 .paper-box .jp { font: 30pt "Noto Sans JP",sans-serif; color: #ccc; }
-.paper-body-kana .paper-kana-family { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(5,minmax(0,1fr)); gap: 3mm; }
-.paper-kana-family .paper-row { margin: 0; }
-.paper-kana-gap .paper-boxes { border: 0; }
-.paper-repeat-grid { width: 100%; display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); grid-template-rows: repeat(9,minmax(0,1fr)); aspect-ratio: 1; border-top: .5pt solid #999; border-left: .5pt solid #999; margin: 7mm 0; }
+.paper-repeat-grid { width: 100%; display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); grid-template-rows: repeat(11,minmax(0,1fr)); aspect-ratio: 9 / 11; border-top: .5pt solid #999; border-left: .5pt solid #999; margin: 3mm 0; }
 .paper-repeat-grid .paper-box { border-top: 0; }
 .paper-practice-line { min-height: 8mm; border-bottom: .5pt solid #aaa; margin-top: 1mm; }
 .paper-checklist { display: flex; flex-wrap: wrap; gap: 2mm 5mm; margin: 2mm 0 5mm; font-size: 8pt; }
-.paper-question { padding: 0 0 2mm; margin: 0 0 2mm; break-inside: avoid; }
+.paper-question { padding: 0 0 1mm; margin: 0 0 1mm; break-inside: avoid; }
 .paper-question > strong { font-size: 10pt; }
-.paper-question > p { margin: 1.5mm 0; font-size: 9pt; }
-.paper-question .jp { font-size: 13pt; line-height: 1.8; }
-.paper-question .paper-practice-line { min-height: 6mm; }
+.paper-question > p { margin: 1mm 0; font-size: 9pt; }
+.paper-question .jp { font-size: 12pt; line-height: 1.65; }
+.paper-sentence-question .paper-practice-line { min-height: 10mm; }
+.paper-question .paper-practice-line { min-height: 8mm; }
 .paper-writing-extension { margin-top: 3mm; }
-.paper-body-practice > .paper-question { flex-grow: 1; display: flex; flex-direction: column; }
-.paper-body-practice > .paper-question .paper-practice-line:last-child { margin-top: auto; }
-.paper-answer { margin: 0 0 4mm; padding-bottom: 3mm; border-bottom: .5pt solid #ddd; font-size: 9pt; break-inside: avoid; }
+.paper-answer { margin: 0 0 1.5mm; padding-bottom: 1.5mm; border-bottom: .5pt solid #ddd; font-size: 9pt; break-inside: avoid; }
 .paper-answer strong { display: block; font-size: 10pt; margin-bottom: 1mm; }
 .paper-answer p { margin: 1mm 0; }
+.paper-answer-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5mm; }
 .paper-image-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4mm; }
 .paper-image-grid[data-count="4"],.paper-image-grid[data-count="2"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
-.paper-image-card { height: 59mm; border: .5pt solid #ccc; border-radius: 2mm; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; break-inside: avoid; }
-.paper-image-card img { width: 33mm; height: 33mm; object-fit: contain; max-width: 80%; }
+.paper-image-grid[data-count="5"] { grid-template-columns: repeat(6,minmax(0,1fr)); }
+.paper-image-grid[data-count="5"] .paper-image-card { grid-column: span 2; }
+.paper-image-grid[data-count="5"] .paper-image-card:nth-last-child(-n+2) { grid-column: span 3; }
+.paper-image-card { height: 48mm; border: .5pt solid #ccc; border-radius: 2mm; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; break-inside: avoid; }
+.paper-image-card img { width: 29mm; height: 29mm; object-fit: contain; max-width: 80%; }
 .paper-image-number { position: absolute; top: 3mm; left: 3mm; font-weight: 700; font-size: 9pt; }
 .paper-image-answer { font-size: 9pt; margin-top: 3mm; }
 .paper-art-credit { font: 7pt/1.5 "DM Sans",sans-serif; margin-top: 4mm; }
-.paper-word-bank { margin-top: 6mm; padding: 4mm; border: .5pt solid #bbb; border-radius: 2mm; }
+.paper-word-bank { margin-top: 4mm; padding: 4mm; border: .5pt solid #bbb; border-radius: 2mm; }
 .paper-word-bank h3,.paper-dialogue-questions h3,.paper-dialogue-answer h3 { font: 700 11pt/1.4 "DM Sans",sans-serif; margin: 0 0 3mm; }
 .paper-word-bank > div { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 3mm; }
-.paper-word-bank > div > span { font-size: 10pt; white-space: nowrap; }
+.paper-word-bank > div > span { font-size: 10pt; overflow-wrap: anywhere; }
 .paper-word-bank small { display: block; font: 8pt "Noto Sans JP",sans-serif; margin-left: 4mm; }
 .paper-picture-answers { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4mm 6mm; }
 .paper-picture-answers > div { border-bottom: .5pt solid #ccc; padding: 3mm 0; }
@@ -77,8 +77,8 @@
 .paper-dialogue-turn p { font: 12pt/1.9 "Noto Sans JP",sans-serif; margin: 0; }
 .paper-dialogue-turn small { font-size: 9pt; }
 .paper-dialogue-turn .paper-practice-line { min-height: 7mm; }
-.paper-dialogue-questions { margin-top: 6mm; }
-.paper-dialogue-questions > div { margin-bottom: 4mm; }
+.paper-dialogue-questions { margin-top: 4mm; }
+.paper-dialogue-questions > div { margin-bottom: 3mm; }
 .paper-dialogue-questions strong { font-size: 9pt; }
 .paper-dialogue-answer { padding: 0 0 4mm; margin-bottom: 4mm; border-bottom: .5pt solid #ccc; break-inside: avoid; }
 .paper-dialogue-answer p { font-size: 9pt; margin: 2mm 0; }
@@ -91,17 +91,15 @@
 .paper-book-cover-art { margin: 9mm 0; align-self: center; text-align: center; }
 .paper-book-cover-art img { width: 52mm; height: 52mm; object-fit: contain; }
 .paper-book-cover small { font-size: 9pt; max-width: 150mm; margin-top: 8mm; }
-.paper-book-toc { display: grid; gap: 3mm; margin-top: 5mm; }
-.paper-book-toc > div { padding: 4mm 0; border-bottom: .5pt solid #bbb; }
+.paper-book-toc { display: grid; gap: 0; margin-top: 2mm; }
+.paper-book-toc > div { display: grid; grid-template-columns: minmax(0,1fr) 10mm; gap: 3mm; padding: 3mm 0; border-bottom: .5pt solid #bbb; }
+.paper-book-toc b { text-align: right; font-size: 10pt; font-variant-numeric: tabular-nums; align-self: center; }
 .paper-book-toc strong,.paper-book-toc span { display: block; }
 .paper-book-toc span { font-size: 9pt; }
 .paper-book-goal { font-size: 9pt; padding: 2mm 3mm; margin: 0 0 4mm; border-left: 2pt solid #555; }
-.paper-book-section { font-size: 10pt; line-height: 1.55; padding-bottom: 3mm; margin-bottom: 3mm; }
+.paper-book-section { font-size: 10pt; line-height: 1.5; padding-bottom: 1mm; margin-bottom: 3mm; }
 .paper-book-section h3 { font-size: 11pt; margin: 0 0 2mm; }
 .paper-book-section > p { margin: 1.5mm 0; }
-.paper-book-example { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: 3mm; align-items: baseline; padding: 1mm 0; }
-.paper-book-example span { font: 11pt/1.8 "Noto Sans JP",sans-serif; overflow-wrap: anywhere; }
-.paper-book-example small { font-size: 8.5pt; }
 .paper-book-tip { font-size: 9pt; padding: 2mm 3mm; border-left: 1pt solid #aaa; background: #f7f7f7; }
 .paper-book-practice-title { font-size: 11pt; border-top: 1pt solid #aaa; padding-top: 3mm; margin: 1mm 0 3mm; }
 .paper-book-question { margin: 0 0 3mm; font-size: 9pt; break-inside: avoid; }
@@ -111,13 +109,148 @@
 .paper-book-answers { padding-bottom: 3mm; margin-bottom: 3mm; border-bottom: .5pt solid #ccc; font-size: 9pt; break-inside: avoid; }
 .paper-book-answers h3 { font-size: 11pt; margin-bottom: 2mm; }
 .paper-book-answers p { margin: 1.5mm 0; }
-.paper-book-words { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4mm; }
+.paper-book-words { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5mm; margin-bottom: 3mm; }
 .paper-book-words > div { padding: 2mm 0; border-bottom: .5pt solid #bbb; }
 .paper-book-words strong,.paper-book-words span,.paper-book-words small { display: block; }
 .paper-book-words strong { font: 13pt/1.8 "Noto Sans JP",sans-serif; }
 .paper-book-words span { font-size: 9pt; }
 .paper-book-words small { font: 10pt/1.8 "Noto Sans JP",sans-serif; }
-.paper-source { visibility: hidden; position: absolute; width: 182mm; font: 10.5pt/1.55 "DM Sans",sans-serif; }
+/* Shared workbook rhythm: useful writing space, without stretching exercises. */
+.print-sheet .eyebrow { font: 700 7.5pt/1.4 "DM Sans",sans-serif; letter-spacing: 1px; margin: 0 0 2mm; }
+.paper-section-heading { padding-top: 3mm; border-top: 1pt solid #777; margin-top: 3mm; }
+.paper-body > .paper-section-start:first-child .paper-section-heading { border-top: 0; padding-top: 0; margin-top: 0; }
+.paper-section-start { break-inside: avoid; }
+.paper-writing-extension { break-inside: avoid; }
+.paper-writing-extension h3,.paper-study-guide h3 { font-size: 11pt; margin: 0 0 2mm; }
+.paper-study-guide { margin-top: 6mm; border: .5pt solid #aaa; padding: 4mm; font-size: 9pt; }
+.paper-study-guide ol { padding-left: 5mm; margin: 2mm 0; }
+.paper-study-guide li { margin-bottom: 2mm; }
+.paper-study-guide p { margin: 3mm 0 0; }
+.paper-recall-grid { display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); grid-template-rows: repeat(5,minmax(0,1fr)); aspect-ratio: 9 / 5; border-top: .5pt solid #999; border-left: .5pt solid #999; margin: 3mm 0; }
+.paper-recall-grid .paper-box { border-top: 0; }
+.paper-recall-words { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5mm; }
+.paper-recall-words > div { min-height: 11mm; border-bottom: .5pt solid #aaa; font-size: 8pt; }
+.paper-question,.paper-book-question,.paper-answer,.paper-book-answers { overflow-wrap: anywhere; }
+/* Illustrated lessons: the Japanese example is the focal point. */
+.paper-lesson-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 5mm; }
+.paper-learning-image { width: 28mm; height: 28mm; object-fit: contain; display: block; }
+.paper-lesson-heading > .paper-learning-image { width: 30mm; height: 30mm; }
+.paper-learning-steps { font-size: 8pt; margin: 0 0 3mm; letter-spacing: .2pt; }
+.paper-section-label { display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm; }
+.paper-section-label > span { display: grid; place-items: center; width: 7mm; height: 7mm; flex: 0 0 7mm; border-radius: 50%; background: var(--paper-tint); font-size: 8pt; font-weight: 700; }
+.paper-section-label h3 { margin: 0; }
+.paper-explanation { font-size: 9.5pt; line-height: 1.55; }
+.paper-explanation p { margin: 0 0 2mm; }
+.paper-example-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 3mm; margin: 2mm 0 3mm; break-inside: avoid; }
+.paper-example-grid[data-example-layout="word"][data-count="2"],.paper-example-grid[data-example-layout="character"][data-count="2"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="3"] { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="4"] { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.paper-example-grid[data-example-layout="character"][data-count="5"] { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.paper-example-card { min-width: 0; padding: 3mm; border: .6pt solid var(--paper-rule); background: var(--paper-tint); border-radius: 3mm; display: grid; grid-template-columns: minmax(0,1fr); align-items: center; gap: 3mm; break-inside: avoid; }
+.paper-example-card:has(> img) { grid-template-columns: 23mm minmax(0,1fr); }
+.paper-example-card > .paper-learning-image { width: 23mm; height: 25mm; }
+.paper-example-copy { min-width: 0; }
+.paper-example-japanese { font: 500 18pt/1.65 "Noto Sans JP",sans-serif; overflow-wrap: anywhere; }
+[data-example-kind="word"] .paper-example-japanese { font-size: 25pt; line-height: 1.45; }
+[data-example-kind="character"] { text-align: center; }
+[data-example-kind="character"] .paper-example-japanese { font-size: 44pt; line-height: 1.35; }
+[data-example-kind="contrast"] .paper-example-japanese { font-size: 30pt; }
+.paper-example-copy p { margin: 1mm 0 0; }
+.paper-example-reading { font-size: 8pt; line-height: 1.4; }
+.paper-example-meaning { font-size: 9.5pt; font-weight: 600; line-height: 1.45; }
+.paper-example-note { font-size: 8pt; line-height: 1.45; padding-top: 2mm; border-top: .5pt solid var(--paper-rule); }
+.paper-kana-strip { display: flex; justify-content: space-around; gap: 2mm; }
+.paper-kana-strip span { font: 500 30pt/1.4 "Noto Sans JP",sans-serif; }
+.paper-book-tip > strong { font-size: 8pt; text-transform: uppercase; letter-spacing: .5pt; margin-right: 2mm; }
+.paper-family-overview { display: flex; justify-content: space-around; gap: 2mm; padding: 2mm; margin-bottom: 3mm; border-radius: 3mm; background: var(--paper-tint); }
+.paper-family-overview strong { display: block; font: 500 28pt/1.25 "Noto Sans JP",sans-serif; }
+.paper-family-overview small { display: block; font-size: 8pt; text-align: center; }
+.paper-vocabulary-card { display: flex; align-items: center; gap: 3mm; }
+.paper-vocabulary-card > div { min-width: 0; }
+.paper-vocabulary-card .paper-learning-image { width: 20mm; height: 22mm; flex: 0 0 20mm; }
+.paper-vocabulary-card strong { font-size: 19pt; overflow-wrap: anywhere; }
+.paper-kanji-study { margin-bottom: 4mm; break-inside: avoid; }
+.paper-kanji-intro { display: grid; grid-template-columns: 28mm 25mm minmax(0,1fr); gap: 5mm; align-items: center; padding: 2mm 3mm; margin-bottom: 2mm; background: var(--paper-tint); border-radius: 3mm; }
+.paper-kanji-intro .paper-kanji-display { font: 500 54pt/1.25 "Noto Sans JP",sans-serif; text-align: center; }
+.paper-kanji-intro h3 { font-size: 13pt; margin: 0 0 1mm; }
+.paper-kanji-intro p { font-size: 15pt; margin: 0; }
+.paper-kanji-intro small { font-size: 9pt; }
+.paper-meaning-sketch { width: 24mm; height: 24mm; fill: #f5d389; stroke: #956620; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.paper-kanji-study .paper-row-label { display: none; }
+/* A family is taught and practised on the same page. Keep the 20 mm writing
+   squares; recover space from duplicated headings, examples and decoration. */
+.paper-kana-study { break-inside: avoid; }
+.paper-kana-study .paper-lesson-heading { display: block; padding: 0; border: 0; margin: 0 0 2mm; }
+.paper-kana-study .paper-lesson-heading h2 { font-size: 14pt; margin: 0 0 1mm; }
+.paper-kana-study .paper-book-goal { padding: 0; border: 0; background: none; margin: 0; font-size: 8.5pt; }
+.paper-kana-study .paper-learning-steps { display: none; }
+.paper-kana-study .paper-book-section { margin-bottom: 1mm; padding: 0; }
+.paper-kana-study .paper-section-label { margin-bottom: 1mm; }
+.paper-kana-study .paper-section-label > span { width: 6mm; height: 6mm; flex-basis: 6mm; }
+.paper-kana-study .paper-explanation { font-size: 9pt; line-height: 1.45; }
+.paper-kana-study .paper-example-grid { margin: 1mm 0 2mm; }
+.paper-kana-study .paper-example-card { padding: 1.5mm 2mm; }
+.paper-kana-study [data-example-kind="character"] .paper-example-japanese { font-size: 36pt; }
+.paper-kana-study .paper-row { margin-bottom: 1.5mm; }
+.paper-kana-study .paper-row-label { margin-bottom: .8mm; line-height: 1.25; }
+.paper-kana-study .paper-writing-extension { margin-top: 2mm; }
+.paper-kana-study .paper-writing-extension h3 { margin-bottom: 1mm; }
+.paper-kana-study .paper-instructions { margin-bottom: 2mm; font-size: 8.5pt; line-height: 1.4; }
+.paper-kana-study .paper-checklist { margin-bottom: 0; }
+/* Colour supports the learning hierarchy while the writing areas stay white. */
+.print-sheet { --paper-accent: #146b70; --paper-tint: #edf8f6; --paper-rule: #aad5d0; }
+.print-sheet[data-paper-tone="coral"] { --paper-accent: #ac4637; --paper-tint: #fff2ed; --paper-rule: #e7b4a4; }
+.print-sheet[data-paper-tone="violet"] { --paper-accent: #6b4a95; --paper-tint: #f5f0fc; --paper-rule: #cbb8e2; }
+.print-sheet[data-paper-tone="blue"] { --paper-accent: #285ea0; --paper-tint: #eef5ff; --paper-rule: #acc9e9; }
+.print-sheet[data-paper-tone="gold"] { --paper-accent: #85550d; --paper-tint: #fff7df; --paper-rule: #dec57e; }
+.print-sheet .paper-header { border-color: var(--paper-accent); }
+.print-sheet .paper-header strong,.print-sheet h2,.print-sheet .eyebrow { color: var(--paper-accent); }
+.print-sheet .paper-header span,.print-sheet .paper-continuation { color: var(--paper-accent); }
+.paper-book-goal { background: var(--paper-tint); border-color: var(--paper-accent); }
+.paper-book-tip { background: #fff7df; border-color: #bb891e; }
+.paper-book-practice-title { color: var(--paper-accent); border-color: var(--paper-rule); }
+.paper-section-heading,.paper-footer,.paper-book-toc > div { border-color: var(--paper-rule); }
+.print-sheet .paper-page-number,.print-sheet .paper-book-toc b { color: var(--paper-accent); }
+.paper-study-guide { background: var(--paper-tint); border-color: var(--paper-rule); border-radius: 2mm; }
+.print-sheet .paper-study-guide h3,.print-sheet .paper-writing-extension h3 { color: var(--paper-accent); }
+.paper-row-label { padding-left: 2mm; border-left: 2pt solid var(--paper-accent); }
+.paper-box.model { background: var(--paper-tint); }
+.paper-box.model path { stroke: var(--paper-accent); }
+.paper-box.model text { fill: #234c54; }
+.paper-image-card,.paper-word-bank { border-color: var(--paper-rule); }
+.paper-image-card:nth-child(3n+1) { background: #fff7ed; }
+.paper-image-card:nth-child(3n+2) { background: #f0f8f4; }
+.paper-image-card:nth-child(3n) { background: #f4f0fb; }
+.paper-word-bank { background: #edf8f6; }
+.paper-dialogue-turn { border-color: var(--paper-rule); }
+.paper-dialogue-turn > strong { background: var(--paper-accent); color: #fff; border-color: var(--paper-accent); }
+.paper-dialogue-turn:nth-child(even) > strong { background: #9b4770; border-color: #9b4770; }
+.paper-book-cover { border-top: 3mm solid #e69b72; padding-top: 8mm; }
+.print-sheet .paper-book-cover h2 { color: #146b70; }
+.paper-cover-path { display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 4mm; }
+.paper-cover-path span { border: .5pt solid #aad5d0; border-radius: 8mm; padding: 1.5mm 3mm; background: #edf8f6; font-size: 8pt; }
+.paper-cover-path span:nth-child(2) { background: #fff2ed; border-color: #e7b4a4; }
+.paper-cover-path span:nth-child(3) { background: #f5f0fc; border-color: #cbb8e2; }
+.paper-cover-path span:nth-child(4) { background: #fff7df; border-color: #dec57e; }
+.paper-kanji-answers { margin-top: 4mm; font-size: 9pt; }
+/* Monochrome uses ink-saving white surfaces and explicit dark rules. It does
+   not depend on the printer converting pale coloured backgrounds to grey. */
+.worksheet-preview[data-print-color="mono"] .print-sheet {
+  --paper-accent: #111; --paper-tint: #fff; --paper-rule: #777;
+  background: #fff; color: #111;
+}
+.worksheet-preview[data-print-color="mono"] .print-sheet * {
+  color: #111 !important; background-color: transparent !important;
+  border-color: #777 !important;
+}
+.worksheet-preview[data-print-color="mono"] .print-sheet img { filter: grayscale(1) contrast(1.2); }
+.worksheet-preview[data-print-color="mono"] .paper-box path { stroke: #111; }
+.worksheet-preview[data-print-color="mono"] .paper-box text { fill: #111; }
+.worksheet-preview[data-print-color="mono"] .paper-box.ghost path { stroke: #888; }
+.worksheet-preview[data-print-color="mono"] .paper-box::before,
+.worksheet-preview[data-print-color="mono"] .paper-box::after { border-color: #aaa; }
+.worksheet-preview[data-print-color="mono"] .paper-meaning-sketch { fill: #eee; stroke: #222; }
+.paper-source { visibility: hidden; position: absolute; width: 182mm; height: auto; padding: 0; transform: none; font: 10.5pt/1.55 "DM Sans",sans-serif; }
 @page { size: A4 portrait; margin: 0; }
 @media print {
   html,html[data-theme],body { color-scheme: light; background: white !important; color: black !important; margin: 0 !important; padding: 0 !important; }

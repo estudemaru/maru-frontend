@@ -14,6 +14,11 @@ os [termos](https://www.irasutoya.com/p/terms.html) e a
 [FAQ](https://www.irasutoya.com/p/faq.html). Não oferecer as artes como pacote de
 downloads. O site não solicita apoio financeiro.
 
+O Livro 1 reutiliza essas imagens nos exemplos das lições e nas atividades de
+vocabulário, associadas às respectivas palavras. As páginas ilustradas mantêm
+o crédito a Mifune Takashi / Irasutoya no rodapé. Os desenhos esquemáticos dos
+significados na seção final de kanji são vetores próprios do projeto.
+
 | Arquivo local | Uso | Página oficial |
 | --- | --- | --- |
 | `irasutoya-study-nihongo.png` | Capa do Livro 1 | https://www.irasutoya.com/2015/08/blog-post_26.html |

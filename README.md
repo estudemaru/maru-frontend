@@ -8,14 +8,18 @@ O Maru organiza o estudo em uma trilha clara e acolhedora: a pessoa aprende o al
 
 - 40 lições distribuídas em 8 etapas, do primeiro contato a conversas cotidianas;
 - hiragana, katakana, kanji, vocabulário, partículas e construção de frases;
+- jogos curtos de escrita e escuta com 15, 30 ou 60 segundos por tentativa, modo sem tempo e indicação do que revisar;
 - prática de escrita com ordem dos traços, áudio e revisão espaçada;
-- folhas A4 para imprimir um, 20 recomendados, mais de 20 ou todos os caracteres; cada família de kana em sua folha, com quadrados pequenos lado a lado, espaços em YA/YU/YO e WA/WO/O/N, e páginas extras de repetição com guias tracejadas;
+- aulas gratuitas no YouTube, incluindo o 123 Japonês, com sugestões de prática no papel;
+- folhas A4 por família, começando pelas vogais, ou por seleção livre de caracteres; modelos de traços e opções colorida e preto e branco de alto contraste;
 - atividades A4 de associação entre imagens e palavras, diálogos para completar e perguntas de compreensão, separadas ou em um pacote, com gabarito opcional;
-- Livro 1 completo para imprimir, com as 40 lições, práticas de escrita, palavras, frases, partículas, imagens, diálogos e gabaritos;
+- Livro 1 colorido para imprimir, com sumário paginado, 36 lições em kana, atividades e gabaritos; uma introdução a dez kanji básicos aparece somente na última parte;
 - pacotes públicos para professores compartilharem uma etapa ou trilha temática com a turma, sem conta de aluno ou acompanhamento individual;
 - diagnóstico inicial e uma trilha que indica o próximo passo;
 - estilos visuais Dojo e Arcade, metas, constância e conquistas;
-- estudo anônimo no navegador ou sincronização entre aparelhos com uma conta por e-mail.
+- estudo anônimo no navegador ou sincronização entre aparelhos com uma conta por e-mail em Minha conta; cadastro, confirmação e recuperação de senha sem Google.
+
+Para quem começa, exemplos usam kana como leitura principal. Kanji passam a aparecer nas palavras após concluir pelo menos 80% das lições de cada silabário; a consulta específica de kanji continua disponível pela trilha.
 
 Todo o conteúdo é gratuito, sem pedidos de apoio financeiro. As ilustrações do Irasutoya têm fontes e registro da autorização informada pela responsável em [IRASUTOYA.md](frontend/assets/img/IRASUTOYA.md). O antigo teto interno de 20 foi retirado para o uso educacional gratuito do Maru.
 

@@ -91,11 +91,11 @@ test("typed kana answers and combined-sound lesson links work", async ({ page })
 
 test("sentence building corrects particles, credits the corrected answer once and supports kana typing", async ({ page }) => {
   await go(page, "sentences");
-  for (const token of ["わたし", "を", "学生", "です"]) await page.locator(".token-bank .word-token").filter({ has: page.locator(".jp", { hasText: new RegExp("^" + token + "$") }) }).click();
+  for (const token of ["わたし", "を", "がくせい", "です"]) await page.locator(".token-bank .word-token").filter({ has: page.locator(".jp", { hasText: new RegExp("^" + token + "$") }) }).click();
   await page.getByRole("button", { name: "Verificar frase", exact: false }).click();
   await expect(page.locator(".feedback")).toHaveClass(/retry/);
   await page.locator('[data-sentence="clear"]').click();
-  for (const token of SENTENCES[0].tokens) await page.locator(".token-bank .word-token").filter({ has: page.locator(".jp", { hasText: new RegExp("^" + token[0] + "$") }) }).click();
+  for (const token of SENTENCES[0].tokens) await page.locator(".token-bank .word-token").filter({ has: page.locator(".jp", { hasText: new RegExp("^" + (token[3] || token[0]) + "$") }) }).click();
   await page.getByRole("button", { name: "Verificar frase", exact: false }).click();
   await expect(page.locator(".feedback")).toHaveClass(/success/);
   const count = await page.evaluate(() => JSON.parse(localStorage.getItem("maru-learning-v2")).stats.sentencesWritten);

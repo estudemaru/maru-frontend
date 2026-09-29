@@ -2,15 +2,16 @@
 export const NAVIGATION = [
   { route: "home", icon: "home", title: "Início" },
   { route: "journey", icon: "path", title: "Minha trilha" },
-  { route: "practice", icon: "target", title: "Praticar" },
+  { route: "practice", icon: "target", title: "Jogos e prática" },
   { route: "review", icon: "repeat", title: "Revisão" },
   { route: "explore", icon: "book", title: "Explorar" },
   { route: "worksheets", icon: "pen", title: "Imprimir" },
-  { route: "teacher", icon: "path", title: "Para professores" }
+  { route: "videos", icon: "volume", title: "Aulas gratuitas" }
 ];
 export const PRACTICE_TOOLS = [
+  { route: "challenge", icon: "clock", title: "Desafios de repetição", description: "Escreva kana e frases em rodadas curtas, com tempo ou no seu ritmo. Descubra o que revisar.", detail: "Começar pelas vogais", color: "lavender" },
   { route: "exercises", icon: "volume", title: "Exercícios e escuta", description: "Reconheça os sons, escolha palavras e pratique partículas com explicações a cada resposta.", detail: "Ouvir e responder", color: "sage" },
-  { route: "writing", icon: "pen", title: "Caderno de escrita", description: "Veja a ordem dos traços e escreva kana e kanji com um modelo para acompanhar.", detail: "Ver e desenhar", color: "peach" },
+  { route: "writing", icon: "pen", title: "Caderno de escrita", description: "Comece por あ, acompanhe os traços e repita à mão. Os kanji ficam para depois dos kana.", detail: "Ver e desenhar", color: "peach" },
   { route: "sentences", icon: "chat", title: "Formar frases", description: "Organize palavras, entenda a função das partículas e digite suas primeiras frases.", detail: "Montar e entender", color: "sky" }
 ];
 export const RESOURCE_GROUPS = [
@@ -19,6 +20,7 @@ export const RESOURCE_GROUPS = [
   { id: "materials", title: "Materiais de apoio", description: "Tire dúvidas, conheça outras fontes e leve a escrita para o papel." }
 ];
 export const RESOURCES = [
+  { route: "videos", group: "materials", icon: "volume", title: "Aulas gratuitas", description: "Vídeos em português do 123 Japonês e de outros professores, com prática depois de assistir.", keywords: "youtube aula video online professor 123 japones", color: "sage" },
   { route: "kana", group: "basics", icon: "あ", title: "Hiragana e katakana", description: "As duas tabelas de kana, com sons, combinações e prática.", keywords: "alfabeto vogais silabas letras leitura", color: "sage" },
   { route: "kanji", group: "basics", icon: "日", title: "Primeiros kanji", description: "Significados, leituras e exemplos dos seus primeiros caracteres.", keywords: "ideogramas simbolos", color: "sand" },
   { route: "vocabulary", group: "basics", icon: "book", title: "Primeiras palavras", description: "Vocabulário do cotidiano com pronúncia e frases de exemplo.", keywords: "vocabulario dicionario", color: "sky" },
@@ -38,6 +40,7 @@ const pages = [
   { route: "package", title: "Pacote de estudo", section: "teacher" },
   { route: "placement", title: "Encontre seu começo", section: "journey" },
   { route: "settings", title: "Meu ritmo", section: "settings" },
+  { route: "account", title: "Minha conta", section: "account" },
 ];
 export function navigationFor(route) {
   return pages.find(item => item.route === route) || { title: "Página não encontrada", section: "" };
