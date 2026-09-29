@@ -37,7 +37,7 @@ test("theme switching keeps the active answer, persists and updates both selecto
   await go(page,"settings");
   await expect(page.locator('.theme-card[data-theme-choice="arcade"]')).toHaveAttribute("aria-pressed","true");
   await go(page,"home");
-  await expect(page.locator(".sidebar .nav-link.is-active")).toHaveCSS("color","rgb(255, 255, 255)");
+  await expect(page.locator(".sidebar .nav-link.is-active")).toHaveCSS("color","rgb(255, 63, 139)");
   await expect(page.locator(".kana-art")).toBeVisible();
   await page.getByRole("button",{name:"Pausar animações"}).click();
   await expect(page.locator(".art-main")).toHaveCSS("animation-play-state","paused");
@@ -95,7 +95,8 @@ test("listening hides transcription until the answer and records the actual resp
   await page.getByRole("radio",{name:item.answer,exact:false}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
   await expect(page.locator(".feedback")).toHaveClass(/success/);
-  await expect(page.locator(".feedback")).toContainText(item.prompt);
+  // A learner without a kana foundation yet sees readings only; kanji appears once that base is solid.
+  await expect(page.locator(".feedback")).toContainText(item.reading);
   expect((await snapshot(page)).reviews[item.id].correct).toBe(1);
 });
 

@@ -32,7 +32,7 @@ test("a new learner completes the introduction, saves and resumes after reload",
   await expect(page.locator(".completion")).toContainText("Lição revisitada");
   await expect(page.locator("#xp-total")).toHaveText("30 XP");
   await go(page);
-  await expect(page.locator(".hero-footnote")).toContainText("Ouça o ritmo");
+  await expect(page.locator(".hero-footnote")).toContainText(LESSONS[1].minutes + " min · " + LESSONS[1].title);
 });
 
 test("incorrect lesson answers are explained and repeated before completion", async ({ page }) => {
