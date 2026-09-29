@@ -7,7 +7,7 @@ import { THEMES } from "../core/theme.js";
 import { pageHeading, icon, routeLink, audioButton } from "../core/ui.js";
 import { signUpWithEmail, signInWithEmail, recoverEmail, changeEmailPassword } from "../api.js";
 
-export function renderSettings(ctx, status = "") {
+export function renderSettings(ctx, status = "", accountOnly = false) {
   const controller = new AbortController(), p = ctx.progress;
   const level = playerLevel(p.xp.total);
   ctx.main.innerHTML = pageHeading("DO SEU JEITO", "Um ritmo que combina com você.", "Escolha o seu espaço, ajuste os sons e encontre uma meta que cabe no seu dia.") +
@@ -19,8 +19,9 @@ export function renderSettings(ctx, status = "") {
     <div class="setting-row"><div><h3>Efeitos de jogo no Arcade</h3><p>Sons curtos ao acertar, errar e concluir. A pronúncia continua disponível com esta opção desligada.</p></div><label class="switch"><input id="setting-effects" type="checkbox" ${p.preferences.soundEffects?"checked":""}><span aria-hidden="true"></span><span class="sr-only">Efeitos de jogo</span></label></div>
     <p class="audio-status-note">As pronúncias são consultadas na API TTS Quest e reproduzidas diretamente no navegador, sem exportar arquivos. Voz: VOICEVOX:ずんだもん. É necessária conexão com a internet. Toque uma vez para ouvir e novamente para interromper. Na primeira consulta, a voz pode levar alguns segundos para ficar pronta. Para escutar falantes em conversas reais, explore os recursos da biblioteca.</p><div class="setting-note">${icon("check")} As preferências são salvas automaticamente.</div></section>
     <aside class="panel progress-overview"><span class="jp" lang="ja">歩</span><h2>Cada passo fica.</h2><dl><div><dt>Lições concluídas</dt><dd>${LESSONS.filter(lesson=>p.lessons[lesson.id]?.completedAt).length} / ${LESSONS.length}</dd></div><div><dt>Experiência acumulada</dt><dd>${p.xp.total} XP</dd></div><div><dt>Nível de experiência</dt><dd>${level.level}</dd></div><div><dt>Dias de constância</dt><dd>${currentStreak(p)}</dd></div><div><dt>Frases acertadas</dt><dd>${p.stats.sentencesWritten}</dd></div><div><dt>Práticas de escrita</dt><dd>${p.stats.writingSessions}</dd></div></dl><p class="small muted">O nível acompanha sua prática no Maru; não é uma avaliação de proficiência.</p>${routeLink("journey","Continuar minha trilha "+icon("arrow"),"text-link")}</aside></div>
-    <section class="panel settings-panel about-panel"><h2>Pequenas conquistas, progresso real.</h2><p class="muted">Cada conquista acompanha uma atividade feita por você. Elas valem nos três estilos.</p><div class="achievement-grid">${ACHIEVEMENTS.map(item=>{const earned=item.test(p);return `<article class="achievement ${earned?"is-earned":""}"><span class="badge-symbol jp" lang="ja">${item.symbol}</span><h3>${item.title}</h3><p>${item.description}</p><small>${earned?"✓ Conquistada":"Em construção"}</small></article>`;}).join("")}</div></section>
+    <section class="panel settings-panel about-panel"><h2>Pequenas conquistas, progresso real.</h2><p class="muted">Cada conquista acompanha uma atividade feita por você. Elas valem nos dois estilos.</p><div class="achievement-grid">${ACHIEVEMENTS.map(item=>{const earned=item.test(p);return `<article class="achievement ${earned?"is-earned":""}"><span class="badge-symbol jp" lang="ja">${item.symbol}</span><h3>${item.title}</h3><p>${item.description}</p><small>${earned?"✓ Conquistada":"Em construção"}</small></article>`;}).join("")}</div></section>
     <section class="panel settings-panel about-panel"><h2>Os selos do seu caminho.</h2><p class="muted">Cada selo reúne uma etapa realmente concluída. Diagnóstico e escolha de nível não concedem selos.</p><div class="stage-seals">${moduleSeals(p).map(module => `<article class="stage-seal ${module.earned ? "is-earned" : ""}"><span class="hanko jp" lang="ja">${module.symbol}</span><h3>${module.title}</h3><p>${module.done} / ${module.lessons.length} lições</p><small>${module.earned ? "Etapa concluída" : "Um traço de cada vez"}</small></article>`).join("")}</div></section><section class="panel settings-panel about-panel"><h2>Sobre este espaço</h2><p>Maru é um ponto de partida para quem começa japonês do zero. A trilha introduz leitura, escrita, gramática e situações de comunicação. Você pode estudar nos estilos Dojo ou Arcade e levar atividades para o papel.</p><p>Sem conta, cada navegador tem seu próprio perfil. Com uma conta, seu progresso é sincronizado entre os aparelhos em que você entrar. Sair da conta devolve este navegador ao perfil anônimo, sem misturar contas.</p>${routeLink("library","Conhecer os recursos e as referências "+icon("external"),"text-link")}</section>`;
+  if (accountOnly) ctx.main.innerHTML = `<div class="account-page">${pageHeading('ENTRE COM SEU E-MAIL','Guarde seu progresso.','Crie uma conta ou entre para continuar seus estudos em outro aparelho.')}${accountHTML(ctx,status)}${routeLink('home','Continuar estudando','btn btn-ghost')}</div>`;
   ctx.main.addEventListener("click", async event => {
     const logout = event.target.closest("#account-logout");
     if (logout) {
@@ -30,7 +31,7 @@ export function renderSettings(ctx, status = "") {
     const tab = event.target.closest("#email-mode-login, #email-mode-signup");
     if (tab) {
       const signup = tab.id === "email-mode-signup";
-      ctx.main.querySelectorAll(".account-tabs button").forEach(button => button.setAttribute("aria-pressed", String(button === tab)));
+      ctx.main.querySelectorAll(".account-tabs button").forEach(button => { button.setAttribute("aria-pressed", String(button === tab)); button.classList.toggle('is-active',button===tab); });
       ctx.main.querySelector("#account-password").autocomplete = signup ? "new-password" : "current-password";
       ctx.main.querySelector("#email-submit").textContent = signup ? "Criar conta por e-mail" : "Entrar com e-mail";
       ctx.main.querySelector("#account-feedback").textContent = "";
@@ -61,7 +62,7 @@ export function renderSettings(ctx, status = "") {
         } else {
           await ctx.flush();
           await signInWithEmail(email, password);
-          location.replace("/#/settings/login-success");
+          location.replace("/#/account/login-success");
           location.reload();
         }
       } else if (form.id === "email-recover-form") {
@@ -76,6 +77,7 @@ export function renderSettings(ctx, status = "") {
     finally { button.disabled = false; }
   }, { signal: controller.signal });
   ctx.main.addEventListener("change",event=>{
+    if (!["setting-romaji","setting-effects","setting-audio-rate"].includes(event.target.id) && event.target.name!=="daily-goal") return;
     if(event.target.id==="setting-romaji")p.preferences.romaji=event.target.checked;
     if(event.target.name==="daily-goal")p.preferences.dailyGoal=Number(event.target.value);
     if(event.target.id==="setting-effects")p.preferences.soundEffects=event.target.checked;

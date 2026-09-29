@@ -78,14 +78,13 @@ export async function renderPrintPages(preview, sheets, isCurrent) {
       current.body.append(node);
       const families = current.body.querySelectorAll('.paper-kana-family');
       if (!fits(current.body) || families.length > 1) {
-        const blockHeight = node.offsetHeight;
         node.remove();
-        if (!current.body.childElementCount) throw new Error(`Um bloco de conteúdo excede a área A4: ${node.querySelector('[data-print-char]')?.dataset.printChar || ''} (${blockHeight}/${current.body.clientHeight}).`);
+        if (!current.body.childElementCount) throw new Error('Um bloco de conteúdo excede a área A4.');
         const hasOwnHeading = node.matches('.paper-kana-study') || node.querySelector('[data-book-lesson]');
         current = createPage(preview, heading, true, lessonTitle, !hasOwnHeading);
         pages.push(current);
         current.body.append(node);
-        if (!fits(current.body)) throw new Error(`Um bloco de conteúdo excede a área A4: ${node.querySelector('[data-print-char]')?.dataset.printChar || ''} (${node.offsetHeight}/${current.body.clientHeight}).`);
+        if (!fits(current.body)) throw new Error('Um bloco de conteúdo excede a área A4.');
       }
     }
   }
