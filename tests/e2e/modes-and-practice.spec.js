@@ -25,15 +25,14 @@ test("palette and motion preferences persist",async({page})=>{
   await page.locator('#arcade-answer').fill('あ');
   await page.getByRole('button',{name:'Ativar modo escuro',exact:true}).click();
   await expect(page.locator('#arcade-answer')).toHaveValue('あ');
-  await expect(page.locator('#toast')).toContainText('Estilo Arcade ativado');
+  await expect(page.locator('#toast')).toContainText('Estilo Sumi-e Noite ativado');
   await expect(page.locator('#arcade-hud')).toBeHidden();
   await expect(page.locator('html')).toHaveCSS('color-scheme','dark');
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme","arcade");
   await go(page,"home");
-  await expect(page.locator(".play-hero h1")).toHaveCSS("font-family", /Space Grotesk/);
-  await expect(page.locator(".book-scene")).toBeHidden();
-  await expect(page.locator(".play-halo")).not.toHaveCSS("animation-name","none");
+  await expect(page.locator(".play-hero h1")).toHaveCSS("font-family", /Shippori Mincho/);
+  await expect(page.locator(".book-scene")).toBeVisible();
   await page.getByRole("button",{name:"Pausar animações"}).click();
   await expect(page.locator(".play-halo")).toHaveCSS("animation-name","none");
   await expect(page.locator(".play-hero-art > img")).toHaveCSS("animation-name","none");
@@ -164,7 +163,7 @@ test("all themes fit desktop, tablet and small phones",async({page})=>{
       const routes=theme!=="dojo"?["home","journey","kana","kanji","writing","sentences","particles","expressions","library","review","settings","lesson/welcome","vocabulary","exercises","worksheets","glossary","teacher","account","progress","practice","arcade/sentences","arcade/pictures","arcade/translate","explore"]:["home","account","progress","practice","arcade/sentences","explore","vocabulary","exercises","worksheets","glossary","settings"];
       for(const route of routes){
         await go(page,route);
-        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(8, 15, 34)",dojo:"rgb(243, 234, 215)"}[theme]);
+        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(18, 21, 31)",dojo:"rgb(243, 234, 215)"}[theme]);
         if(route === "worksheets") await expect(page.locator('#worksheet-preview')).toHaveAttribute('data-ready','true');
         await expect.poll(async()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),{message:theme+" "+route+" at "+width}).toBe(false);
         if ([1440,390].includes(width) && ['settings','explore','arcade/sentences','progress'].includes(route)) {

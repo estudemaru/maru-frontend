@@ -23,25 +23,28 @@
 }
 :root[data-theme="arcade"] {
   color-scheme: dark;
-  --paper: #101a2c;
-  --surface: #18263c;
-  --surface-soft: #203149;
-  --ink: #e9edf6;
-  --muted: #b3c2d7;
-  --subtle: #99acc7;
-  --line: #344b68;
-  --accent: #ed9781;
-  --accent-hover: #f5ac98;
-  --accent-soft: #30384f;
-  --button-ink: #291c16;
-  --peach: #2c3851;
-  --sage: #203b48;
-  --lavender: #30334f;
-  --sky: #203c55;
-  --sand: #384056;
-  --success: #b3cc9c;
-  --success-bg: #233d3b;
+  --paper: #12151f;
+  --surface: #1a1e2c;
+  --surface-soft: #232838;
+  --ink: #ece8e1;
+  --muted: #a6a49b;
+  --subtle: #8f8d84;
+  --line: #333a4c;
+  --accent: #e2704f;
+  --accent-hover: #ef8a68;
+  --accent-soft: #3a2a29;
+  --button-ink: #241209;
+  --peach: #33293a;
+  --sage: #22322c;
+  --lavender: #292a3f;
+  --sky: #212c3a;
+  --sand: #322d29;
+  --success: #8fb87e;
+  --success-bg: #1e3128;
   --font-display: "Shippori Mincho", Georgia, serif;
+  --font-jp-serif: "Shippori Mincho", "Noto Serif JP", serif;
+  --radius: 5px;
+  --radius-sm: 4px;
 }
 html[data-theme] body { background-image: url("/assets/img/washi.svg"); }
 html[data-theme] .sidebar { background: var(--surface) url("/assets/img/washi.svg"); }
