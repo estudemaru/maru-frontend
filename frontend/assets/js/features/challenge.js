@@ -6,7 +6,16 @@ import { pageHeading, esc, icon, routeLink, shuffle, beginnerText } from '../cor
 export function renderChallenge(ctx, initial = 'hiragana') {
   const controller = new AbortController();
   let mode = ['hiragana','katakana','sentences','listening'].includes(initial) ? initial : 'hiragana';
-  let family = 'a', seconds = 30, game, timer, generation = 0, preparing = false, warning = false;
+  let family = 'a', seconds = 30, game, items = [], timer, generation = 0, preparing = false, warning = false;
+  // The TTS request is the slow part of "listen"; fetch it as soon as a round
+  // is visible so the click only has to start playback, not wait on the API.
+  function preloadRound() {
+    if (mode!=='listening' || !game) return;
+    if (game.phase==='ready') ctx.audio.preload(game.item.answer).catch(()=>{});
+    const upcoming = items[game.index+1];
+    if (upcoming) ctx.audio.preload(upcoming.answer).catch(()=>{});
+  }
+  function newGame() { items=shuffle(challengeItems(mode,family)).slice(0,5); game=createChallenge(items,seconds); preloadRound(); }
   const title = {hiragana:'Escreva hiragana',katakana:'Escreva katakana',sentences:'Escreva uma frase',listening:'Ouça e escreva'};
   const heading = () => pageHeading('PEQUENAS RODADAS, MUITA PRÁTICA',title[mode],'Até cinco tentativas. Veja o resultado de cada uma e descubra o que revisar.',routeLink('practice','Voltar às práticas','btn btn-ghost'));
   function setup() {
@@ -70,7 +79,7 @@ export function renderChallenge(ctx, initial = 'hiragana') {
     if(event.target.name==='mode'){setup();ctx.main.querySelector('[name="mode"]').focus();}
   }, {signal:controller.signal});
   ctx.main.addEventListener('submit',event=>{
-    if(event.target.id==='challenge-setup'){event.preventDefault();game=createChallenge(shuffle(challengeItems(mode,family)).slice(0,5),seconds);draw();if(mode!=='listening')void startItem();}
+    if(event.target.id==='challenge-setup'){event.preventDefault();newGame();draw();if(mode!=='listening')void startItem();}
     if(event.target.id==='challenge-answer-form'){event.preventDefault();finish(game.answer(new FormData(event.target).get('answer'),Date.now()));}
   },{signal:controller.signal});
   ctx.main.addEventListener('keydown',event=>{if(event.isComposing && event.key==='Enter')event.preventDefault();},{signal:controller.signal});
@@ -79,9 +88,9 @@ export function renderChallenge(ctx, initial = 'hiragana') {
     if(key && game.phase==='answer'){const input=ctx.main.querySelector('#challenge-answer');input.value=key==='delete'?[...input.value].slice(0,-1).join(''):input.value+key;input.focus();}
     const action=event.target.closest('[data-challenge]')?.dataset.challenge;
     if(action==='listen'){if(game.phase==='ready')void startItem();else if(game.phase==='answer')void ctx.audio.speak(game.item.answer);}
-    if(action==='next' && game.next()){draw();if(game.phase==='ready'&&mode!=='listening')void startItem();}
+    if(action==='next' && game.next()){preloadRound();draw();if(game.phase==='ready'&&mode!=='listening')void startItem();}
     if(action==='setup')setup();
-    if(action==='retry'){game=createChallenge(shuffle(challengeItems(mode,family)).slice(0,5),seconds);draw();if(mode!=='listening')void startItem();}
+    if(action==='retry'){newGame();draw();if(mode!=='listening')void startItem();}
   },{signal:controller.signal});
   setup();
   return()=>{controller.abort();generation++;clearInterval(timer);ctx.audio.stop();};

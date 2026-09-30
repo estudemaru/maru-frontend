@@ -17,6 +17,14 @@ export function renderPractice(ctx, options) {
     const others = [...new Set(sameKind.map(entry => entry.answer))].filter(answer => answer !== item.answer);
     choices = item.choices ? shuffle(item.choices) : shuffle([item.answer, ...shuffle(others).slice(0, 3)]);
   }
+  // The TTS request is the slow part of listening items; fetch it as soon as
+  // the item is on screen so the click only has to start playback.
+  function preloadListening() {
+    const item = queue[index];
+    if (item?.listening) ctx.audio.preload(item.speech || item.prompt).catch(() => {});
+    const upcoming = queue[index + 1];
+    if (upcoming?.listening) ctx.audio.preload(upcoming.speech || upcoming.prompt).catch(() => {});
+  }
   function draw() {
     if (index >= queue.length) {
       ctx.audio.feedback("complete");
@@ -47,12 +55,12 @@ export function renderPractice(ctx, options) {
   }, { signal: controller.signal });
   ctx.main.addEventListener("click", event => {
     const action = event.target.closest("[data-practice]")?.dataset.practice;
-    if (action === "next" && feedback) { ctx.audio.stop(); index++; feedback = null; setChoices(); draw(); }
+    if (action === "next" && feedback) { ctx.audio.stop(); index++; feedback = null; setChoices(); draw(); preloadListening(); }
     if (action === "retry") {
       queue = shuffle(misses); misses = []; index = 0; correctCount = 0; feedback = null;
-      setChoices(); draw();
+      setChoices(); draw(); preloadListening();
     }
   }, { signal: controller.signal });
-  setChoices(); draw();
+  setChoices(); draw(); preloadListening();
   return () => { controller.abort(); ctx.audio.stop(); };
 }
