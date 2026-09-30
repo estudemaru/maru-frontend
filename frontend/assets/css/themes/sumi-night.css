@@ -105,6 +105,7 @@ html[data-theme="arcade"] .lesson-section-title { font-family: var(--font-displa
   html[data-theme="arcade"] .play-hero { grid-template-columns: 1fr; padding-top: 12px; padding-bottom: 30px; min-height: 0; gap: 0; }
   html[data-theme="arcade"] .play-hero h1 { font-size: clamp(39px, 10vw, 52px); margin: 24px 0 18px; }
   html[data-theme="arcade"] .play-hero-art { min-height: 280px; margin-top: 18px; }
+  html[data-theme="arcade"] .book-scene { height: 280px; max-width: 400px; }
   html[data-theme="arcade"] .book-vertical { font-size: 16px; right: 8%; }
   html[data-theme="arcade"] .book-seal { top: 65%; right: 9%; font-size: 14px; }
   html[data-theme="arcade"] .play-art-caption { right: 23%; font-size: 11px; bottom: -2px; background: none; padding: 0; }
