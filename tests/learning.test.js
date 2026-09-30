@@ -77,6 +77,12 @@ test("reviews use FSRS: misses return in ten minutes, successes space out by mem
   assert.ok(scheduleReview({ ...first, stability: 5000, interval: 3000, due: now, updatedAt: now - 3000 * 86400000 }, true, now).interval <= 365);
 });
 
+test("the Japanese game font is one of the offered fonts", () => {
+  assert.equal(normalizeSnapshot().preferences.jpFont, "mincho");
+  assert.equal(normalizeSnapshot({ preferences: { jpFont: "kyokasho" } }).preferences.jpFont, "kyokasho");
+  assert.equal(normalizeSnapshot({ preferences: { jpFont: "comic-sans" } }).preferences.jpFont, "mincho");
+});
+
 test("reviews saved before FSRS keep their spacing and gain memory fields", () => {
   const now = Date.UTC(2026, 8, 29);
   const legacy = normalizeSnapshot({ reviews: { "h-a-0": { due: now, interval: 8, attempts: 4, correct: 4, streak: 4, updatedAt: now - 8 * 86400000 } } }).reviews["h-a-0"];

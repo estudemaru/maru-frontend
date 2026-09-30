@@ -183,6 +183,19 @@ e `npm run vendor`, e copie `shared/vendor/` para o `maru-backend`.
 no futuro "Monte a frase", Pointer Events nativos (como no caderno de escrita)
 ou SortableJS servem sem React.
 
+## Letra do japonês nos jogos
+
+Meu ritmo oferece seis letras para kana e kanji dos jogos (`core/jpFont.js`):
+Mincho clássica (Shippori Mincho, padrão), Gótica (Noto Sans JP), Caderno
+escolar (Klee One), Arredondada (Zen Maru Gothic), Arredondada firme (M PLUS
+Rounded 1c) e Caneta (Zen Kurenaido). A escolha fica em
+`preferences.jpFont`, validada em `normalizeSnapshot`, e vira a variável
+`--font-game-jp` com `html[data-jp-font]`. Ela vale para o japonês dentro de
+`.play-page`, `.lesson-game` e `.practice-session`; o resto do site mantém a
+letra do tema. Mincho e gótica já vêm na página; as demais só são baixadas ao
+serem escolhidas, e a tela de ajustes baixa apenas os caracteres das amostras
+(`text=` do Google Fonts).
+
 ## CSS
 
 A folha anterior foi substituída integralmente:
@@ -199,6 +212,14 @@ A folha anterior foi substituída integralmente:
 - motion.css: entradas, interação e movimento das ilustrações;
 - print.css: papel A4, grades sem degradê e paginação independente do tema.
 - interface.css: geometria comum aos dois mundos, movimento fluido e ajustes de toque;
+- themes/showa.css: camada final dos dois temas, no estilo de cartaz Shōwa retrô
+  (creme, sálvia, vermelho-selo e tinta). Barra lateral sálvia, molduras finas
+  com sombra sálvia deslocada, botão principal em pílula de tinta com ícone num
+  círculo vermelho, cartas de karuta com moldura vermelha dupla, ◎ vermelho no
+  acerto, carimbo 済 no desafio do dia feito, faixa quadriculada nos divisores,
+  pontinhos same-komon nas artes e um selo circular que gira na capa. Os
+  ornamentos ficam nas bordas; o conteúdo continua limpo. O modo noturno usa as
+  mesmas regras com paleta verde-tinta (`--paper` #161b18);
 - themes/sumi-book.css: Sumi-e (claro), o caderno de tinta e papel;
 - themes/arcade-world.css: Arcade (escuro), a mesma estrutura do Sumi-e em pixels e
   neon: fundo #080f22 com grade, bordas quadradas com sombra deslocada, títulos em
