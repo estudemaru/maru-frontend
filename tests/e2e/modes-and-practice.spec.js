@@ -102,7 +102,7 @@ test("listening hides transcription until the answer and records the actual resp
   await page.getByRole("radio",{name:item.answer,exact:false}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
   await expect(page.locator(".feedback")).toHaveClass(/success/);
-  // A learner without a kana foundation yet sees readings only; kanji appears once that base is solid.
+  // Furigana is always shown now; the reading still appears as a substring alongside the kanji.
   await expect(page.locator(".feedback")).toContainText(item.reading);
   expect((await snapshot(page)).reviews[item.id].correct).toBe(1);
 });
@@ -110,10 +110,16 @@ test("listening hides transcription until the answer and records the actual resp
 test("particle activities explain the selected model and wrong answers enter the review schedule",async({page})=>{
   await go(page,"exercises");
   await page.locator('[data-start-exercises="particles"]').click();
-  const prompt=await page.locator(".quiz-character").innerText();
+  // Furigana is always on now, so the prompt renders as kanji + <rt> reading;
+  // strip the reading back out to recover the original (kanji-form) prompt.
+  const prompt=await page.locator(".quiz-character").evaluate(el => {
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("rt").forEach(rt => rt.remove());
+    return clone.textContent;
+  });
   // Some prompts have a different requested nuance: match both prompt and context.
   const context=await page.locator(".quiz-stage > .muted").innerText();
-  const exact=PARTICLE_EXERCISES.find(item=>(item.reading || bookKanaText(item.prompt))===prompt && bookKanaText(item.context)===context);
+  const exact=PARTICLE_EXERCISES.find(item=>item.prompt===prompt && bookKanaText(item.context)===context);
   const wrong=exact.choices.find(choice=>choice!==exact.answer);
   await page.getByRole("radio",{name:new RegExp("^[1-4] " + wrong + "$")}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
