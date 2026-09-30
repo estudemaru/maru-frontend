@@ -169,7 +169,7 @@ test("all themes fit desktop, tablet and small phones",async({page})=>{
       const routes=theme!=="dojo"?["home","journey","kana","kanji","writing","sentences","particles","expressions","library","review","settings","lesson/welcome","vocabulary","exercises","worksheets","glossary","teacher","account","progress","practice","arcade/sentences","arcade/pictures","arcade/translate","explore"]:["home","account","progress","practice","arcade/sentences","explore","vocabulary","exercises","worksheets","glossary","settings"];
       for(const route of routes){
         await go(page,route);
-        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(18, 21, 31)",dojo:"rgb(243, 234, 215)"}[theme]);
+        await expect(page.locator("body"),theme+" colors at "+width).toHaveCSS("background-color",{arcade:"rgb(22, 27, 24)",dojo:"rgb(243, 234, 215)"}[theme]);
         if(route === "worksheets") await expect(page.locator('#worksheet-preview')).toHaveAttribute('data-ready','true');
         await expect.poll(async()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),{message:theme+" "+route+" at "+width}).toBe(false);
         if ([1440,390].includes(width) && ['settings','explore','arcade/sentences','progress'].includes(route)) {

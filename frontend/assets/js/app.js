@@ -24,6 +24,7 @@ import { applyTheme, syncMotion, toggleMotion, THEMES } from "./core/theme.js";
 import { playerLevel, ACHIEVEMENTS } from "/shared/gamification.js";
 import { completeEmailLink } from "./api.js";
 import { setupKanaInput } from "./core/kanaInput.js";
+import { applyJpFont } from "./core/jpFont.js";
 
 // Supabase sends confirmation/recovery tokens in the fragment for implicit links.
 // Clear the fragment before any further work so the credentials leave the URL quickly.
@@ -59,6 +60,7 @@ function updateStatus(value) {
 const store = await createStore(updateStatus);
 const audio = createAudio(toast, () => store.snapshot.preferences);
 applyTheme(store.snapshot.preferences.theme);
+applyJpFont(store.snapshot.preferences.jpFont);
 app.innerHTML = `
   <button class="sidebar-backdrop" id="sidebar-backdrop" aria-label="Fechar navegação" hidden></button>
   <aside class="sidebar" id="sidebar" aria-label="Seu espaço de estudo"><div class="sidebar-brand"><a class="brand" href="#/home" aria-label="Maru, início"><img src="/assets/img/maru-mark.svg" alt="" width="38" height="38"><span>maru<span class="brand-period">.</span><small>JAPONÊS NO SEU RITMO</small></span></a><button class="icon-button menu-close" id="menu-close" aria-label="Fechar navegação">${icon("close")}</button></div>

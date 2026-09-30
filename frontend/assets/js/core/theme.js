@@ -6,7 +6,7 @@ export const THEMES = [
 export function applyTheme(theme) {
   const selected = THEMES.some(item => item.id === theme) ? theme : "dojo";
   document.documentElement.dataset.theme = selected;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#12151f" : "#f3ead7");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#161b18" : "#f3ead7");
   const mark = "maru-mark.svg";
   document.querySelector('link[rel="icon"]')?.setAttribute("href", "/assets/img/" + mark);
   document.querySelector(".brand img")?.setAttribute("src", "/assets/img/" + mark);
