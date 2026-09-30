@@ -1,3 +1,11 @@
+# Estado atual · 29/09/2026
+
+A experiência combina o Arcade e a trilha, reativada com um jogo no fim de cada
+lição. Trilhas temáticas, material para professores e atividades impressas
+(exceto as folhas de repetição) seguem em pausa. Consulte
+[a documentação da fase Arcade](./ARCADE-2026-09-29.md).
+As seções abaixo registram também módulos preservados para reativação futura.
+
 # Arquitetura do Maru
 
 O produto começa com uma trilha para quem ainda não conhece japonês. Conteúdo
@@ -78,10 +86,12 @@ a busca. Nenhuma rota de conteúdo foi removida.
 O schema v2 contém lessons, reviews, activity, preferences e updatedAt, além
 dos campos anteriores progress, kanaStats, xp, streak e stats. Os campos placement
 e restDays registram o diagnóstico e as pausas protegidas sem alterar dados anteriores.
+`arcade` guarda recordes e `daily`, o primeiro resultado de cada desafio do dia.
 
 A normalização limita números, valida estruturas e converte revisões antigas.
 A mesclagem mantém a união das conclusões e os registros de revisão mais
-recentes; contadores históricos preservam o maior valor.
+recentes; contadores históricos preservam o maior valor. No `daily`, vale a
+conclusão mais antiga de cada data.
 
 O navegador grava imediatamente em `maru-learning-v2` para convidados e em
 `maru-account-<id>-v2` para cada conta. A importação anônima é feita uma vez por
@@ -103,13 +113,24 @@ recuperação de dados.
 
 Uma lição exige responder corretamente a todas as perguntas. As erradas são
 explicadas e retornam antes da conclusão. Os 30 XP são concedidos uma vez.
+Depois das perguntas, a lição termina num jogo curto com os próprios exemplos
+(`shared/lessonGame.js`, tela em `features/lessonGame.js`); a conclusão já está
+registrada quando ele começa, então sair ou pular o jogo não desfaz a lição.
 
 Rodadas usam no máximo dez itens. Cada resposta verificada é registrada uma
 vez antes do avanço. Distratores são distintos e pertencem ao mesmo tipo de
 pergunta. Três acertos seguidos são um indicador de prática, não uma certificação.
 
-Erros retornam em dez minutos. Acertos começam com um intervalo de um dia e
-dobram até sessenta dias. A prática livre continua disponível.
+Erros retornam em dez minutos. Os acertos são agendados pelo FSRS (`ts-fsrs`, o
+mesmo algoritmo do Anki): cada revisão guarda estabilidade, dificuldade, estado e
+esquecimentos (`stability`, `difficulty`, `state`, `lapses`) junto dos campos
+antigos, e o intervalo cresce conforme a memória fica estável, até 365 dias.
+Repetir um item na mesma sessão não infla a memória. Sem "fuzz", o agendamento é
+reproduzível; sem passos curtos, os intervalos são em dias. Registros anteriores
+viram um cartão aproximado a partir do intervalo que já tinham. As chaves de
+revisão já separam a habilidade (`arcade:karuta:kana:listen:…` é ouvir,
+`arcade:pictures:…:write:…` é escrever), então a mesma palavra tem um agendamento
+por jogo. A prática livre continua disponível.
 
 O registro de escrita concede 5 XP uma vez por folha/caractere aberto e não
 altera o desempenho de reconhecimento de kana. A caligrafia é autoavaliada.
@@ -125,7 +146,9 @@ O áudio usa `POST /api/audio`. O `speechService.js` do backend valida o texto c
 de estudo, consulta TTS Quest e devolve uma URL de streaming. Só URLs expiráveis
 ficam em memória; o servidor e o frontend não escrevem áudio no disco. O player
 cancela requisições e reprodução ao navegar, respeita a velocidade escolhida e
-trata falhas, limites da API e bloqueio de reprodução automática.
+trata falhas, limites da API e bloqueio de reprodução automática. `preload(texto)`
+prepara uma URL sem tocar (usado pela karuta para a próxima rodada); os erros
+trazem `status` e `retryAfter` para quem precisa esperar um 429.
 
 `core/kanji.js` consulta KanjiAPI ao abrir um caractere. Valida campos, compartilha
 requisições simultâneas, mantém cache de 24 horas e usa a cópia dos 20 caracteres
@@ -139,6 +162,26 @@ O arquivo derivado mantém CC BY-SA 3.0 e atribuição.
 O canvas usa coordenadas normalizadas e redesenha ao mudar de tamanho.
 Pointer Events permitem mouse, toque e caneta. Mostrar o guia não limpa o
 desenho. Animações respeitam a preferência por movimento reduzido.
+
+## Bibliotecas de terceiros (sem etapa de build)
+
+O site não tem bundler: as bibliotecas ficam como arquivos ES module copiados de
+`node_modules` por `npm run vendor` (`scripts/vendor.js`), com o aviso de licença
+MIT ao lado. Para atualizar, mude a versão em `package.json`, rode `npm install`
+e `npm run vendor`, e copie `shared/vendor/` para o `maru-backend`.
+
+- `ts-fsrs` → `shared/vendor/ts-fsrs.js`: agendamento da revisão em
+  `shared/progress.js`; roda no navegador, no Node e na Edge Function.
+- `wanakana` → `frontend/assets/vendor/wanakana.js`: `core/kanaInput.js` liga a
+  conversão romaji → kana nos campos com `data-kana` (Arcade, shiritori, desafio
+  do dia). Só é baixada quando um desses campos aparece. Minúsculas viram
+  hiragana e MAIÚSCULAS, katakana; o botão あ/ア força katakana. O "n" final é
+  convertido no envio (captura do `submit`), antes de a tela conferir a resposta.
+  A preferência `preferences.kanaInput` (padrão ligado) desliga a conversão.
+
+`dnd-kit` é uma biblioteca de React e não se aplica aqui. Para arrastar blocos
+no futuro "Monte a frase", Pointer Events nativos (como no caderno de escrita)
+ou SortableJS servem sem React.
 
 ## CSS
 
@@ -155,6 +198,20 @@ A folha anterior foi substituída integralmente:
 - navigation.css: navegação simplificada, páginas Praticar/Explorar e busca;
 - motion.css: entradas, interação e movimento das ilustrações;
 - print.css: papel A4, grades sem degradê e paginação independente do tema.
+- interface.css: geometria comum aos dois mundos, movimento fluido e ajustes de toque;
+- themes/sumi-book.css: Sumi-e (claro), o caderno de tinta e papel;
+- themes/arcade-world.css: Arcade (escuro), a mesma estrutura do Sumi-e em pixels e
+  neon: fundo #080f22 com grade, bordas quadradas com sombra deslocada, títulos em
+  Space Grotesk e rótulos/placares em Press Start 2P. Os IDs internos continuam
+  `dojo` e `arcade`.
+
+Movimento: só `transform` e `opacity` animam, com desaceleração suave
+(`--ease-out`). Levantar cartões ao passar o mouse vale só para mouse; no toque
+há um leve "aperto" ao pressionar. Decorações contínuas usam `will-change`, a
+troca de tema usa View Transitions quando o navegador permite, e tudo respeita
+`prefers-reduced-motion` e o botão de pausar animações. No celular: toque sem
+atraso (`touch-action`), alvos de 44 px, áreas seguras (`viewport-fit=cover`) e
+teclado virtual que redimensiona a página (`interactive-widget`).
 
 Dojo usa papel claro (#f8f7f3), superfícies quase brancas, washi em SVG estático, tinta escura,
 Shippori Mincho e vermelho de hanko. themes/dojo.css concentra essa identidade;

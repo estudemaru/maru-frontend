@@ -1,30 +1,29 @@
-import { renderPracticeHub, renderExplore } from "./features/hubs.js";
-import { renderChallenge } from "./features/challenge.js";
+import { renderArcade, renderArcadeHub, renderArcadeProgress } from "./features/arcade.js";
+import { renderDaily } from "./features/daily.js";
+import { renderJourney } from "./features/journey.js";
+import { renderLesson } from "./features/lesson.js";
+import { renderPlacement } from "./features/placement.js";
+import { renderExplore } from "./features/hubs.js";
 import { renderVideoLessons } from "./features/video-lessons.js";
 import { NAVIGATION, navigationFor } from "./core/navigation.js";
-import { renderThematic } from "./features/thematic.js";
-import { renderPlacement } from "./features/placement.js";
 import { renderVocabulary, renderGlossary, renderExercises } from "./features/study.js";
 import { renderWorksheets } from "./features/worksheets.js";
-import { renderTeacher } from "./features/teacher.js";
 import { createStore } from "./core/store.js";
 import { createAudio } from "./core/audio.js";
 import { icon } from "./core/icons.js";
 import { dueReviews, currentStreak } from "/shared/progress.js";
 import { renderDashboard } from "./features/dashboard.js";
-import { renderJourney } from "./features/journey.js";
-import { renderLesson } from "./features/lesson.js";
 import { renderKana } from "./features/kana.js";
 import { renderWriting } from "./features/writing.js";
-import { renderSentences } from "./features/sentences.js";
 import { renderKanji, renderParticles, renderExpressions, renderLibrary, renderReview, addToReview } from "./features/reference.js";
 import { renderSettings } from "./features/settings.js";
 import { emptyState, routeLink, setReaderMode } from "./core/ui.js";
 import { hasKanaFoundation } from './core/beginner.js';
 import { getLesson } from '/shared/curriculum.js';
-import { applyTheme, themeSwitcher } from "./core/theme.js";
+import { applyTheme, syncMotion, toggleMotion, THEMES } from "./core/theme.js";
 import { playerLevel, ACHIEVEMENTS } from "/shared/gamification.js";
 import { completeEmailLink } from "./api.js";
+import { setupKanaInput } from "./core/kanaInput.js";
 
 // Supabase sends confirmation/recovery tokens in the fragment for implicit links.
 // Clear the fragment before any further work so the credentials leave the URL quickly.
@@ -62,14 +61,15 @@ const audio = createAudio(toast, () => store.snapshot.preferences);
 applyTheme(store.snapshot.preferences.theme);
 app.innerHTML = `
   <button class="sidebar-backdrop" id="sidebar-backdrop" aria-label="Fechar navegação" hidden></button>
-  <aside class="sidebar" id="sidebar" aria-label="Seu espaço de estudo"><div class="sidebar-brand"><a class="brand" href="#/home" aria-label="Maru, início"><img src="/assets/img/maru-mark.svg" alt="" width="38" height="38"><span>maru<span class="brand-period">.</span><small>JAPONÊS, PASSO A PASSO</small></span></a><button class="icon-button menu-close" id="menu-close" aria-label="Fechar navegação">${icon("close")}</button></div>
-    <nav aria-label="Navegação principal"><p class="nav-label">SEU JAPONÊS</p>${NAVIGATION.map(({route, icon: symbol, title}) => `<a class="nav-link" href="#/${route}" data-nav="${route}">${icon(symbol)}<span>${title}</span>${route === "review" ? '<span class="nav-count" id="review-count" hidden></span>' : ""}</a>`).join("")}</nav>
-    <div class="sidebar-bottom"><p class="sidebar-mode-label">Seu ambiente</p>${themeSwitcher()}<a class="profile-link" href="#/settings" data-nav="settings"><span class="profile-avatar">M</span><span><strong>Meu ritmo</strong><small id="save-status">${statusLabels[status]}</small></span>${icon("settings")}</a></div>
+  <aside class="sidebar" id="sidebar" aria-label="Seu espaço de estudo"><div class="sidebar-brand"><a class="brand" href="#/home" aria-label="Maru, início"><img src="/assets/img/maru-mark.svg" alt="" width="38" height="38"><span>maru<span class="brand-period">.</span><small>JAPONÊS NO SEU RITMO</small></span></a><button class="icon-button menu-close" id="menu-close" aria-label="Fechar navegação">${icon("close")}</button></div>
+    <nav aria-label="Navegação principal"><p class="nav-label">SEU ESPAÇO</p>${NAVIGATION.map(({route, icon: symbol, title}) => `<a class="nav-link" href="#/${route}" data-nav="${route}">${icon(symbol)}<span>${title}</span>${route === "progress" ? '<span class="nav-count" id="review-count" hidden></span>' : ""}</a>`).join("")}</nav>
+    <div class="sidebar-bottom"><p class="sidebar-mode-label">Seu ambiente</p><button class="text-link motion-control" type="button" data-motion-toggle aria-pressed="false">Pausar animações</button><a class="profile-link" href="#/settings" data-nav="settings"><span class="profile-avatar">M</span><span><strong>Meu ritmo</strong><small id="save-status">${statusLabels[status]}</small></span>${icon("settings")}</a></div>
   </aside>
-  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><a href="#/account" class="topbar-avatar" aria-label="Entrar ou ver minha conta">${store.account.user ? "Minha conta" : "Entrar"}</a></div></header>
-  <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer></div>
+  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="theme-identity">Caderno Sumi-e</span><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><button class="icon-button" id="theme-toggle" type="button" data-theme-choice="arcade" aria-label="Ativar modo escuro"><span aria-hidden="true">☾</span></button><a href="#/account" class="topbar-avatar" aria-label="Entrar ou ver minha conta">${store.account.user ? "Minha conta" : "Entrar"}</a></div></header>
+  <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Arte: Irasutoya / Mifune Takashi · Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer></div>
 `;
 const main = document.querySelector("#main");
+const kanaInput = setupKanaInput(main, () => store.snapshot.preferences.kanaInput !== false);
 let cleanup;
 let routeParams = null;
 const ctx = {
@@ -78,8 +78,14 @@ const ctx = {
   flush: () => store.flush(),
   logout: () => store.logout(),
   get progress() { return store.snapshot; },
-  save() { store.save(); updateStats(); },
-  setTheme(theme) { store.snapshot.preferences.theme = theme; applyTheme(theme); store.save(); updateStats(); },
+  save() { store.save(); updateStats(); kanaInput.rescan(); },
+  setTheme(theme) {
+    store.snapshot.preferences.theme = theme;
+    // Troca de tema com transição suave onde o navegador permite; sem ela, a troca é imediata.
+    const still = document.documentElement.dataset.motion === "paused" || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !still) document.startViewTransition(() => applyTheme(theme)); else applyTheme(theme);
+    store.save(); updateStats();
+  },
   navigate(route, params = null) {
     routeParams = params;
     const hash = "#/" + route;
@@ -89,7 +95,7 @@ const ctx = {
 function updateStats() {
   const count = dueReviews(ctx.progress).length;
   const badge = document.querySelector("#review-count");
-  badge.hidden = !count; badge.textContent = count;
+  if (badge) { badge.hidden = true; badge.textContent = count; }
   const streak = currentStreak(ctx.progress);
   document.querySelector("#streak-count").textContent = streak + (streak === 1 ? " dia" : " dias");
   document.querySelector("#xp-total").textContent = ctx.progress.xp.total + " XP";
@@ -130,15 +136,19 @@ function render() {
   document.title = locationInfo.title + " · Maru";
   const views = {
     home: () => renderDashboard(ctx),
-    practice: () => renderPracticeHub(ctx),
-    challenge: () => renderChallenge(ctx, id),
-    videos: () => renderVideoLessons(ctx),
-    explore: () => renderExplore(ctx),
+    practice: () => renderArcadeHub(ctx),
+    arcade: () => renderArcade(ctx, id),
+    daily: () => renderDaily(ctx),
     journey: () => renderJourney(ctx, id),
     lesson: () => renderLesson(ctx, id),
+    placement: () => renderPlacement(ctx),
+    progress: () => renderArcadeProgress(ctx),
+    challenge: () => renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),
+    videos: () => renderVideoLessons(ctx),
+    explore: () => renderExplore(ctx),
     kana: () => renderKana(ctx, params),
     writing: () => renderWriting(ctx, id || params.char || "あ"),
-    sentences: () => renderSentences(ctx, id),
+    sentences: () => renderArcade(ctx, "sentences"),
     kanji: () => renderKanji(ctx),
     particles: () => renderParticles(ctx),
     expressions: () => renderExpressions(ctx),
@@ -148,14 +158,12 @@ function render() {
     glossary: () => renderGlossary(ctx),
     exercises: () => renderExercises(ctx),
     worksheets: () => renderWorksheets(ctx, id),
-    teacher: () => renderTeacher(ctx),
-    package: () => renderTeacher(ctx, id),
-    themes: () => renderThematic(ctx, id),
-    placement: () => renderPlacement(ctx),
     settings: () => renderSettings(ctx, id),
     account: () => renderSettings(ctx, id, true)
   };
-  if (views[route]) cleanup = views[route]();
+  const paused = ["themes", "teacher", "package"].includes(route) || (route === "worksheets" && id && id !== "characters");
+  if (paused) main.innerHTML = `<section class="play-paused panel"><span class="play-tag">EM PAUSA</span><h1 tabindex="-1">Um intervalo para preparar o próximo passo.</h1><p>As trilhas temáticas, o material para professores e as atividades impressas estão temporariamente fechados. Seu progresso anterior está preservado.</p><div class="play-actions">${routeLink("journey", "Seguir a trilha", "btn btn-primary")}${routeLink("practice", "Ir para os jogos", "btn btn-ghost")}${routeLink("worksheets", "Imprimir repetições", "btn btn-ghost")}</div></section>`;
+  else if (views[route]) cleanup = views[route]();
   else main.innerHTML = emptyState("Este caminho ainda não existe.", "Volte para seu espaço de aprendizado.", routeLink("home", "Meu aprendizado", "btn btn-primary"));
   // Animate only the route entrance. Answering or moving through a lesson keeps the workspace still.
   for (const element of main.children) {
@@ -178,8 +186,9 @@ document.addEventListener("keydown", event => {
   }
 });
 document.addEventListener("click", event => {
+  if (event.target.closest("[data-motion-toggle]")) toggleMotion();
   const theme = event.target.closest("[data-theme-choice]");
-  if (theme) { ctx.setTheme(theme.dataset.themeChoice); toast("Estilo " + ({ dojo: "Dojo", arcade: "Arcade" }[theme.dataset.themeChoice] || "Dojo") + " ativado. Seu progresso continua o mesmo."); }
+  if (theme) { const choice = theme.dataset.themeChoice; ctx.setTheme(choice); toast("Estilo " + (THEMES.find(item => item.id === choice) || THEMES[0]).title + " ativado. Seu progresso continua o mesmo."); }
   const speaker = event.target.closest("[data-speak]");
   if (speaker) { event.preventDefault(); audio.speak(speaker.dataset.speak, speaker); }
   const review = event.target.closest("[data-add-review]");
@@ -190,4 +199,5 @@ document.addEventListener("click", event => {
 document.querySelector(".skip-link").addEventListener("click", event => { event.preventDefault(); main.focus(); });
 window.addEventListener("hashchange", render);
 applyTheme(store.snapshot.preferences.theme);
+syncMotion();
 render();

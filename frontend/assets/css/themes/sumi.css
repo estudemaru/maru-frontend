@@ -1,0 +1,92 @@
+/* Warm paper and sumi ink. The legacy arcade preference now selects Sumi. */
+:root, :root[data-theme="dojo"] {
+  color-scheme: light;
+  --paper: #f3ead7;
+  --surface: #fbf5e8;
+  --surface-soft: #ece1cc;
+  --ink: #342e27;
+  --muted: #71634f;
+  --subtle: #746650;
+  --line: #ddd0b9;
+  --accent: #a3311f;
+  --accent-hover: #842516;
+  --accent-soft: #efdfd0;
+  --button-ink: #fff7eb;
+  --peach: #edd9c5;
+  --sage: #e7e0cb;
+  --lavender: #e8ddcf;
+  --sky: #dfded2;
+  --sand: #eddfbc;
+  --success: #49613f;
+  --success-bg: #e6ead6;
+  --font-display: "Shippori Mincho", Georgia, serif;
+}
+:root[data-theme="arcade"] {
+  color-scheme: dark;
+  --paper: #12151f;
+  --surface: #1a1e2c;
+  --surface-soft: #232838;
+  --ink: #ece8e1;
+  --muted: #a6a49b;
+  --subtle: #8f8d84;
+  --line: #333a4c;
+  --accent: #e2704f;
+  --accent-hover: #ef8a68;
+  --accent-soft: #3a2a29;
+  --button-ink: #241209;
+  --peach: #33293a;
+  --sage: #22322c;
+  --lavender: #292a3f;
+  --sky: #212c3a;
+  --sand: #322d29;
+  --success: #8fb87e;
+  --success-bg: #1e3128;
+  --font-display: "Shippori Mincho", Georgia, serif;
+  --font-jp-serif: "Shippori Mincho", "Noto Serif JP", serif;
+  --radius: 5px;
+  --radius-sm: 4px;
+}
+html[data-theme] body { background-image: url("/assets/img/washi.svg"); }
+html[data-theme] .sidebar { background: var(--surface) url("/assets/img/washi.svg"); }
+html[data-theme] .topbar { background: var(--paper); }
+html[data-theme] .play-hero h1,
+html[data-theme] .play-heading h1,
+html[data-theme] .play-setup-intro h1,
+html[data-theme] .play-result-hero h1,
+html[data-theme] .play-section-title h2,
+html[data-theme] .page-heading h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.045em; }
+html[data-theme] .btn-primary { color: var(--button-ink); }
+html[data-theme] .btn-ghost:hover { background: var(--surface-soft); border-color: var(--line); }
+html[data-theme] .eyebrow { color: var(--accent); }
+html[data-theme] .nav-link:hover { background: var(--surface-soft); color: var(--ink); }
+html[data-theme] .nav-link.is-active { box-shadow: inset 2px 0 var(--accent); }
+html[data-theme] .play-art-circle { background: var(--accent-soft); border: 1px solid var(--line); border-radius: 49% 51% 47% 53% / 52% 47% 53% 48%; }
+html[data-theme] .play-orbit { font-family: var(--font-jp-serif); color: var(--accent); border-radius: 5px; border: 1px solid var(--accent); box-shadow: 2px 4px 0 var(--line); }
+html[data-theme] .play-card { background: var(--surface); color: var(--ink); }
+html[data-theme] .play-card-art, html[data-theme] .play-setup-intro { background-image: url("/assets/img/washi.svg"); }
+html[data-theme] .play-art-caption, html[data-theme] .play-hero-foot { color: var(--muted); }
+html[data-theme] .profile-avatar { color: var(--accent); background: var(--accent-soft); }
+html[data-theme] .app-footer, html[data-theme] .app-footer > a:first-child { color: var(--muted); }
+html[data-theme] .text-input::placeholder { color: var(--subtle); }
+html[data-theme] .theme-preview.dojo { background: #f3ead7 url("/assets/img/washi.svg"); color: #a3311f; border: 1px solid #ddd0b9; box-shadow: none; }
+html[data-theme] .theme-preview.arcade { background: #101a2c url("/assets/img/washi.svg"); color: #ed9781; border: 1px solid #344b68; box-shadow: none; }
+html[data-theme] .theme-preview small { color: inherit; }
+#theme-toggle { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font-size: 23px; }
+#theme-toggle:hover { background: var(--accent-soft); }
+/* Reference/practice surfaces also follow the dark palette; paper previews do not. */
+html[data-theme="arcade"] :is(.example, .context-box, .sentence-hint, .tip-box, .option-letter, .segmented, .word-token, .kana-cell, .goal-option, .setting-note, .account-notice, .pill, .worksheet-char) {
+  background: var(--surface-soft); border-color: var(--line); color: var(--ink);
+}
+html[data-theme="arcade"] :is(.answer-option:hover, .answer-option:has(input:checked), .selected-token, .word-token:hover:not(:disabled), .kana-row.is-selected .kana-cell, .worksheet-char[aria-pressed="true"], .chip:hover) { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+html[data-theme="arcade"] .kana-cell:hover, html[data-theme="arcade"] .kana-cell.is-active { background: var(--accent-soft) !important; }
+html[data-theme="arcade"] :is(.detail-character, .kanji-card-symbol, .summary-symbol, .writing-reading > .jp, .input-label, .romaji, .particle-note, .kanji-expand, .context-box p, .word-token small, .kana-cell small, .sentence-hint summary, .tip-box > .icon) { color: var(--muted); }
+html[data-theme="arcade"] :is(.peach, .sage, .lavender, .sky, .sand, .particle-symbol) { color: var(--ink); }
+html[data-theme="arcade"] .feedback.success, html[data-theme="arcade"] .answer-option.is-correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+html[data-theme="arcade"] .feedback.retry, html[data-theme="arcade"] .answer-option.is-wrong { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+html[data-theme="arcade"] .is-urgent { color: var(--accent); }
+html[data-theme="arcade"] .play-picture { background: var(--surface-soft); border-radius: 16px; }
+html[data-theme="arcade"] .stroke-model, html[data-theme="arcade"] .writing-stage { border-color: var(--line); }
+/* Handwriting canvases retain light paper because the saved ink is dark. */
+html[data-theme] .stroke-model, html[data-theme] .writing-stage { color-scheme: light; }
+
+html[data-theme] #arcade-hud { display: none; }

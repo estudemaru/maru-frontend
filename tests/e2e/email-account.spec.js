@@ -1,5 +1,44 @@
 import { test, expect } from "@playwright/test";
 
+test("Google and Discord login appear alongside email when enabled by Supabase", async ({ page }) => {
+  let holdWrites = false, releaseSave, loginStarted = false;
+  await page.route("**/api/account", route => route.fulfill({ json: {
+    user: null, googleEnabled: true, discordEnabled: true, emailEnabled: true
+  } }));
+  await page.route("**/api/progress", async route => {
+    if (holdWrites && route.request().method() === "PUT") await new Promise(resolve => { releaseSave = resolve; });
+    await route.fulfill({ json: {} });
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#/account");
+  await expect(page.getByRole("link", { name: "Continuar com Google" })).toHaveAttribute("href", "/api/auth/google");
+  await expect(page.getByRole("link", { name: "Continuar com Discord" })).toHaveAttribute("href", "/api/auth/discord");
+  await expect(page.locator("#email-account-form")).toBeVisible();
+  for (const [size, viewport] of [["desktop", { width: 1440, height: 1000 }], ["mobile", { width: 390, height: 844 }]]) {
+    await page.setViewportSize(viewport);
+    for (const [theme, name] of [["dojo", "sumie"], ["arcade", "arcade"]]) {
+      if (await page.locator("html").getAttribute("data-theme") !== theme) await page.locator("#theme-toggle").click();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      await page.screenshot({ path: `docs/previews/account-${name}-${size}.png`, fullPage: true });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    }
+  }
+  await page.route("**/api/auth/discord", route => {
+    loginStarted = true;
+    return route.fulfill({ status: 303, headers: { location: "/#/settings/login-success" } });
+  });
+  holdWrites = true;
+  await page.locator("#theme-toggle").click();
+  await page.getByRole("link", { name: "Continuar com Discord" }).click();
+  await expect(page.locator("#discord-login")).toHaveAttribute("aria-disabled", "true");
+  await expect.poll(() => Boolean(releaseSave)).toBe(true);
+  expect(loginStarted).toBe(false);
+  holdWrites = false;
+  releaseSave();
+  await expect(page).toHaveURL(/#\/settings\/login-success$/);
+  await expect(page.locator(".account-notice")).toContainText("Conta conectada");
+});
+
 test("email signup, recovery and login are visible without Google", async ({ page }) => {
   let signed = false;
   const requests = [];
