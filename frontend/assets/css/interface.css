@@ -3,6 +3,7 @@
 html[data-theme="arcade"] .theme-copy--paper { display: none; }
 html[data-theme="arcade"] .theme-copy--arcade { display: inline; }
 html[data-theme="dojo"] .book-scene { display: block; }
+html[data-theme="arcade"] .book-scene { display: block; }
 .theme-identity { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; white-space: nowrap; }
 .theme-identity::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .world-label { display: inline-flex; align-items: center; gap: 10px; font-size: 10px; letter-spacing: .14em; font-weight: 650; }
@@ -49,11 +50,10 @@ html[data-theme] .theme-card { padding: 16px; }
 html[data-theme] .theme-card strong { font-family: var(--font-display); }
 html[data-theme] .theme-preview { min-height: 155px; position: relative; overflow: hidden; border-radius: 8px; }
 html[data-theme] .theme-preview.dojo { background: #f3ead7 url('/assets/img/sumi-landscape.svg') right center / auto 180px no-repeat; color: #a3311f; border: 1px solid #d9ccb4; }
-html[data-theme] .theme-preview.arcade { background: radial-gradient(ellipse at 70% 20%, #7456e14d, transparent 65%), repeating-linear-gradient(0deg, transparent 0 23px, #44ceec10 24px 25px), #0c1731; color: #70e6ff; border: 1px solid #42618a; box-shadow: inset 0 0 30px #33d4fa0d; }
-html[data-theme] .theme-preview.arcade::after { content: ''; position: absolute; width: 92px; height: 92px; right: 25px; border-radius: 50%; border: 1px solid #b5a0ff; box-shadow: 0 0 24px #9377ff45, inset 0 0 24px #9377ff25; pointer-events: none; }
+html[data-theme] .theme-preview.arcade { background: #12151f url('/assets/img/sumi-landscape-night.svg') right center / auto 180px no-repeat; color: #e2704f; border: 1px solid #333a4c; }
 html[data-theme] .theme-preview > small { z-index: 1; font-size: 12px; }
 html[data-theme] .theme-preview.dojo > small { background: #f3ead7df; padding: 6px; }
-html[data-theme] .theme-preview.arcade > small { background: #0b1436cc; padding: 6px; }
+html[data-theme] .theme-preview.arcade > small { background: #12151fdf; padding: 6px; }
 html[data-theme] .theme-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 html[data-theme] .theme-card[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--accent); }
 .settings-history { margin-top: 28px; }

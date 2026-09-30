@@ -1,12 +1,12 @@
 // Keep the stored IDs so existing account preferences remain compatible.
 export const THEMES = [
   { id: "dojo", title: "Sumi-e", subtitle: "Claro · caderno de tinta e papel.", description: "Papel amarelado, textura washi e vermelho de selo. Um caderno para voltar todos os dias.", symbol: "道", tag: "PAPEL & VERMELHO" },
-  { id: "arcade", title: "Arcade", subtitle: "Escuro · pixels e neon.", description: "O mesmo caderno à noite: azul profundo, blocos de pixel e brilho de fliperama.", symbol: "遊", tag: "PIXEL & NEON" }
+  { id: "arcade", title: "Sumi-e Noite", subtitle: "Escuro · o mesmo caderno, à noite.", description: "O mesmo caderno, sob a lua: tinta clara sobre papel escuro. A paisagem ganha uma lua no lugar do sol.", symbol: "遊", tag: "TINTA & LUA" }
 ];
 export function applyTheme(theme) {
   const selected = THEMES.some(item => item.id === theme) ? theme : "dojo";
   document.documentElement.dataset.theme = selected;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#080f22" : "#f3ead7");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", selected === "arcade" ? "#12151f" : "#f3ead7");
   const mark = "maru-mark.svg";
   document.querySelector('link[rel="icon"]')?.setAttribute("href", "/assets/img/" + mark);
   document.querySelector(".brand img")?.setAttribute("src", "/assets/img/" + mark);
