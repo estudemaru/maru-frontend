@@ -1,7 +1,5 @@
 /* Shared geometry and accessible controls. Each world supplies its own materials. */
-.theme-copy--arcade, .book-scene { display: none; }
-html[data-theme="arcade"] .theme-copy--paper { display: none; }
-html[data-theme="arcade"] .theme-copy--arcade { display: inline; }
+.book-scene { display: none; }
 html[data-theme="dojo"] .book-scene { display: block; }
 html[data-theme="arcade"] .book-scene { display: block; }
 .theme-identity { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; white-space: nowrap; }
