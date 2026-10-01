@@ -15,7 +15,7 @@
   --sakura: url("/assets/img/wagara/sakura.svg");
 }
 :root[data-theme="dojo"] {
-  --pattern-soft: var(--pattern); --pattern-page: .045; --pattern-art: .12; --pattern-strip: .22; --sidebar-pattern: .1;
+  --pattern-soft: var(--pattern); --pattern-page: .025; --pattern-art: .12; --pattern-strip: .22; --sidebar-pattern: .1;
   --sky-top: #fcf5e8; --sky-bottom: #efe1c5; --sky-glow: #f8d6c0;
   --sun: #b5342a; --sun-light: #db5c43; --sun-glow: #b5342a33; --wave: #1f3150; --wave-alpha: .4; --kasumi: #fff8ea; --kasumi-alpha: .95;
   --yama-far: #373a34; --yama-near: #34362f; --yama-ridge: #30352e; --yama-water: #777664; --yama-tree: #34362f; --yama-tree-alpha: 1;
@@ -23,7 +23,7 @@
 :root[data-theme="arcade"] {
   /* Linha clara sobre fundo escuro "vibra" mais: fundo e barra lateral usam índigo sobre índigo (como um
      tecido 藍染) e o dourado fica só nos detalhes, mais fraco. */
-  --pattern-soft: #8ea6dc; --pattern-page: .18; --pattern-art: .07; --pattern-strip: .11; --sidebar-pattern: .06;
+  --pattern-soft: #8ea6dc; --pattern-page: .03; --pattern-art: .07; --pattern-strip: .11; --sidebar-pattern: .06;
   --sky-top: #1f3159; --sky-bottom: #0e1730; --sky-glow: #3a5288;
   --sun: #ecdcae; --sun-light: #fffbef; --sun-glow: #f3d99055; --wave: #e4b65e; --wave-alpha: .38; --kasumi: #f0cd84; --kasumi-alpha: .3;
   --yama-far: #8ea6dc; --yama-near: #b2c4ee; --yama-ridge: #b7c8ee; --yama-water: #9fb0d6; --yama-tree: #c3d3f5; --yama-tree-alpha: .85;
