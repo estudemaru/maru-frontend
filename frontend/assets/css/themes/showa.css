@@ -1,0 +1,179 @@
+/* Shōwa retrô em cores tradicionais japonesas (和色): papel 生成り, índigo 藍, vermelho 朱 e dourado 金.
+   Os ornamentos moram nas bordas (molduras, sombras deslocadas, selos, carimbos); o miolo, onde está o
+   conteúdo, fica limpo. Os dois temas usam estas mesmas regras: só a paleta muda. Padrões japoneses,
+   a capa e o movimento ficam em themes/wagara.css. Carregado depois de sumi-book.css e sumi-night.css. */
+:root[data-theme="dojo"] {
+  --paper: #f3ead7; --surface: #fbf5e6; --surface-soft: #ede3cb; --ink: #24211d; --muted: #5f5547; --subtle: #685c4b;
+  --line: #d6c8ab; --frame: #24211da6; --frame-strong: #24211d; --offset: #c3cede;
+  --accent: #b5342a; --accent-hover: #952419; --accent-soft: #f1dcd1; --seal: #b5342a; --seal-ink: #fbf5e6;
+  --button-bg: #1f3150; --button-ink: #fbf5e6;
+  /* 藍 na barra lateral e no botão principal; 金 nos ornamentos; --pattern colore os padrões. */
+  --ai: #1f3150; --ai-ink: #f5eedd; --ai-pattern: #f5eedd; --tab: var(--paper); --kin: #a87b22; --pattern: #1f3150;
+  /* Fundos das artes, como papéis chiyogami: 洗柿 caqui, 桜 sakura, 藤 glicínia, 白藍 índigo claro e 卵 gema. */
+  --sage: #f1d6c2; --peach: #f2d7d7; --lavender: #e2dbea; --sky: #d8e2ed; --sand: #f0dfb3;
+  --success: #2f6b4f; --success-bg: #dfe9dc;
+}
+:root[data-theme="arcade"] {
+  /* Noite de 藍: índigo profundo, lua dourada e o mesmo 朱, mais aceso para ler no escuro. */
+  --paper: #111a2c; --surface: #172237; --surface-soft: #1f2c46; --ink: #f1e9d7; --muted: #b7b1a3; --subtle: #a29d92;
+  --line: #2f3d5b; --frame: #f1e9d77a; --frame-strong: #f1e9d7; --offset: #263759;
+  --accent: #ef6d4f; --accent-hover: #f5866b; --accent-soft: #3a2430; --seal: #c23b2b; --seal-ink: #fbf5e6;
+  --button-bg: #f1e9d7; --button-ink: #111a2c;
+  --ai: #0b1222; --ai-ink: #f1e9d7; --ai-pattern: #8ea6dc; --tab: #1c2944; --kin: #e4b65e; --pattern: #e4b65e;
+  --sage: #3a271f; --peach: #3a2333; --lavender: #2b2648; --sky: #1c2c4a; --sand: #382d1c;
+  --success: #8cc7a5; --success-bg: #18322e;
+}
+:root[data-theme] {
+  --font-display: "DM Serif Display", "Shippori Mincho", Georgia, serif;
+  --font-jp-serif: "Shippori Mincho", "Noto Serif JP", serif;
+  --radius: 14px; --radius-sm: 9px;
+}
+/* Etiquetas coloridas no claro: o texto acompanha o tom do papel. No escuro, sumi.css usa a tinta. */
+html[data-theme="dojo"] .sage { color: #8a4528; }
+html[data-theme="dojo"] .peach { color: #97343f; }
+html[data-theme="dojo"] .lavender { color: #5e4b7d; }
+html[data-theme="dojo"] .sky { color: #2c4a72; }
+html[data-theme="dojo"] .sand { color: #6f5418; }
+
+/* Barra lateral: o painel índigo, como um tecido tingido de 藍. */
+html[data-theme] .sidebar { background: var(--ai); border-right: 0; box-shadow: none; color: var(--ai-ink); }
+html[data-theme] .sidebar > * { position: relative; z-index: 1; }
+html[data-theme] .sidebar-brand { border-bottom: 1px dashed color-mix(in srgb, var(--ai-ink) 33%, transparent); }
+html[data-theme] :is(.brand, .brand > span) { color: var(--ai-ink); }
+html[data-theme] .brand > span { font-family: var(--font-display); font-weight: 400; letter-spacing: -1px; }
+html[data-theme] .brand small { color: color-mix(in srgb, var(--ai-ink) 70%, transparent); }
+html[data-theme] .brand-period { color: #f0a58f; }
+html[data-theme] .nav-label, html[data-theme] .motion-control { color: color-mix(in srgb, var(--ai-ink) 76%, transparent); }
+html[data-theme] .nav-link { color: var(--ai-ink); border-radius: 10px; }
+html[data-theme] .nav-link:hover { background: color-mix(in srgb, var(--ai-ink) 10%, transparent); color: var(--ai-ink); }
+html[data-theme] .nav-link.is-active { background: var(--tab); color: var(--ink); box-shadow: inset 3px 0 var(--accent), 3px 3px 0 #00000033; }
+html[data-theme] .nav-link.is-active .icon { color: var(--accent); }
+html[data-theme] .profile-link { border-top: 1px dashed color-mix(in srgb, var(--ai-ink) 33%, transparent); color: var(--ai-ink); }
+html[data-theme] :is(.profile-link small, .profile-link .icon) { color: color-mix(in srgb, var(--ai-ink) 76%, transparent); }
+html[data-theme] .profile-avatar { background: var(--tab); color: var(--accent); border: 0; border-radius: 50%; font-family: var(--font-display); }
+html[data-theme] .menu-close { color: var(--ai-ink); }
+html[data-theme] .sidebar-backdrop { background: #0b122266; }
+
+/* Topo e rodapé: fios duplos, como a moldura de um cartaz. */
+html[data-theme] .topbar { background: var(--paper); border-bottom: 3px double var(--line); }
+html[data-theme] .theme-identity { font-family: var(--font-display); color: var(--accent); }
+html[data-theme] #theme-toggle { border: 1.5px solid var(--frame); border-radius: 50%; background: var(--surface); }
+html[data-theme] .topbar-avatar { border: 1.5px solid var(--frame); border-radius: 999px; background: transparent; color: var(--ink); }
+html[data-theme] .main-content::before { display: none; }
+html[data-theme] .app-footer { position: relative; border-top: 3px double var(--line); }
+html[data-theme] .app-footer > a:first-child { font-family: var(--font-display); color: var(--accent); }
+
+/* Títulos: serifada de cartaz para o latim, mincho para o japonês. */
+html[data-theme] :is(.play-hero h1, .play-heading h1, .page-heading h1, .play-setup-intro h1, .play-result-hero h1, .play-section-title h2, .play-card h3, .panel h2, .play-paper-link h2) { font-family: var(--font-display); font-weight: 400; letter-spacing: -.015em; }
+html[data-theme] .eyebrow { color: var(--accent); letter-spacing: .16em; font-weight: 700; }
+html[data-theme] :is(.play-heading, .page-heading) { border-bottom: 3px double var(--line); }
+html[data-theme] :is(.play-heading, .page-heading)::after { height: 3px; width: 44px; border-radius: 0; background: var(--accent); }
+
+/* Seções: rótulos com estrelinhas, como no título "✦ 饮品售卖 ✦". */
+html[data-theme] .play-section-title .eyebrow::before, html[data-theme] .play-section-title .eyebrow::after { content: "✦"; margin: 0 .6em; font-size: 9px; vertical-align: 1px; }
+html[data-theme] .play-section-title .eyebrow::before { margin-left: 0; }
+
+/* Cartões de jogo: moldura fina e sombra índigo deslocada, como impressão fora de registro. */
+html[data-theme] .play-card { background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
+html[data-theme] .play-card-art { background: var(--sage); border: 1.5px solid var(--frame); border-radius: 10px; }
+html[data-theme] .peach .play-card-art, html[data-theme] .play-setup-intro.peach { background: var(--peach); }
+html[data-theme] .lilac .play-card-art, html[data-theme] .play-setup-intro.lilac { background: var(--lavender); }
+html[data-theme] .blue .play-card-art, html[data-theme] .play-setup-intro.blue { background: var(--sky); }
+html[data-theme] .yellow .play-card-art, html[data-theme] .play-setup-intro.yellow { background: var(--sand); }
+html[data-theme] .play-card-art img { filter: none; }
+html[data-theme] .play-number { display: grid; place-items: center; left: 9px; top: 9px; width: 26px; height: 26px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); font: 700 10px/1 var(--font-body); opacity: 1; }
+html[data-theme] .play-arrow { display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--frame-strong); color: var(--paper); font-size: 14px; }
+html[data-theme] .play-card-meta { border-top: 1.5px dashed var(--line); }
+html[data-theme] .play-new { background: var(--seal); color: var(--seal-ink); border-radius: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme] .play-card:hover { transform: translate(-2px, -3px); border-color: var(--frame-strong); box-shadow: 8px 8px 0 var(--offset); }
+  html[data-theme] .play-card:hover .play-arrow { background: var(--accent); }
+}
+
+/* Desafio do dia (tela): estrelas, passos e resultado. O cartão da home está em wagara.css. */
+html[data-theme] .daily-stars .is-on { color: var(--accent); }
+html[data-theme] .daily-progress li { border: 1.5px solid var(--frame); border-radius: 999px; }
+html[data-theme] .daily-progress .is-current span { background: var(--frame-strong); color: var(--paper); }
+html[data-theme] .daily-progress .is-right span { background: var(--seal); color: var(--seal-ink); }
+
+/* Superfícies: moldura fina; nas telas de jogo, uma segunda linha tracejada por dentro. */
+html[data-theme] :is(.panel, .explore-controls) { border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: none; }
+html[data-theme] :is(.play-question, .play-setup, .lesson-content) { border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
+html[data-theme] .play-question { border-top-width: 1.5px; outline: 1.5px dashed var(--line); outline-offset: -9px; }
+html[data-theme] .play-question .eyebrow::before, html[data-theme] .play-question .eyebrow::after { content: "✦"; margin: 0 .7em; font-size: 8px; vertical-align: 1px; }
+html[data-theme] .play-setup-intro { background: var(--sage); border-right: 1.5px solid var(--frame); }
+html[data-theme] :is(.play-setup-intro img, .play-setup-intro) { filter: none; }
+html[data-theme] .play-scoreboard { background: var(--surface); border: 1.5px solid var(--frame); border-radius: 999px; box-shadow: 0 6px 18px #0b122214; padding-inline: 28px; }
+html[data-theme] .play-scoreboard small { color: var(--accent); font-weight: 700; letter-spacing: .12em; }
+html[data-theme] .play-scoreboard strong { font-family: var(--font-display); font-weight: 400; }
+html[data-theme] .play-time-track { background: var(--line); }
+html[data-theme] :is(.play-result-hero) { background: none; }
+html[data-theme] .play-results-stats { background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
+html[data-theme] .play-results-stats strong { font-family: var(--font-display); font-weight: 400; color: var(--accent); }
+html[data-theme] .play-paper-link { border: 1.5px dashed var(--frame); border-radius: var(--radius); background: transparent; }
+html[data-theme] :is(.journey-module, .lesson-card, .journey-recommendation, .hub-card, .theme-card, .achievement, .example, .tip-box, .context-box) { border-radius: var(--radius-sm); }
+html[data-theme] .lesson-state { border-radius: 50%; }
+html[data-theme] .lesson-state.is-done { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); }
+html[data-theme] .lesson-reader { border-top: 0; }
+
+/* Cartas: karuta de verdade, com moldura vermelha dupla. O acerto recebe ◎, como nas provas japonesas. */
+html[data-theme] :is(.karuta-card, .play-choice) { position: relative; background: var(--surface); color: var(--ink); border: 1.5px solid var(--accent); border-radius: 10px; outline: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: -6px; box-shadow: 3px 3px 0 var(--offset); }
+html[data-theme] .karuta-card small { color: var(--accent); font-weight: 700; }
+html[data-theme] :is(.karuta-card, .play-choice):hover:not(:disabled) { border-color: var(--accent-hover); }
+html[data-theme] :is(.karuta-card, .play-choice):focus-visible { outline: 2.5px solid var(--frame-strong); outline-offset: 3px; }
+html[data-theme] :is(.karuta-card, .daily-choice).is-right { background: var(--success-bg); border-color: var(--success); outline-color: color-mix(in srgb, var(--success) 55%, transparent); }
+html[data-theme] :is(.karuta-card, .daily-choice).is-wrong { background: var(--accent-soft); }
+html[data-theme] .karuta-card.is-right::after, html[data-theme] .play-feedback.correct::after { content: "◎"; color: var(--accent); font-weight: 700; }
+html[data-theme] .karuta-card.is-right::after { position: absolute; right: 8px; top: 4px; font-size: 22px; line-height: 1; }
+html[data-theme] .daily-choice.play-choice { outline: 0; border-color: var(--frame); box-shadow: none; }
+html[data-theme] .play-feedback { background: var(--accent-soft); border: 1.5px solid var(--frame); border-left: 5px solid var(--accent); border-radius: 10px; }
+html[data-theme] .play-feedback.correct { background: var(--success-bg); border-left-color: var(--success); }
+html[data-theme] .feedback { border-radius: 10px; }
+
+/* Controles: pílula índigo (tinta clara à noite) com o ícone num círculo vermelho, como o botão do cartaz. */
+html[data-theme] .btn { border-radius: 999px; font-weight: 650; min-height: 48px; padding-inline: 22px; }
+html[data-theme] .btn-primary { background: var(--button-bg); border: 1.5px solid var(--button-bg); color: var(--button-ink); box-shadow: 3px 3px 0 var(--accent); }
+html[data-theme] .btn-primary:hover:not(:disabled) { background: var(--button-bg); border-color: var(--button-bg); box-shadow: 4px 5px 0 var(--accent); }
+html[data-theme] .btn-primary:active:not(:disabled) { translate: 2px 2px; box-shadow: 1px 1px 0 var(--accent); }
+html[data-theme] .btn-primary .icon { width: 22px; height: 22px; padding: 4px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); }
+html[data-theme] .btn-ghost { background: transparent; border: 1.5px solid var(--frame); color: var(--ink); }
+html[data-theme] .btn-ghost:hover:not(:disabled) { background: var(--surface-soft); border-color: var(--frame-strong); }
+html[data-theme] .account-provider { background: var(--surface); border: 1.5px solid var(--frame); color: var(--ink); }
+html[data-theme] .account-provider:hover { background: var(--surface-soft); border-color: var(--frame-strong); }
+html[data-theme] .text-input { background: var(--surface); border: 1.5px solid var(--frame); border-radius: 10px; }
+html[data-theme] .text-input:focus { border-color: var(--frame-strong); box-shadow: 0 0 0 4px var(--accent-soft); }
+html[data-theme] :is(.chip, .segmented) { border-radius: 999px; }
+html[data-theme] .kana-mode { border: 1.5px solid var(--frame); border-radius: 50%; background: var(--surface); color: var(--accent); }
+html[data-theme] .toast { background: var(--button-bg); color: var(--button-ink); border: 0; border-radius: 999px; box-shadow: 3px 3px 0 var(--accent); }
+
+/* Ajustes: amostras da letra dos jogos. */
+.jp-font-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin-top: 18px; }
+.jp-font-option { position: relative; display: grid; gap: 6px; padding: 16px 16px 14px; border: 1.5px solid var(--frame); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+.jp-font-option input { position: absolute; opacity: 0; pointer-events: none; }
+.jp-font-sample { font-size: 26px; line-height: 1.5; color: var(--ink); }
+.jp-font-option strong { font-size: 14px; }
+.jp-font-option small { font-size: 12px; line-height: 1.6; color: var(--muted); }
+.jp-font-option:has(input:checked) { border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+.jp-font-option:has(input:checked)::after { content: "◎"; position: absolute; top: 8px; right: 12px; color: var(--accent); font-size: 20px; }
+.jp-font-option:has(input:focus-visible) { outline: 2.5px solid var(--frame-strong); outline-offset: 3px; }
+
+/* Movimento: carimbos "batem" ao aparecer. O resto do movimento está em wagara.css. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="paused"]) .karuta-card.is-right::after { animation: stamp-in .5s cubic-bezier(.34, 1.4, .64, 1) both; }
+  html:not([data-motion="paused"]) .jp-font-option { transition: transform .25s var(--ease-out, ease), box-shadow .25s var(--ease-out, ease), border-color .2s; }
+  html:not([data-motion="paused"]) .jp-font-option:active { transform: scale(.98); }
+}
+@keyframes stamp-in { from { opacity: 0; scale: 1.8; } 60% { opacity: 1; } to { opacity: .9; scale: 1; } }
+
+@media (max-width: 820px) { html[data-theme] .play-scoreboard { border-radius: 18px; } }
+@media (max-width: 600px) {
+  html[data-theme] .play-card { box-shadow: 4px 4px 0 var(--offset); }
+  html[data-theme] .play-scoreboard { padding-inline: 16px; }
+  html[data-theme] .play-question { outline-offset: -7px; }
+  .jp-font-options { grid-template-columns: 1fr; }
+  .jp-font-option { grid-template-columns: 1fr; }
+  html[data-theme] .toast { border-radius: 16px; }
+}
+
+/* Letra escolhida para o japonês dos jogos (core/jpFont.js). */
+html[data-jp-font] :is(.play-page, .lesson-game, .practice-session) :is([lang="ja"], .play-prompt, .play-choice, .karuta-card, .shiritori-kana, .quiz-character) { font-family: var(--font-game-jp, var(--font-jp-serif)); }

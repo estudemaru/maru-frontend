@@ -35,7 +35,7 @@
 .account-panel > p { line-height: 1.9; color: var(--muted); margin: 14px 0; max-width: 72ch; }
 .account-panel .account-notice { background: var(--surface-soft); padding: 16px; border-left: 2px solid var(--accent); color: var(--ink); }
 .account-panel .source-note { font-size: 12px; }
-.account-panel #account-logout, .account-panel #google-login { margin: 10px 0; }
+.account-panel #account-logout { margin: 10px 0; }
 .account-panel .small { overflow-wrap: anywhere; }
 .account-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 12px; }
 .account-tabs button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
@@ -70,10 +70,8 @@
   .stage-seal { padding: 18px 12px; }
   .setting-row:has(.btn) { flex-wrap: wrap; gap: 16px; }
   .placement-breakdown > a { display: block; margin: 22px 0 0; }
-  :root[data-theme="arcade"] body::before { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-theme="arcade"] body::before { display: none; }
   :root[data-theme="arcade"] { --glow-accent: none; --glow-cyan: none; }
   :where([data-theme="arcade"]) .art-main { filter: none; }
 }

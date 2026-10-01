@@ -16,4 +16,7 @@
 @import "./interface.css";
 @import "./themes/sumi-book.css";
 @import "./themes/sumi-night.css";
+@import "./themes/showa.css";
+@import "./themes/wagara.css";
+@import "./themes/mobile.css";
 @import "./print.css";

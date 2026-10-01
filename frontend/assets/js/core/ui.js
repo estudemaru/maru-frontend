@@ -6,7 +6,7 @@ let kanaOnly = true;
 export const setReaderMode = beginner => { kanaOnly = beginner; };
 export const beginnerText = text => kanaOnly ? bookKanaText(text) : text;
 export { esc, icon, furiganaHTML };
-export const jpHTML = (jp, reading) => kanaOnly ? esc(reading || bookKanaText(jp)) : furiganaHTML(jp, reading, esc);
+export const jpHTML = (jp, reading) => furiganaHTML(jp, reading || bookKanaText(jp), esc);
 export const routeLink = (route, label, className = "btn", extra = "") => `<a class="${className}" href="#/${route}" ${extra}>${label}</a>`;
 export const progressBar = (value, label = "Progresso") => `<div class="progress-track" role="progressbar" aria-label="${esc(label)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(value)}"><span style="width:${Math.max(0, Math.min(100, value))}%"></span></div>`;
 export const pageHeading = (eyebrow, title, subtitle, action = "") => `<div class="page-heading"><div><p class="eyebrow">${eyebrow}</p><h1 tabindex="-1">${title}</h1><p class="page-description">${subtitle}</p></div>${action}</div>`;
