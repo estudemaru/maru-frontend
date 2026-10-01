@@ -42,7 +42,13 @@ function safeFile(base, pathname) {
 
 function proxyApi(req, res) {
   const transport = apiOrigin.protocol === "https:" ? https : http;
-  const upstream = transport.request(new URL(req.url || "/api", apiOrigin), {
+  // apiOrigin may itself carry a path (e.g. a Supabase function URL); prepend
+  // it instead of letting the incoming absolute path replace it outright.
+  const incoming = new URL(req.url || "/api", "http://placeholder");
+  const target = new URL(apiOrigin);
+  target.pathname = (apiOrigin.pathname === "/" ? "" : apiOrigin.pathname.replace(/\/$/, "")) + incoming.pathname;
+  target.search = incoming.search;
+  const upstream = transport.request(target, {
     method: req.method,
     headers: { ...req.headers, host: apiOrigin.host }
   }, response => {

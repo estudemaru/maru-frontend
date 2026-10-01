@@ -90,7 +90,6 @@
 .worksheet-preview > p { justify-self: start; }
 .writing-stage { background-color: #fbfaf6 !important; background-image: linear-gradient(90deg,transparent 49.7%,#d9d5cb 50%,transparent 50.3%),linear-gradient(transparent 49.7%,#d9d5cb 50%,transparent 50.3%) !important; }
 .writing-guide .stroke-paths { stroke: #c5beb0 !important; }
-:root[data-theme="arcade"] body::before { opacity: .18; }
 :root[data-theme="arcade"] .theme-choice { font-family: var(--font-body); }
 :root[data-theme="arcade"] .theme-card[aria-pressed="true"] { box-shadow: 4px 4px 0 var(--accent); }
 :root[data-theme="arcade"] .lesson-body, :root[data-theme="arcade"] .example-note { line-height: 1.9; }
