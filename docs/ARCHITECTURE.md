@@ -212,25 +212,53 @@ A folha anterior foi substituída integralmente:
 - motion.css: entradas, interação e movimento das ilustrações;
 - print.css: papel A4, grades sem degradê e paginação independente do tema.
 - interface.css: geometria comum aos dois mundos, movimento fluido e ajustes de toque;
-- themes/showa.css: camada final dos dois temas, no estilo de cartaz Shōwa retrô
-  (creme, sálvia, vermelho-selo e tinta). Barra lateral sálvia, molduras finas
-  com sombra sálvia deslocada, botão principal em pílula de tinta com ícone num
-  círculo vermelho, cartas de karuta com moldura vermelha dupla, ◎ vermelho no
-  acerto, carimbo 済 no desafio do dia feito, faixa quadriculada nos divisores,
-  pontinhos same-komon nas artes e um selo circular que gira na capa. Os
-  ornamentos ficam nas bordas; o conteúdo continua limpo. O modo noturno usa as
-  mesmas regras com paleta verde-tinta (`--paper` #161b18);
+- themes/showa.css: paleta e ornamentos dos dois temas, no estilo de cartaz Shōwa
+  retrô em cores tradicionais japonesas (和色): papel 生成り, índigo 藍, vermelho 朱
+  e dourado 金. Barra lateral índigo, molduras finas com sombra índigo deslocada,
+  botão principal em pílula (índigo de dia, creme à noite) com ícone num círculo
+  vermelho, cartas de karuta com moldura vermelha dupla e ◎ vermelho no acerto.
+  Os ornamentos ficam nas bordas; o conteúdo continua limpo. O modo noturno usa as
+  mesmas regras com paleta de noite índigo (`--paper` #111a2c), detalhes dourados
+  e o vermelho mais aceso; `--seal` é o vermelho dos selos preenchidos, mais
+  fechado que `--accent` para manter o contraste do texto creme;
+- themes/wagara.css: camada final, com os padrões japoneses (和柄), a capa e o
+  movimento. Os padrões são máscaras em `assets/img/wagara/` (só a forma; a cor
+  vem de `--pattern`): 青海波 seigaiha no fundo da página, nas ondas da capa e nos
+  divisores; 麻の葉 asanoha na barra lateral; 七宝, 亀甲, 鱗 e 市松 nas artes dos
+  jogos, como papéis chiyogami. No escuro, linha clara sobre fundo escuro cansa a
+  vista: o fundo e a barra lateral usam índigo sobre índigo (`--pattern-soft`,
+  `--ai-pattern`) e o dourado fica só nos detalhes, com opacidade menor. As
+  opacidades ficam em variáveis no topo do arquivo (`--pattern-page` é a do fundo)
+  e valem em qualquer largura e com movimento reduzido. A capa é uma janela redonda (丸窓) desenhada em
+  SVG no `dashboard.js`, com cores por variável: sol vermelho de dia; lua,
+  estrelas e montanhas azuladas à noite; névoa, pássaros, ondas e pétalas de
+  sakura em camadas próprias. O desafio do dia vira uma folha de calendário de
+  destacar (日めくり) com o dia da semana em kanji e o carimbo 済 quando feito.
+  Os cartões de jogo ficam em pé, três por linha nas telas largas;
+- themes/mobile.css: a escala final do celular (até 600 px), carregada depois de
+  wagara.css, por cima dos tamanhos de desktop e de temas antigos empilhados nas
+  outras folhas: títulos de página com 26 px (a capa, ~34 px), texto corrido com
+  14 px e entrelinha 1,6, painéis e cartões com 16 px de respiro, controles com
+  44 px e campos de texto com 16 px de letra (o iPhone não dá zoom ao focar). Os
+  jogos viram uma lista com a arte em miniatura. Um piso de legibilidade mantém
+  rótulos em maiúsculas com pelo menos 11 px, notas com 12 px e só selos e números
+  com 10 px;
 - themes/sumi-book.css: Sumi-e (claro), o caderno de tinta e papel;
 - themes/arcade-world.css: Arcade (escuro), a mesma estrutura do Sumi-e em pixels e
   neon: fundo #080f22 com grade, bordas quadradas com sombra deslocada, títulos em
   Space Grotesk e rótulos/placares em Press Start 2P. Os IDs internos continuam
   `dojo` e `arcade`.
 
-Movimento: só `transform` e `opacity` animam, com desaceleração suave
-(`--ease-out`). Levantar cartões ao passar o mouse vale só para mouse; no toque
+Movimento: o movimento contínuo anima só `transform` e `opacity`, com
+desaceleração suave (`--ease-out`); entradas pontuais, como o texto vertical da
+capa e a troca de tema, podem animar `clip-path` uma vez. Levantar cartões ao passar o mouse vale só para mouse; no toque
 há um leve "aperto" ao pressionar. Decorações contínuas usam `will-change`, a
-troca de tema usa View Transitions quando o navegador permite, e tudo respeita
-`prefers-reduced-motion` e o botão de pausar animações. No celular: toque sem
+troca de tema usa View Transitions quando o navegador permite (a partir de um
+botão, o novo tema se abre num círculo que nasce dele), e tudo respeita
+`prefers-reduced-motion` e o botão de pausar animações. A capa entra em camadas
+(título, pincelada, janela, sol nascendo, texto vertical escrito, hanko
+carimbado); ao rolar, os cartões sobem conforme entram na tela onde o navegador
+oferece `animation-timeline: view()`. Sem movimento, as pétalas não aparecem. No celular: toque sem
 atraso (`touch-action`), alvos de 44 px, áreas seguras (`viewport-fit=cover`) e
 teclado virtual que redimensiona a página (`interactive-widget`).
 

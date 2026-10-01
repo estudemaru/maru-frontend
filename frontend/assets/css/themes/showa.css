@@ -1,49 +1,58 @@
-/* Shōwa retrô: um cartaz japonês antigo em creme, sálvia, vermelho-selo e tinta.
-   Os ornamentos moram nas bordas (molduras, faixas quadriculadas, selos, carimbos);
-   o miolo, onde está o conteúdo, fica limpo. Os dois temas usam estas mesmas regras:
-   só a paleta muda. Carregado por último para vencer sumi-book.css e sumi-night.css. */
+/* Shōwa retrô em cores tradicionais japonesas (和色): papel 生成り, índigo 藍, vermelho 朱 e dourado 金.
+   Os ornamentos moram nas bordas (molduras, sombras deslocadas, selos, carimbos); o miolo, onde está o
+   conteúdo, fica limpo. Os dois temas usam estas mesmas regras: só a paleta muda. Padrões japoneses,
+   a capa e o movimento ficam em themes/wagara.css. Carregado depois de sumi-book.css e sumi-night.css. */
 :root[data-theme="dojo"] {
-  --paper: #f3ead7; --surface: #fbf4e4; --surface-soft: #ece1c8; --ink: #2a2622; --muted: #665a49; --subtle: #6b5f4d;
-  --line: #d6c8aa; --frame: #2a2622a8; --frame-strong: #2a2622; --offset: #b9c4a6;
-  --accent: #b3362b; --accent-hover: #932a20; --accent-soft: #f2ddd1; --button-bg: #2a2622; --button-ink: #fbf4e4;
-  --sage: #dfe4cf; --sage-mid: #a9b797; --sage-deep: #56694e; --sage-ink: #f7f0de; --dots: #2a26221c;
-  --peach: #f1dccb; --lavender: #e7ddd0; --sky: #dbe3d8; --sand: #f0e0bb;
-  --success: #3f6537; --success-bg: #e2ead3;
+  --paper: #f3ead7; --surface: #fbf5e6; --surface-soft: #ede3cb; --ink: #24211d; --muted: #5f5547; --subtle: #685c4b;
+  --line: #d6c8ab; --frame: #24211da6; --frame-strong: #24211d; --offset: #c3cede;
+  --accent: #b5342a; --accent-hover: #952419; --accent-soft: #f1dcd1; --seal: #b5342a; --seal-ink: #fbf5e6;
+  --button-bg: #1f3150; --button-ink: #fbf5e6;
+  /* 藍 na barra lateral e no botão principal; 金 nos ornamentos; --pattern colore os padrões. */
+  --ai: #1f3150; --ai-ink: #f5eedd; --ai-pattern: #f5eedd; --tab: var(--paper); --kin: #a87b22; --pattern: #1f3150;
+  /* Fundos das artes, como papéis chiyogami: 洗柿 caqui, 桜 sakura, 藤 glicínia, 白藍 índigo claro e 卵 gema. */
+  --sage: #f1d6c2; --peach: #f2d7d7; --lavender: #e2dbea; --sky: #d8e2ed; --sand: #f0dfb3;
+  --success: #2f6b4f; --success-bg: #dfe9dc;
 }
 :root[data-theme="arcade"] {
-  --paper: #161b18; --surface: #1e2420; --surface-soft: #262e29; --ink: #efe6d2; --muted: #b5ad9a; --subtle: #a8a08d;
-  --line: #3a453e; --frame: #efe6d28c; --frame-strong: #efe6d2; --offset: #34463a;
-  --accent: #e36a52; --accent-hover: #ef856e; --accent-soft: #3b2723; --button-bg: #efe6d2; --button-ink: #1b201c;
-  --sage: #25302a; --sage-mid: #3f5145; --sage-deep: #1f2b24; --sage-ink: #efe6d2; --dots: #efe6d214;
-  --peach: #33282a; --lavender: #2b2b33; --sky: #232f30; --sand: #312d25;
-  --success: #9cc38a; --success-bg: #213228;
+  /* Noite de 藍: índigo profundo, lua dourada e o mesmo 朱, mais aceso para ler no escuro. */
+  --paper: #111a2c; --surface: #172237; --surface-soft: #1f2c46; --ink: #f1e9d7; --muted: #b7b1a3; --subtle: #a29d92;
+  --line: #2f3d5b; --frame: #f1e9d77a; --frame-strong: #f1e9d7; --offset: #263759;
+  --accent: #ef6d4f; --accent-hover: #f5866b; --accent-soft: #3a2430; --seal: #c23b2b; --seal-ink: #fbf5e6;
+  --button-bg: #f1e9d7; --button-ink: #111a2c;
+  --ai: #0b1222; --ai-ink: #f1e9d7; --ai-pattern: #8ea6dc; --tab: #1c2944; --kin: #e4b65e; --pattern: #e4b65e;
+  --sage: #3a271f; --peach: #3a2333; --lavender: #2b2648; --sky: #1c2c4a; --sand: #382d1c;
+  --success: #8cc7a5; --success-bg: #18322e;
 }
 :root[data-theme] {
   --font-display: "DM Serif Display", "Shippori Mincho", Georgia, serif;
   --font-jp-serif: "Shippori Mincho", "Noto Serif JP", serif;
   --radius: 14px; --radius-sm: 9px;
-  --komon: radial-gradient(circle, var(--dots) 1.1px, transparent 1.5px) 0 0 / 9px 9px;
-  --checker: repeating-conic-gradient(var(--frame-strong) 0 25%, transparent 0 50%) 0 0 / 8px 8px;
 }
+/* Etiquetas coloridas no claro: o texto acompanha o tom do papel. No escuro, sumi.css usa a tinta. */
+html[data-theme="dojo"] .sage { color: #8a4528; }
+html[data-theme="dojo"] .peach { color: #97343f; }
+html[data-theme="dojo"] .lavender { color: #5e4b7d; }
+html[data-theme="dojo"] .sky { color: #2c4a72; }
+html[data-theme="dojo"] .sand { color: #6f5418; }
 
-/* Barra lateral: o painel sálvia do cartaz. */
-html[data-theme] .sidebar { background: var(--sage-deep); border-right: 0; box-shadow: none; color: var(--sage-ink); }
-html[data-theme] .sidebar::after { content: ""; position: absolute; inset: auto 0 0 0; height: 140px; background: radial-gradient(circle, #f7f0de1f 1.1px, transparent 1.5px) 0 0 / 9px 9px; -webkit-mask-image: linear-gradient(transparent, #000); mask-image: linear-gradient(transparent, #000); pointer-events: none; }
+/* Barra lateral: o painel índigo, como um tecido tingido de 藍. */
+html[data-theme] .sidebar { background: var(--ai); border-right: 0; box-shadow: none; color: var(--ai-ink); }
 html[data-theme] .sidebar > * { position: relative; z-index: 1; }
-html[data-theme] .sidebar-brand { border-bottom: 1px dashed #f7f0de55; }
-html[data-theme] :is(.brand, .brand > span) { color: var(--sage-ink); }
+html[data-theme] .sidebar-brand { border-bottom: 1px dashed color-mix(in srgb, var(--ai-ink) 33%, transparent); }
+html[data-theme] :is(.brand, .brand > span) { color: var(--ai-ink); }
 html[data-theme] .brand > span { font-family: var(--font-display); font-weight: 400; letter-spacing: -1px; }
-html[data-theme] .brand small { color: #f7f0deb3; }
+html[data-theme] .brand small { color: color-mix(in srgb, var(--ai-ink) 70%, transparent); }
 html[data-theme] .brand-period { color: #f0a58f; }
-html[data-theme] .nav-label, html[data-theme] .motion-control { color: #f7f0dec2; }
-html[data-theme] .nav-link { color: var(--sage-ink); border-radius: 10px; }
-html[data-theme] .nav-link:hover { background: #f7f0de1a; color: var(--sage-ink); }
-html[data-theme] .nav-link.is-active { background: var(--paper); color: var(--ink); box-shadow: inset 3px 0 var(--accent), 3px 3px 0 #0000001f; }
+html[data-theme] .nav-label, html[data-theme] .motion-control { color: color-mix(in srgb, var(--ai-ink) 76%, transparent); }
+html[data-theme] .nav-link { color: var(--ai-ink); border-radius: 10px; }
+html[data-theme] .nav-link:hover { background: color-mix(in srgb, var(--ai-ink) 10%, transparent); color: var(--ai-ink); }
+html[data-theme] .nav-link.is-active { background: var(--tab); color: var(--ink); box-shadow: inset 3px 0 var(--accent), 3px 3px 0 #00000033; }
 html[data-theme] .nav-link.is-active .icon { color: var(--accent); }
-html[data-theme] .profile-link { border-top: 1px dashed #f7f0de55; color: var(--sage-ink); }
-html[data-theme] :is(.profile-link small, .profile-link .icon) { color: #f7f0dec2; }
-html[data-theme] .profile-avatar { background: var(--paper); color: var(--accent); border: 0; border-radius: 50%; font-family: var(--font-display); }
-html[data-theme] .menu-close { color: var(--sage-ink); }
+html[data-theme] .profile-link { border-top: 1px dashed color-mix(in srgb, var(--ai-ink) 33%, transparent); color: var(--ai-ink); }
+html[data-theme] :is(.profile-link small, .profile-link .icon) { color: color-mix(in srgb, var(--ai-ink) 76%, transparent); }
+html[data-theme] .profile-avatar { background: var(--tab); color: var(--accent); border: 0; border-radius: 50%; font-family: var(--font-display); }
+html[data-theme] .menu-close { color: var(--ai-ink); }
+html[data-theme] .sidebar-backdrop { background: #0b122266; }
 
 /* Topo e rodapé: fios duplos, como a moldura de um cartaz. */
 html[data-theme] .topbar { background: var(--paper); border-bottom: 3px double var(--line); }
@@ -52,8 +61,6 @@ html[data-theme] #theme-toggle { border: 1.5px solid var(--frame); border-radius
 html[data-theme] .topbar-avatar { border: 1.5px solid var(--frame); border-radius: 999px; background: transparent; color: var(--ink); }
 html[data-theme] .main-content::before { display: none; }
 html[data-theme] .app-footer { position: relative; border-top: 3px double var(--line); }
-html[data-theme] .app-footer::before, html[data-theme] .play-hero::after { content: ""; position: absolute; left: 0; right: 0; height: 8px; background: var(--checker); opacity: .13; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-html[data-theme] .app-footer::before { top: -14px; }
 html[data-theme] .app-footer > a:first-child { font-family: var(--font-display); color: var(--accent); }
 
 /* Títulos: serifada de cartaz para o latim, mincho para o japonês. */
@@ -62,65 +69,41 @@ html[data-theme] .eyebrow { color: var(--accent); letter-spacing: .16em; font-we
 html[data-theme] :is(.play-heading, .page-heading) { border-bottom: 3px double var(--line); }
 html[data-theme] :is(.play-heading, .page-heading)::after { height: 3px; width: 44px; border-radius: 0; background: var(--accent); }
 
-/* Capa: mesma composição; a paisagem ganha um fundo de pontinhos (same-komon) e um selo que gira. */
-html[data-theme] .play-hero { position: relative; border-bottom: 0; }
-html[data-theme] .play-hero::after { bottom: -4px; }
-html[data-theme] .world-label { gap: 0; padding: 0 12px 0 0; color: var(--paper); background: var(--frame-strong); border-radius: 4px; font-size: 10px; letter-spacing: .14em; line-height: 28px; }
-html[data-theme] .world-label-mark { display: grid; place-items: center; width: 28px; height: 28px; margin-right: 11px; padding: 0; border: 0; border-radius: 4px 0 0 4px; rotate: 0deg; background: var(--accent); color: #fbf4e4; font-family: var(--font-jp-serif); }
-html[data-theme] .play-hero h1 { font-size: clamp(44px, 5vw, 70px); line-height: 1.08; }
-html[data-theme] .play-hero h1 em { color: var(--accent); font-style: normal; }
-html[data-theme] .play-hero h1 em::after { background: var(--accent); height: 3px; opacity: .55; }
-html[data-theme] .play-hero-foot { border-left-color: var(--accent); }
-html[data-theme] .play-hero-art > :is(img, .play-orbit, .play-art-circle, .play-halo, .play-star) { display: none; }
-html[data-theme] .book-scene { display: block; }
-html[data-theme] .book-scene::before { content: ""; position: absolute; left: 50%; top: 50%; height: 94%; width: auto; aspect-ratio: 1; translate: -56% -50%; z-index: -1; border-radius: 50%; background: var(--komon), var(--sage); box-shadow: 0 0 0 1.5px var(--frame), 7px 7px 0 var(--offset); }
-html[data-theme] .book-seal { color: var(--accent); border-color: var(--accent); background: var(--surface); }
-.hero-badge { display: none; }
-html[data-theme] .hero-badge { display: grid; place-items: center; position: absolute; left: 2%; top: 4%; width: 108px; height: 108px; z-index: 2; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 1.5px var(--frame), 4px 4px 0 var(--offset); color: var(--ink); pointer-events: none; }
-.hero-badge svg { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); overflow: visible; }
-.hero-badge text { font: 700 9.4px/1 "DM Sans", sans-serif; letter-spacing: .22em; fill: currentColor; }
-.hero-badge b { font: 600 25px/1 var(--font-jp-serif); color: var(--accent); }
-
 /* Seções: rótulos com estrelinhas, como no título "✦ 饮品售卖 ✦". */
 html[data-theme] .play-section-title .eyebrow::before, html[data-theme] .play-section-title .eyebrow::after { content: "✦"; margin: 0 .6em; font-size: 9px; vertical-align: 1px; }
 html[data-theme] .play-section-title .eyebrow::before { margin-left: 0; }
 
-/* Cartões de jogo: moldura fina e sombra sálvia deslocada, como impressão fora de registro. */
+/* Cartões de jogo: moldura fina e sombra índigo deslocada, como impressão fora de registro. */
 html[data-theme] .play-card { background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
-html[data-theme] .play-card-art { background: var(--komon), var(--sage); border: 1.5px solid var(--frame); border-radius: 10px; }
-html[data-theme] .peach .play-card-art, html[data-theme] .play-setup-intro.peach { background: var(--komon), var(--peach); }
-html[data-theme] .lilac .play-card-art, html[data-theme] .play-setup-intro.lilac { background: var(--komon), var(--lavender); }
-html[data-theme] .blue .play-card-art, html[data-theme] .play-setup-intro.blue { background: var(--komon), var(--sky); }
-html[data-theme] .yellow .play-card-art, html[data-theme] .play-setup-intro.yellow { background: var(--komon), var(--sand); }
+html[data-theme] .play-card-art { background: var(--sage); border: 1.5px solid var(--frame); border-radius: 10px; }
+html[data-theme] .peach .play-card-art, html[data-theme] .play-setup-intro.peach { background: var(--peach); }
+html[data-theme] .lilac .play-card-art, html[data-theme] .play-setup-intro.lilac { background: var(--lavender); }
+html[data-theme] .blue .play-card-art, html[data-theme] .play-setup-intro.blue { background: var(--sky); }
+html[data-theme] .yellow .play-card-art, html[data-theme] .play-setup-intro.yellow { background: var(--sand); }
 html[data-theme] .play-card-art img { filter: none; }
-html[data-theme] .play-number { display: grid; place-items: center; left: 9px; top: 9px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fbf4e4; font: 700 10px/1 var(--font-body); opacity: 1; }
+html[data-theme] .play-number { display: grid; place-items: center; left: 9px; top: 9px; width: 26px; height: 26px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); font: 700 10px/1 var(--font-body); opacity: 1; }
 html[data-theme] .play-arrow { display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--frame-strong); color: var(--paper); font-size: 14px; }
 html[data-theme] .play-card-meta { border-top: 1.5px dashed var(--line); }
-html[data-theme] .play-new { background: var(--accent); color: #fbf4e4; border-radius: 3px; }
+html[data-theme] .play-new { background: var(--seal); color: var(--seal-ink); border-radius: 3px; }
 @media (hover: hover) and (pointer: fine) {
   html[data-theme] .play-card:hover { transform: translate(-2px, -3px); border-color: var(--frame-strong); box-shadow: 8px 8px 0 var(--offset); }
   html[data-theme] .play-card:hover .play-arrow { background: var(--accent); }
 }
 
-/* Desafio do dia: um bilhete destacável, com picote entre o canhoto e o texto. */
-html[data-theme] .play-daily { position: relative; background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
-html[data-theme] .play-daily-date { position: relative; border-right: 2px dashed var(--line); }
-html[data-theme] .play-daily-date small { display: inline-block; width: fit-content; padding: 3px 7px; border-radius: 3px; background: var(--accent); color: #fbf4e4; }
-html[data-theme] .play-daily-date strong { font-family: var(--font-display); font-weight: 400; font-size: 22px; }
-html[data-theme] .play-daily.is-done .play-daily-date::after { content: "済"; position: absolute; right: 8px; top: -8px; display: grid; place-items: center; width: 34px; height: 34px; border: 2px solid var(--accent); border-radius: 50%; color: var(--accent); font: 700 17px/1 var(--font-jp-serif); rotate: -12deg; opacity: .85; }
+/* Desafio do dia (tela): estrelas, passos e resultado. O cartão da home está em wagara.css. */
 html[data-theme] .daily-stars .is-on { color: var(--accent); }
 html[data-theme] .daily-progress li { border: 1.5px solid var(--frame); border-radius: 999px; }
 html[data-theme] .daily-progress .is-current span { background: var(--frame-strong); color: var(--paper); }
-html[data-theme] .daily-progress .is-right span { background: var(--accent); color: #fbf4e4; }
+html[data-theme] .daily-progress .is-right span { background: var(--seal); color: var(--seal-ink); }
 
 /* Superfícies: moldura fina; nas telas de jogo, uma segunda linha tracejada por dentro. */
 html[data-theme] :is(.panel, .explore-controls) { border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: none; }
 html[data-theme] :is(.play-question, .play-setup, .lesson-content) { border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); }
 html[data-theme] .play-question { border-top-width: 1.5px; outline: 1.5px dashed var(--line); outline-offset: -9px; }
 html[data-theme] .play-question .eyebrow::before, html[data-theme] .play-question .eyebrow::after { content: "✦"; margin: 0 .7em; font-size: 8px; vertical-align: 1px; }
-html[data-theme] .play-setup-intro { background: var(--komon), var(--sage); border-right: 1.5px solid var(--frame); }
+html[data-theme] .play-setup-intro { background: var(--sage); border-right: 1.5px solid var(--frame); }
 html[data-theme] :is(.play-setup-intro img, .play-setup-intro) { filter: none; }
-html[data-theme] .play-scoreboard { background: var(--surface); border: 1.5px solid var(--frame); border-radius: 999px; box-shadow: 0 6px 18px #2a262212; padding-inline: 28px; }
+html[data-theme] .play-scoreboard { background: var(--surface); border: 1.5px solid var(--frame); border-radius: 999px; box-shadow: 0 6px 18px #0b122214; padding-inline: 28px; }
 html[data-theme] .play-scoreboard small { color: var(--accent); font-weight: 700; letter-spacing: .12em; }
 html[data-theme] .play-scoreboard strong { font-family: var(--font-display); font-weight: 400; }
 html[data-theme] .play-time-track { background: var(--line); }
@@ -130,7 +113,7 @@ html[data-theme] .play-results-stats strong { font-family: var(--font-display); 
 html[data-theme] .play-paper-link { border: 1.5px dashed var(--frame); border-radius: var(--radius); background: transparent; }
 html[data-theme] :is(.journey-module, .lesson-card, .journey-recommendation, .hub-card, .theme-card, .achievement, .example, .tip-box, .context-box) { border-radius: var(--radius-sm); }
 html[data-theme] .lesson-state { border-radius: 50%; }
-html[data-theme] .lesson-state.is-done { background: var(--accent); border-color: var(--accent); color: #fbf4e4; }
+html[data-theme] .lesson-state.is-done { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); }
 html[data-theme] .lesson-reader { border-top: 0; }
 
 /* Cartas: karuta de verdade, com moldura vermelha dupla. O acerto recebe ◎, como nas provas japonesas. */
@@ -147,14 +130,16 @@ html[data-theme] .play-feedback { background: var(--accent-soft); border: 1.5px 
 html[data-theme] .play-feedback.correct { background: var(--success-bg); border-left-color: var(--success); }
 html[data-theme] .feedback { border-radius: 10px; }
 
-/* Controles: pílula de tinta com o ícone num círculo vermelho, como o botão do cartaz. */
+/* Controles: pílula índigo (tinta clara à noite) com o ícone num círculo vermelho, como o botão do cartaz. */
 html[data-theme] .btn { border-radius: 999px; font-weight: 650; min-height: 48px; padding-inline: 22px; }
 html[data-theme] .btn-primary { background: var(--button-bg); border: 1.5px solid var(--button-bg); color: var(--button-ink); box-shadow: 3px 3px 0 var(--accent); }
 html[data-theme] .btn-primary:hover:not(:disabled) { background: var(--button-bg); border-color: var(--button-bg); box-shadow: 4px 5px 0 var(--accent); }
 html[data-theme] .btn-primary:active:not(:disabled) { translate: 2px 2px; box-shadow: 1px 1px 0 var(--accent); }
-html[data-theme] .btn-primary .icon { width: 22px; height: 22px; padding: 4px; border-radius: 50%; background: var(--accent); color: #fbf4e4; }
+html[data-theme] .btn-primary .icon { width: 22px; height: 22px; padding: 4px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); }
 html[data-theme] .btn-ghost { background: transparent; border: 1.5px solid var(--frame); color: var(--ink); }
 html[data-theme] .btn-ghost:hover:not(:disabled) { background: var(--surface-soft); border-color: var(--frame-strong); }
+html[data-theme] .account-provider { background: var(--surface); border: 1.5px solid var(--frame); color: var(--ink); }
+html[data-theme] .account-provider:hover { background: var(--surface-soft); border-color: var(--frame-strong); }
 html[data-theme] .text-input { background: var(--surface); border: 1.5px solid var(--frame); border-radius: 10px; }
 html[data-theme] .text-input:focus { border-color: var(--frame-strong); box-shadow: 0 0 0 4px var(--accent-soft); }
 html[data-theme] :is(.chip, .segmented) { border-radius: 999px; }
@@ -172,30 +157,21 @@ html[data-theme] .toast { background: var(--button-bg); color: var(--button-ink)
 .jp-font-option:has(input:checked)::after { content: "◎"; position: absolute; top: 8px; right: 12px; color: var(--accent); font-size: 20px; }
 .jp-font-option:has(input:focus-visible) { outline: 2.5px solid var(--frame-strong); outline-offset: 3px; }
 
-/* Movimento: o selo gira devagar, o fundo de pontinhos respira, carimbos "batem" ao aparecer. */
+/* Movimento: carimbos "batem" ao aparecer. O resto do movimento está em wagara.css. */
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion="paused"]) .hero-badge svg { animation: badge-turn 48s linear infinite; will-change: transform; }
-  html:not([data-motion="paused"]) .book-scene::before { animation: komon-breathe 10s var(--ease-out, ease) infinite alternate; will-change: transform; }
-  html:not([data-motion="paused"]) .karuta-card.is-right::after, html:not([data-motion="paused"]) .play-daily.is-done .play-daily-date::after { animation: stamp-in .5s cubic-bezier(.34, 1.4, .64, 1) both; }
+  html:not([data-motion="paused"]) .karuta-card.is-right::after { animation: stamp-in .5s cubic-bezier(.34, 1.4, .64, 1) both; }
   html:not([data-motion="paused"]) .jp-font-option { transition: transform .25s var(--ease-out, ease), box-shadow .25s var(--ease-out, ease), border-color .2s; }
   html:not([data-motion="paused"]) .jp-font-option:active { transform: scale(.98); }
 }
-@keyframes badge-turn { to { transform: rotate(360deg); } }
-@keyframes komon-breathe { from { transform: scale(1); } to { transform: scale(1.03); } }
 @keyframes stamp-in { from { opacity: 0; scale: 1.8; } 60% { opacity: 1; } to { opacity: .9; scale: 1; } }
 
-@media (max-width: 1100px) { html[data-theme] .hero-badge { width: 92px; height: 92px; } .hero-badge text { font-size: 10px; } }
 @media (max-width: 820px) { html[data-theme] .play-scoreboard { border-radius: 18px; } }
 @media (max-width: 600px) {
   html[data-theme] .play-card { box-shadow: 4px 4px 0 var(--offset); }
-  html[data-theme] .hero-badge { width: 78px; height: 78px; left: 0; top: 0; }
-  .hero-badge b { font-size: 20px; }
   html[data-theme] .play-scoreboard { padding-inline: 16px; }
-  html[data-theme] .play-daily-date { border-right: 0; border-bottom: 2px dashed var(--line); padding-bottom: 12px; }
   html[data-theme] .play-question { outline-offset: -7px; }
   .jp-font-options { grid-template-columns: 1fr; }
   .jp-font-option { grid-template-columns: 1fr; }
-  html[data-theme] .world-label { font-size: 9px; letter-spacing: .1em; }
   html[data-theme] .toast { border-radius: 16px; }
 }
 

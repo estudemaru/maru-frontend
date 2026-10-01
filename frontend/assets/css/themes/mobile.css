@@ -1,0 +1,211 @@
+/* Celular (até 600 px): a escala final de tamanhos e espaços dos dois temas. As folhas anteriores empilham
+   tamanhos de desktop e de temas passados (responsive.css, play.css, interface.css, sumi-*.css); aqui o
+   celular ganha uma escala só, mais compacta:
+   - títulos de página com 26 px (a capa fica em wagara.css), de painel com 17–18 px e de cartão com 16–17 px;
+   - texto corrido com 14 px e entrelinha 1,6; rótulos em maiúsculas com 11 px; nada abaixo de 10 px;
+   - painéis e cartões com 16 px de respiro; botões e campos com 44 px de altura;
+   - campos de texto mantêm 16 px de letra, para o iPhone não dar zoom ao focar.
+   Carregado depois de wagara.css. */
+@media (max-width: 600px) {
+  /* Moldura: topo, margens e rodapé. */
+  html[data-theme] .topbar { height: 56px; }
+  html[data-theme] #theme-toggle { width: 40px; height: 40px; font-size: 20px; }
+  html[data-theme] .topbar-avatar { height: auto; min-height: 40px; padding-inline: 14px; }
+  html[data-theme] .main-content { padding: 18px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left)); }
+  html[data-theme] .app-footer { margin-inline: 16px; }
+
+  /* Cabeçalhos de página. */
+  html[data-theme] .play-heading { padding: 6px 0 18px; }
+  html[data-theme] .page-heading { margin-bottom: 18px; padding-bottom: 16px; }
+  html[data-theme] .page-heading .eyebrow { margin-bottom: 8px; }
+  html[data-theme] :is(.play-heading, .page-heading) h1 { font-size: 26px; line-height: 1.2; }
+  html[data-theme] .play-heading h1 { margin: 10px 0 8px; }
+  html[data-theme] :is(.page-description, .play-heading > p:last-child) { margin-top: 8px; font-size: 14px; line-height: 1.6; }
+  html[data-theme] .lesson-reader-head { margin-bottom: 16px; }
+  html[data-theme] .lesson-reader-head h1 { font-size: 22px; }
+
+  /* Controles: 44 px de altura; o botão principal da capa não ocupa a linha inteira. */
+  html[data-theme] .btn { min-height: 44px; padding-inline: 18px; }
+  html[data-theme] .btn-primary .icon { width: 20px; height: 20px; }
+  html[data-theme] .text-input { min-height: 44px; }
+  html[data-theme] .kana-mode { flex-basis: 44px; width: 44px; min-height: 44px; }
+  html[data-theme] .play-hero .play-actions .btn { flex: 0 0 auto; }
+
+  /* Texto corrido: sem palavra sozinha na última linha, onde o navegador permite. */
+  html[data-theme] :is(.play-hero-copy > p, .page-description, .play-heading > p:last-child, .play-card p, .hub-card p) { text-wrap: pretty; }
+  html[data-theme] :is(.account-panel > p, .settings-panel > p, .setting-row p, .hub-card p, .play-setup-intro p:last-child, .play-setup-form > p, .play-progress-card details p) { line-height: 1.6; }
+  html[data-theme] :is(.account-panel > p:not(.eyebrow), .settings-panel > p.muted) { font-size: 14px; margin-block: 10px; }
+  html[data-theme] :is(.settings-panel, .account-panel) > h2 { font-size: 18px; margin-bottom: 12px; }
+  html[data-theme] .source-note { margin-top: 18px; }
+  html[data-theme] .account-panel .source-note { padding-top: 16px; }
+
+  /* Seção de jogos: título e cartões em lista, com a arte em miniatura. */
+  html[data-theme] .play-section-title { padding-top: 20px; margin-bottom: 14px; gap: 8px; }
+  html[data-theme] .play-section-title h2 { font-size: 22px; margin-top: 4px; }
+  html[data-theme] .play-grid { gap: 12px; }
+  html[data-theme] .play-card { grid-template-columns: 78px minmax(0, 1fr); box-shadow: 3px 3px 0 var(--offset); }
+  html[data-theme] .play-card .play-card-art { margin: 6px; border-radius: 8px; }
+  html[data-theme] .play-card .play-card-art img { width: 52px; height: 62px; }
+  html[data-theme] .play-number { left: 5px; top: 5px; width: 22px; height: 22px; }
+  html[data-theme] .play-arrow { right: 5px; bottom: 5px; width: 22px; height: 22px; font-size: 12px; }
+  html[data-theme] .play-card-copy { padding: 11px 12px 12px 4px; }
+  html[data-theme] .play-card h3 { margin: 2px 0 4px; font-size: 17px; line-height: 1.25; }
+  html[data-theme] .play-card p { margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  html[data-theme] .play-card-meta { padding-top: 8px; gap: 3px 6px; }
+
+  /* Fim da home. */
+  html[data-theme] .play-bottom { gap: 12px; margin: 28px 0 16px; }
+  html[data-theme] .play-paper-link { gap: 14px; padding: 14px 16px; }
+  html[data-theme] .play-paper-link > .icon { width: 40px; height: 40px; padding: 10px; }
+  html[data-theme] .play-paper-link h2 { font-size: 17px; }
+  html[data-theme] :is(.play-paper-link p, .play-small-note p) { font-size: 13px; line-height: 1.5; }
+  html[data-theme] .play-small-note { padding: 16px; }
+  html[data-theme] .play-small-note strong { font-size: 17px; }
+  html[data-theme] .play-paused-note { font-size: 12px; line-height: 1.6; }
+  html[data-theme] .play-note { padding: 18px 0; }
+
+  /* Preparação do jogo. */
+  html[data-theme] .play-setup-intro { padding: 16px; }
+  html[data-theme] .play-setup-intro img { width: 56px; height: 64px; margin: 0 0 6px 10px; }
+  html[data-theme] .play-setup-intro h1 { margin: 8px 0 6px; font-size: 24px; }
+  html[data-theme] .play-setup-intro p:last-child { font-size: 13px; }
+  html[data-theme] .play-setup-form { padding: 18px 16px; }
+  html[data-theme] .play-setup-form h2 { font-size: 20px; }
+  html[data-theme] .play-setup-form > p { margin: 6px 0 4px; font-size: 13px; }
+  html[data-theme] .play-setup-form label { margin: 16px 0 6px; font-size: 13px; }
+  html[data-theme] .field-hint { margin-top: 8px; line-height: 1.5; }
+  html[data-theme] .play-start { margin-top: 20px; }
+
+  /* Durante o jogo e no desafio do dia. */
+  html[data-theme] .play-session-heading { margin-bottom: 14px; }
+  html[data-theme] .play-scoreboard { padding-block: 10px; margin-bottom: 14px; }
+  html[data-theme] .play-question { padding: 20px 14px; }
+  html[data-theme] .play-question { outline-offset: -6px; }
+  html[data-theme] .play-prompt { margin: 20px 0 16px; }
+  html[data-theme] .play-prompt-short { font-size: 46px; }
+  html[data-theme] .daily-choice.play-choice { min-height: 50px; padding: 10px; }
+  html[data-theme] .daily-choices { gap: 10px; }
+  html[data-theme] .play-feedback { padding: 16px; }
+  html[data-theme] .play-session-note { margin: 16px 0; }
+  html[data-theme] .play-result-hero h1 { font-size: 26px; }
+  html[data-theme] .play-results-stats { margin: 20px 0; padding: 18px 10px; gap: 16px; }
+  html[data-theme] .play-results-stats strong { font-size: 26px; }
+  html[data-theme] .play-insights .panel { padding: 18px 16px; }
+  html[data-theme] .play-insights h2 { font-size: 17px; }
+
+  /* Trilha. */
+  html[data-theme] .journey-summary { gap: 12px 14px; padding: 16px; margin-bottom: 20px; }
+  html[data-theme] .summary-symbol { font-size: 32px; }
+  html[data-theme] .journey-module > summary { gap: 12px; padding: 14px; }
+  html[data-theme] .journey-module > summary h2 { font-size: 16px; }
+  html[data-theme] .module-symbol { width: 38px; height: 38px; font-size: 22px; }
+  html[data-theme] .lesson-list { padding: 0 14px 6px; }
+  html[data-theme] .lesson-row { gap: 10px; padding: 12px 0; }
+
+  /* Lição. */
+  html[data-theme] .lesson-content { margin: 16px 0; padding: 18px 16px; }
+  html[data-theme] .lesson-content h2 { margin-bottom: 12px; font-size: 20px; }
+  :root[data-theme] .lesson-body { font-size: 15px; line-height: 1.7; }
+  html[data-theme] .example { padding: 14px; }
+  html[data-theme] .example-line > .jp { font-size: 20px; }
+  html[data-theme] .tip-box { padding: 14px; font-size: 13px; }
+  html[data-theme] .concept-help { margin: 18px 0; padding: 14px 16px; }
+  /* O resumo de uma linha ganha altura de toque sem mudar o espaço visível. */
+  html[data-theme] .concept-help summary { padding-block: 9px; margin-block: -9px; }
+  html[data-theme] .lesson-controls { margin-top: 20px; padding-top: 16px; }
+
+  /* Desempenho. */
+  html[data-theme] .play-progress-grid { gap: 12px; }
+  html[data-theme] .play-progress-card { padding: 16px; }
+  html[data-theme] .play-progress-card > div { grid-template-columns: 48px 1fr; column-gap: 14px; }
+  html[data-theme] .play-progress-card img { width: 48px; height: 48px; }
+  html[data-theme] .play-progress-card h2 { font-size: 17px; }
+  html[data-theme] .play-progress-card details { padding: 8px 0; }
+
+  /* Ajustes e conta. */
+  html[data-theme] .settings-panel { padding: 18px 16px; }
+  html[data-theme] .account-page .account-panel { margin-bottom: 18px; padding: 18px 16px; }
+  html[data-theme] .account-page .page-heading { margin-bottom: 18px; }
+  html[data-theme] .settings-layout { gap: 14px; }
+  html[data-theme] .theme-options { gap: 12px; margin-top: 14px; }
+  html[data-theme] .theme-card { padding: 12px; }
+  html[data-theme] .theme-preview { min-height: 96px; }
+  html[data-theme] .theme-card strong { margin: 12px 0 4px; font-size: 17px; line-height: 1.3; }
+  html[data-theme] .theme-card small { font-size: 13px; line-height: 1.5; }
+  html[data-theme] .jp-font-options { gap: 10px; margin-top: 14px; }
+  html[data-theme] .jp-font-option { gap: 4px; padding: 12px 14px; }
+  html[data-theme] .jp-font-sample { font-size: 21px; }
+  html[data-theme] .setting-row { gap: 14px; padding: 16px 0; }
+  html[data-theme] .setting-row h3 { font-size: 14px; }
+  html[data-theme] .goal-options { gap: 8px; margin-top: 12px; }
+  html[data-theme] .goal-option { padding: 11px 14px; }
+  html[data-theme] .progress-overview { padding: 18px 16px; }
+  html[data-theme] .progress-overview > .jp { font-size: 40px; margin-bottom: 4px; }
+  html[data-theme] .progress-overview h2 { font-size: 20px; }
+  html[data-theme] .progress-overview dl { margin: 14px 0; }
+  html[data-theme] .progress-overview dl > div { padding: 10px 0; font-size: 12px; }
+  html[data-theme] .achievement-grid { gap: 10px; }
+  html[data-theme] .achievement { padding: 14px 12px; }
+  html[data-theme] .achievement .badge-symbol { margin-bottom: 8px; font-size: 22px; }
+  html[data-theme] .stage-seals { gap: 10px; margin-top: 16px; }
+  html[data-theme] .stage-seal { padding: 14px 10px; }
+  html[data-theme] .stage-seal .hanko { width: 48px; height: 48px; margin-bottom: 10px; font-size: 27px; }
+
+  /* Consultar. */
+  html[data-theme] .explore-controls { padding: 16px; }
+  html[data-theme] .explore-filters { margin-top: 14px; }
+  html[data-theme] .hub-section { margin-bottom: 28px; }
+  html[data-theme] .hub-section-heading { margin: 18px 0 12px; }
+  html[data-theme] .hub-section-heading h2 { font-size: 20px; }
+  html[data-theme] .hub-grid { gap: 12px; }
+  html[data-theme] .hub-card { padding: 16px; }
+  html[data-theme] .hub-card-symbol { width: 40px; height: 40px; margin-bottom: 12px; }
+  html[data-theme] .hub-card-symbol > .jp { font-size: 22px; }
+  html[data-theme] :is(.hub-card h2, .hub-card h3) { margin-bottom: 6px; font-size: 16px; line-height: 1.4; }
+  html[data-theme] .hub-card p { margin-bottom: 12px; }
+  html[data-theme] .hub-card-action { padding-top: 12px; }
+  html[data-theme] .hub-note { padding: 16px; }
+  html[data-theme] .hub-recommendation { padding: 16px; }
+
+  /* Kana. */
+  html[data-theme] .tab-bar button { min-height: 44px; }
+  html[data-theme] .kana-table { padding: 14px 10px; }
+  html[data-theme] .kana-cell { min-height: 54px; }
+  html[data-theme] .kana-cell .jp { font-size: 21px; }
+  html[data-theme] .kana-sidebar { gap: 12px; }
+  html[data-theme] .kana-detail { grid-template-columns: 76px 1fr; column-gap: 14px; padding: 16px; }
+  html[data-theme] .detail-character { font-size: 58px; }
+  html[data-theme] .kana-detail > .btn { margin-top: 12px; }
+  html[data-theme] .practice-setup { padding: 16px; }
+
+  /* Papel e lápis. */
+  html[data-theme] .worksheet-toolbar { gap: 12px; padding: 16px; }
+  html[data-theme] .worksheet-selection { padding: 14px; }
+
+  /* Piso de legibilidade: regras antigas encolhiam rótulos e notas para 8–10 px. Rótulos em maiúsculas
+     ficam com 11 px, notas com 12 px, e só selos e números com 10 px. */
+  html[data-theme] :is(.eyebrow, .page-heading .eyebrow, .journey-module > summary .eyebrow, .kana-detail > .eyebrow, .context-box .eyebrow, .play-setup-intro .eyebrow) { font-size: 11px; }
+  html[data-theme] :is(.world-label, .play-tag, .play-section-title > .play-tag, .step-label, .kana-column-head, .module-count, .play-subtitle, .play-card-meta, .play-art-caption small, .small-segmented button, .chip, .explore-filters .chip, .section-heading > .text-link, .kanji-card-details .romaji, .stat-card p, .card-actions .btn, .word-token small, .token-meaning, .exercise-item > span) { font-size: 11px; }
+  html[data-theme] :is(.pill, .pill.light, .lesson-reader-head .pill, .sentence-workspace .section-heading > .pill) { font-size: 11px; }
+  html[data-theme] :is(.journey-module > summary p:not(.eyebrow), .lesson-row p, .setting-note, .goal-option span, .kana-detail p, .tab-bar button, .practice-card p) { font-size: 12px; }
+  html[data-theme] :is(.play-new, .play-daily-date small, .daily-cal-month, .voice-credit, .play-number) { font-size: 10px; }
+  html[data-theme] .play-scoreboard small { font-size: 10px; }
+  html[data-theme] :is(.kana-cell small, .kana-column-head > span:first-child) { font-size: 10px; }
+  /* A coluna das fileiras tem 40–45 px: a caixinha fica em cima do nome para "Vogais" caber inteiro. */
+  html[data-theme] .row-toggle { flex-direction: column; justify-content: center; gap: 4px; font-size: 10px; text-align: center; }
+  html[data-theme] .topbar-location strong { font-size: 12px; }
+  html[data-theme] .app-footer { font-size: 11px; }
+  html[data-theme] .app-footer > span { font-size: 10px; }
+
+  /* Alvos de toque soltos: pelo menos 38–40 px, com o texto centrado na altura. */
+  html[data-theme] :is(.back-link, .play-actions .text-link, .play-small-note > .text-link, .play-session-heading > .text-link, .play-progress-card .text-link) { min-height: 40px; align-items: center; }
+  html[data-theme] .play-small-note > .text-link { display: inline-flex; margin-top: 4px; }
+  html[data-theme] .explore-search .search-field { min-height: 46px; padding-block: 3px; }
+  html[data-theme] .explore-search input { min-height: 38px; }
+  html[data-theme] :is(.chip, .explore-filters .chip) { min-height: 38px; }
+  html[data-theme] .segmented button { min-height: 40px; }
+  html[data-theme] .play-progress-card summary { padding-block: 10px; }
+}
+@media (max-width: 360px) {
+  html[data-theme] .world-label { font-size: 10px; letter-spacing: .08em; }
+}
