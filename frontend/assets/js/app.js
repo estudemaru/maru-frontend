@@ -81,11 +81,21 @@ const ctx = {
   logout: () => store.logout(),
   get progress() { return store.snapshot; },
   save() { store.save(); updateStats(); kanaInput.rescan(); },
-  setTheme(theme) {
+  setTheme(theme, origin) {
     store.snapshot.preferences.theme = theme;
     // Troca de tema com transição suave onde o navegador permite; sem ela, a troca é imediata.
-    const still = document.documentElement.dataset.motion === "paused" || matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (document.startViewTransition && !still) document.startViewTransition(() => applyTheme(theme)); else applyTheme(theme);
+    // A partir de um botão (origin), o novo tema se abre num círculo que nasce do botão.
+    const root = document.documentElement;
+    const still = root.dataset.motion === "paused" || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !still) {
+      if (origin) root.dataset.themeReveal = "";
+      const transition = document.startViewTransition(() => applyTheme(theme));
+      if (origin) {
+        const radius = Math.hypot(Math.max(origin.x, innerWidth - origin.x), Math.max(origin.y, innerHeight - origin.y));
+        transition.ready.then(() => root.animate({ clipPath: [`circle(0px at ${origin.x}px ${origin.y}px)`, `circle(${radius}px at ${origin.x}px ${origin.y}px)`] }, { duration: 700, easing: "cubic-bezier(.22, 1, .36, 1)", pseudoElement: "::view-transition-new(root)" })).catch(() => {});
+        transition.finished.finally(() => delete root.dataset.themeReveal);
+      }
+    } else applyTheme(theme);
     store.save(); updateStats();
   },
   navigate(route, params = null) {
@@ -190,7 +200,7 @@ document.addEventListener("keydown", event => {
 document.addEventListener("click", event => {
   if (event.target.closest("[data-motion-toggle]")) toggleMotion();
   const theme = event.target.closest("[data-theme-choice]");
-  if (theme) { const choice = theme.dataset.themeChoice; ctx.setTheme(choice); toast("Estilo " + (THEMES.find(item => item.id === choice) || THEMES[0]).title + " ativado. Seu progresso continua o mesmo."); }
+  if (theme) { const choice = theme.dataset.themeChoice; const box = theme.getBoundingClientRect(); ctx.setTheme(choice, { x: box.left + box.width / 2, y: box.top + box.height / 2 }); toast("Estilo " + (THEMES.find(item => item.id === choice) || THEMES[0]).title + " ativado. Seu progresso continua o mesmo."); }
   const speaker = event.target.closest("[data-speak]");
   if (speaker) { event.preventDefault(); audio.speak(speaker.dataset.speak, speaker); }
   const review = event.target.closest("[data-add-review]");
