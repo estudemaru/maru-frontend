@@ -35,7 +35,8 @@ test('on a phone the reference cards keep their details one tap away; the deskto
   await expect(page.locator('.play-hero-art')).toBeHidden();
   // Duas sugestões de prática ficam na primeira tela; o Arcade reúne todos os jogos.
   expect(await page.locator('.play-card').first().evaluate(card => card.getBoundingClientRect().top + scrollY)).toBeLessThan(900);
-  await expect(page.locator('.play-card')).toHaveCount(7);
+  await expect(page.locator('.play-card')).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'Ver todos os jogos' })).toBeVisible();
 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/#/vocabulary');

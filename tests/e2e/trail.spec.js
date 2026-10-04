@@ -30,6 +30,7 @@ test('the journey lists stages on a phone, and the desktop line map opens a stag
   await page.locator('.trail-map-stop[href="#/journey/kanji"]').click();
   await expect(page.locator('#etapa-kanji')).toHaveAttribute('open', '');
   await page.goto('/#/home');
+  await expect(page.locator('.home-start')).toHaveAttribute('href', '#/lesson/' + LESSONS[0].id);
   expect(errors).toEqual([]);
 });
 

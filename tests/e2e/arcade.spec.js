@@ -7,7 +7,8 @@ test('home stays compact and usable from 320px to desktop', async ({ page }) => 
   for (const width of [320,390,768,1440]) {
     await page.setViewportSize({width,height:1000});
     await page.goto('/#/home');
-    await expect(page.locator('.play-card')).toHaveCount(7);
+    await expect(page.locator('.play-card')).toHaveCount(2);
+    await expect(page.getByRole('link', { name: 'Ver todos os jogos' })).toBeVisible();
     await expect(page.locator('.play-hero h1')).toBeVisible();
     await page.locator('.play-card-art img').evaluateAll(images => images.forEach(img => { img.loading = 'eager'; }));
     await expect.poll(() => page.locator('.play-card-art img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
@@ -15,6 +16,9 @@ test('home stays compact and usable from 320px to desktop', async ({ page }) => 
     if (width > 820) await expect.poll(() => page.locator('.sidebar').evaluate(el => Math.round(el.getBoundingClientRect().left))).toBe(0);
     await page.screenshot({path:`test-results/arcade-home-${width}.png`,fullPage:true});
   }
+  await page.getByRole('link', { name: 'Ver todos os jogos' }).click();
+  await expect(page).toHaveURL(/#\/practice$/);
+  await expect(page.locator('.play-card')).toHaveCount(7);
   expect(errors).toEqual([]);
 });
 test('infinite pictures accept the selected script, reveal feedback and persist', async ({ page }) => {
@@ -35,6 +39,7 @@ test('infinite pictures accept the selected script, reveal feedback and persist'
   await page.reload();
   await page.goto('/#/progress');
   await expect(page.locator('.play-heading')).toContainText('17 respostas');
+  // O "Só mais um" abre a lista; Olhou, escreveu é o terceiro cartão.
   await page.locator('.play-progress-card').nth(2).locator('summary').click();
   await expect(page.locator('.play-progress-card').nth(2)).toContainText('100%');
 });
