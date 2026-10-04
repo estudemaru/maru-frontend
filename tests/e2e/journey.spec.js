@@ -27,7 +27,8 @@ const romajiOf = lesson => new Map(lesson.sections.flatMap(section => section.ex
   return parts.length > 1 && parts.length === sounds.length ? parts.map((part, i) => [part, sounds[i].replace(/\s*\(.*\)$/, '')]) : [[example.jp, example.romaji]];
 }));
 async function readLesson(page, lesson) {
-  for (let i = 0; i < lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();
+  // A abertura (objetivo e vídeo) vem antes das partes da lição.
+  for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();
   for (const question of lesson.quiz) {
     await page.locator(`input[name="answer"][value="${question.answer}"]`).check();
     await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
