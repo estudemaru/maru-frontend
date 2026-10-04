@@ -107,3 +107,16 @@ test('finishing a lesson offers the next stop and a drill with only the letters 
   await page.getByRole('button', { name: 'Vamos jogar' }).click();
   await expect(page.locator('.play-session-note')).toContainText('15 caracteres');
 });
+
+test('on a phone the worksheet picks a family by touch and keeps the print button in reach', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/worksheets');
+  await expect(page.locator('#worksheet-family-control')).toBeHidden();
+  await expect(page.locator('.worksheet-family')).toHaveCount(15);
+  await page.locator('.worksheet-family[data-family="sa"]').click();
+  await expect(page.locator('.worksheet-family[data-family="sa"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.worksheet-char').first()).toHaveAttribute('data-print-char', 'さ');
+  await expect(page.locator('#print-worksheet')).toBeEnabled();
+  await expect(page.locator('#print-worksheet')).toBeInViewport();
+  expect(await fits(page)).toBe(true);
+});

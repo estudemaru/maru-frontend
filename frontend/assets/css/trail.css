@@ -395,6 +395,34 @@ html[data-theme] .renda-review { padding: 20px; margin-bottom: 12px; }
   .video-lesson-group { padding: 0 12px 14px; }
 }
 
+/* ── Papel e lápis ──────────────────────────────────────── */
+/* O resumo e o botão de imprimir ficam numa barra presa ao pé da tela, inclusive sobre a prévia. */
+html[data-theme] .worksheet-print-bar { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 6; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding: 8px 8px 8px 18px; background: var(--surface); border: 1.5px solid var(--frame); border-radius: 999px; box-shadow: 0 10px 26px #0b122230, 3px 3px 0 var(--offset); }
+.worksheet-print-status { font-size: 13px; color: var(--muted); line-height: 1.4; }
+.worksheet-print-bar .btn { flex: 0 0 auto; }
+html[data-theme] .worksheet-toolbar { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+.worksheet-family-picker { display: none; }
+html[data-theme] .worksheet-family { display: grid; place-items: center; align-content: center; gap: 1px; aspect-ratio: 1; padding: 0; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; }
+.worksheet-family .jp { font-family: var(--font-jp-serif); font-size: 24px; line-height: 1; }
+.worksheet-family small { font-size: 9px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+html[data-theme] .worksheet-family[aria-pressed="true"] { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); box-shadow: 2px 2px 0 var(--offset); }
+.worksheet-family[aria-pressed="true"] small { color: var(--seal-ink); }
+.worksheet-family:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 2px; }
+@media (max-width: 600px) {
+  html[data-theme] .worksheet-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; padding: 14px; margin-bottom: 14px; }
+  html[data-theme] .worksheet-toolbar label { margin-bottom: 4px; font-size: 12px; }
+  html[data-theme] .worksheet-toolbar select { min-width: 0; min-height: 46px; padding-inline: 10px 28px; text-overflow: ellipsis; }
+  html[data-theme] #worksheet-family-control { display: none; }
+  .worksheet-family-picker:not([hidden]) { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  html[data-theme] .worksheet-selection { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 6px; padding: 10px; margin: 12px 0; max-height: 220px; }
+  html[data-theme] .worksheet-selection .worksheet-char { width: 100%; height: 46px; }
+  .worksheets-page .play-paused-note { font-size: 12px; }
+  .worksheets-page .tip-box { font-size: 12px; }
+  html[data-theme] .worksheet-print-bar { gap: 8px; padding: 8px 8px 8px 14px; border-radius: 18px; }
+  .worksheet-print-status { font-size: 12px; }
+  html[data-theme] .worksheet-print-bar .btn { min-height: 46px; padding-inline: 16px; font-size: 14px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .trail-stop.is-next .trail-node, .renda-choice.is-wrong { animation: none !important; }
 }

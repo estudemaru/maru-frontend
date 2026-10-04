@@ -11,6 +11,10 @@ const ready = async page => {
   await expect(page.locator('#print-worksheet')).toBeEnabled();
 };
 const choose = async (page, selector, value) => {
+  const options = page.locator('.worksheet-options');
+  if (await options.locator(selector).count() && !await options.evaluate(element => element.open)) {
+    await options.locator('summary').click();
+  }
   await page.locator(selector).selectOption(value);
   await ready(page);
 };
@@ -50,6 +54,8 @@ test('kana flows without unused slots, keeps stroke models and supports optional
   await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(5);
   await expect(page.locator('.print-sheet')).toHaveCount(1);
   await expect(page.locator('.worksheet-char')).toHaveCount(5);
+  await expect(page.locator('.worksheet-options')).not.toHaveAttribute('open', '');
+  await expect(page.locator('#worksheet-page-position')).toHaveText('Folha 1 de 1');
   await choose(page, '#worksheet-family', 'ka');
   await expect(page.locator('.paper-kana-family')).toHaveAttribute('data-family', 'ka');
   await expect(page.locator('.paper-row[data-print-char]')).toHaveCount(5);
@@ -70,7 +76,17 @@ test('kana flows without unused slots, keeps stroke models and supports optional
   await expect(page.locator('.paper-repeat-grid')).toHaveCount(2);
   await expect(page.locator('.paper-repeat-grid .paper-box')).toHaveCount(198);
   await expect(page.locator('.paper-repeat-grid svg')).toHaveCount(0);
+  await expect(page.locator('.paper-preview-page:visible')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Próxima folha' }).click();
+  await expect(page.locator('#worksheet-page-position')).toHaveText('Folha 2 de 3');
+  await expect(page.locator('.paper-preview-page:visible .paper-repeat-grid')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Próxima folha' }).click();
+  await expect(page.locator('#worksheet-next')).toBeDisabled();
+  await page.getByRole('button', { name: 'Folha anterior' }).click();
+  // Mesmo com a segunda folha na prévia, o PDF contém as três páginas.
   await checkPaper(page);
+  await expect(page.locator('.paper-preview-page:visible')).toHaveCount(1);
+  await expect(page.locator('#worksheet-page-position')).toHaveText('Folha 2 de 3');
   await page.setViewportSize({ width: 320, height: 900 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.locator('#print-worksheet').click();
@@ -120,4 +136,3 @@ test('monochrome printing keeps dark text, visible tracing models and isolated s
   await choose(page, '#worksheet-color', 'color');
   await expect(page.locator('.paper-header strong').first()).toHaveCSS('color', 'rgb(20, 107, 112)');
 });
-

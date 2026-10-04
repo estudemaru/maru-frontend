@@ -69,3 +69,25 @@ test('phone tabs navigate between sections, retain lesson context and give the k
   await expect(page.locator('.mobile-brand')).toBeHidden();
   await expect(page.locator('.sidebar')).toBeVisible();
 });
+
+test('phone layouts fit the viewport and keep printing above the bottom tabs', async ({ page }) => {
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const route of ['home', 'journey', 'expressions', 'settings', 'worksheets']) {
+      await page.goto('/#/' + route);
+      await expect(page.locator('main h1')).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${route} at ${width}px`).toBeLessThanOrEqual(width);
+    }
+    await page.goto('/#/home');
+    const game = await page.locator('.play-card').first().boundingBox();
+    const tabs = await page.locator('.mobile-nav').boundingBox();
+    expect(game.y + game.height).toBeLessThan(tabs.y);
+  }
+  await page.goto('/#/worksheets');
+  await expect(page.locator('#print-worksheet')).toBeEnabled();
+  const print = await page.locator('.worksheet-print-bar').boundingBox();
+  const tabs = await page.locator('.mobile-nav').boundingBox();
+  expect(print.y + print.height).toBeLessThan(tabs.y);
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.mobile-nav')).toBeHidden();
+});

@@ -107,9 +107,10 @@ export async function renderPrintPages(preview, sheets, isCurrent) {
 
 export function scalePrintPreview(preview) {
   const resize = () => {
-    const paper = preview.querySelector('.print-sheet');
+    const paper = preview.querySelector('.paper-preview-page[data-current] .print-sheet') || preview.querySelector('.print-sheet');
     if (!paper) return;
     const width = paper.offsetWidth;
+    if (!width) return;
     preview.style.setProperty('--paper-scale', String(Math.min(1, preview.clientWidth / width)));
   };
   const observer = new ResizeObserver(resize);

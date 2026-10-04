@@ -78,30 +78,82 @@ export function renderWorksheets(ctx, initialKind = "characters") {
   let kind = "characters", script = "hiragana", group = "food", batch = 0, answers = true, models = true;
   let scope = "family", family = "a", repeatPages = 0, printColor = "color";
   let selected = new Set(KANA.filter(item=>item.script==="hiragana" && item.row==='a').map(item=>item.char));
-  let strokes = null, printing = false, renderVersion = 0;
+  let strokes = null, printing = false, renderVersion = 0, previewPage = 0;
   const characterList = () => script === "all" ? [...KANA.filter(item=>item.script==="hiragana"),...KANA.filter(item=>item.script==="katakana"), ...BEGINNER_KANJI] : script === "kanji" ? BEGINNER_KANJI : KANA.filter(item=>item.script===script);
-  ctx.main.innerHTML = `<div class="worksheets-page">${pageHeading("LEVE O APRENDIZADO PARA O PAPEL", "Seu caderno, pronto para imprimir.", "Escolha os caracteres, confira a folha e imprima em A4. Você também pode salvar em PDF na janela de impressão.",routeLink("writing","Abrir caderno digital " + icon("pen"),"btn btn-ghost"))}<div class="no-print"><div class="panel worksheet-toolbar">
-    <div><label class="input-label" for="worksheet-kind">Atividade</label><select class="text-input" id="worksheet-kind"><option value="characters">Repetição de caracteres</option></select></div>
+  ctx.main.innerHTML = `<div class="worksheets-page">${pageHeading("PAPEL E LÁPIS", "Do traço ao papel.", "Escolha o que praticar. A folha fica por nossa conta.",routeLink("writing",icon("pen") + " Caderno digital","worksheet-digital-link"))}
+    <div class="worksheet-workspace">
+    <section class="worksheet-settings no-print" aria-labelledby="worksheet-settings-title">
+    <div class="worksheet-panel-heading"><span class="worksheet-step">01</span><h2 id="worksheet-settings-title">Monte sua folha</h2></div>
+    <div class="worksheet-toolbar">
+    <div id="worksheet-kind-control" hidden><label class="input-label" for="worksheet-kind">Atividade</label><select class="text-input" id="worksheet-kind"><option value="characters">Repetição de caracteres</option></select></div>
     <div id="worksheet-script-control"><label class="input-label" for="worksheet-script">Escrita</label><select class="text-input" id="worksheet-script"><option value="hiragana">Hiragana</option><option value="katakana">Katakana</option><option value="kanji">Primeiros kanji</option><option value="all">Todos os caracteres</option></select></div>
-    <div id="worksheet-scope-control"><label class="input-label" for="worksheet-scope">O que praticar</label><select class="text-input" id="worksheet-scope"><option value="family" selected>Uma família por vez</option><option value="one">1 caractere</option><option value="recommended">Primeiros 20 caracteres</option><option value="all">Todos</option><option value="custom">Escolher livremente</option></select></div>
+    <div id="worksheet-scope-control"><label class="input-label" for="worksheet-scope">O que praticar</label><select class="text-input" id="worksheet-scope"><option value="family" selected>Uma família</option><option value="one">1 caractere</option><option value="recommended">Os 20 primeiros</option><option value="all">Todos</option><option value="custom">Escolha livre</option></select></div>
     <div id="worksheet-family-control"><label class="input-label" for="worksheet-family">Família</label><select class="text-input" id="worksheet-family">${BOOK_KANA_ORDER.map(id=>`<option value="${id}">${id==='a'?'Vogais · comece aqui':id==='wa'?'WA, WO e N':id.toUpperCase()}</option>`).join('')}</select></div>
+    <div id="worksheet-family-picker-control"><p class="input-label">Escolha uma família</p><div id="worksheet-family-picker" class="worksheet-family-picker" role="group" aria-label="Família"></div></div>
     <div id="worksheet-group-control" hidden><label class="input-label" for="worksheet-group">Tema</label><select class="text-input" id="worksheet-group">${VOCABULARY_GROUPS.filter(([id])=>id!=="all").map(([id,label])=>`<option value="${id}" ${id===group?"selected":""}>${label}</option>`).join("")}</select></div>
     <div id="worksheet-batch-control" hidden><label class="input-label" for="worksheet-batch">Situações</label><select class="text-input" id="worksheet-batch">${chunks(SENTENCES,5).map((items,i)=>`<option value="${i}">${i*5+1} a ${i*5+items.length}</option>`).join("")}</select></div>
-    <div><label class="input-label" for="worksheet-repeat-pages">Páginas para repetir</label><select class="text-input" id="worksheet-repeat-pages"><option value="0" ${repeatPages === 0 ? "selected" : ""}>Nenhuma</option><option value="1" ${repeatPages === 1 ? "selected" : ""}>1 página em branco</option><option value="2">2 páginas em branco</option><option value="3">3 páginas em branco</option><option value="5">5 páginas em branco</option><option value="10">10 páginas em branco</option></select></div>
-    <div><label class="input-label" for="worksheet-color">Cor da impressão</label><select class="text-input" id="worksheet-color"><option value="color">Colorida</option><option value="mono">Preto e branco · alto contraste</option></select></div>
-    <div><button class="btn btn-primary" id="print-worksheet" disabled>${icon("pen")} Imprimir / salvar PDF</button></div>
-    </div><p class="play-paused-note">Atividades e Livro 1 em pausa. As folhas de repetição continuam disponíveis.</p><div class="filter-chips"><label><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label hidden><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
-    <div id="worksheet-characters" class="worksheet-selection panel" role="group" dir="ltr" aria-label="Caracteres da folha"></div><p class="filter-count" id="worksheet-status" aria-live="polite">Preparando os modelos de traços…</p>
-    <aside class="tip-box">${icon("pen")}<p>As folhas aproveitam o A4 com espaço para escrever à mão. Páginas extras de repetição são opcionais, e os gabaritos ficam no final. Na impressão, escolha A4, escala 100% e desative os cabeçalhos e rodapés do navegador.</p></aside></div><div id="worksheet-preview" class="worksheet-preview"></div></div>`;
+    </div>
+    <div id="worksheet-characters" class="worksheet-selection" role="group" dir="ltr" aria-label="Caracteres da folha"></div>
+    <details class="worksheet-options">
+    <summary><span><strong>Ajustes de impressão</strong><small id="worksheet-options-summary">Colorida · sem folhas extras</small></span>${icon("down")}</summary>
+    <div class="worksheet-options-body">
+    <div><label class="input-label" for="worksheet-repeat-pages">Folhas extras em branco</label><select class="text-input" id="worksheet-repeat-pages"><option value="0" ${repeatPages === 0 ? "selected" : ""}>Nenhuma</option><option value="1" ${repeatPages === 1 ? "selected" : ""}>1 folha</option><option value="2">2 folhas</option><option value="3">3 folhas</option><option value="5">5 folhas</option><option value="10">10 folhas</option></select></div>
+    <div><label class="input-label" for="worksheet-color">Cor da impressão</label><select class="text-input" id="worksheet-color"><option value="color">Colorida</option><option value="mono">Preto e branco</option></select></div>
+    <div class="filter-chips"><label hidden><input id="worksheet-models" type="checkbox" checked> Mostrar modelos para copiar</label><label hidden><input id="worksheet-answers" type="checkbox" checked> Incluir gabarito separado</label></div>
+    <p class="worksheet-print-hint">Na janela de impressão, use A4 e escala 100%. Desative os cabeçalhos e rodapés.</p>
+    </div></details>
+    </section>
+    <section class="worksheet-preview-panel" aria-labelledby="worksheet-preview-title">
+      <div class="worksheet-preview-heading no-print"><div><span class="worksheet-step">02</span><h2 id="worksheet-preview-title">Sua folha</h2></div><span class="worksheet-paper-badge">A4</span></div>
+      <div class="worksheet-paper-stage">
+        <p class="worksheet-empty no-print" id="worksheet-empty" hidden>Escolha pelo menos um caractere para montar sua folha.</p>
+        <div id="worksheet-preview" class="worksheet-preview"></div>
+      </div>
+      <nav class="worksheet-preview-pager no-print" aria-label="Prévia das folhas">
+        <button type="button" id="worksheet-previous" aria-label="Folha anterior" disabled>${icon("back")}</button>
+        <span id="worksheet-page-position" aria-live="polite">Preparando sua folha…</span>
+        <button type="button" id="worksheet-next" aria-label="Próxima folha" disabled>${icon("arrow")}</button>
+      </nav>
+    </section></div>
+    <div class="worksheet-print-bar no-print"><div><p class="worksheet-print-status" id="worksheet-status" aria-live="polite">Preparando os modelos de traços…</p><span class="worksheet-pdf-note">Pronta para imprimir ou salvar em PDF</span></div><button class="btn btn-primary" id="print-worksheet" disabled>${icon("pen")} Imprimir / salvar PDF</button></div></div>`;
   const previewScale = scalePrintPreview(ctx.main.querySelector("#worksheet-preview"));
+  const updatePreviewPage = () => {
+    const preview = ctx.main.querySelector("#worksheet-preview");
+    const pages = [...preview.querySelectorAll(".paper-preview-page")];
+    previewPage = Math.max(0, Math.min(previewPage, pages.length - 1));
+    pages.forEach((page, index) => page.toggleAttribute("data-current", index === previewPage));
+    preview.dataset.paginated = "true";
+    ctx.main.querySelector("#worksheet-previous").disabled = previewPage === 0;
+    ctx.main.querySelector("#worksheet-next").disabled = previewPage >= pages.length - 1;
+    ctx.main.querySelector("#worksheet-page-position").textContent = pages.length ? `Folha ${previewPage + 1} de ${pages.length}` : "Nenhuma folha selecionada";
+    ctx.main.querySelector("#worksheet-empty").hidden = pages.length > 0;
+    previewScale.resize();
+  };
+  // No celular, a família vira uma grade de botões com o primeiro kana de cada uma.
+  const drawFamilies = () => {
+    const picker = ctx.main.querySelector("#worksheet-family-picker");
+    const pickerScript = script === "katakana" ? "katakana" : "hiragana";
+    picker.hidden = kind !== "characters" || scope !== "family" || script === "kanji";
+    ctx.main.querySelector("#worksheet-family-picker-control").hidden = picker.hidden;
+    picker.innerHTML = BOOK_KANA_ORDER.map(id => `<button type="button" class="worksheet-family" data-family="${id}" aria-pressed="${family === id}"><span class="jp" lang="ja">${KANA.find(item => item.script === pickerScript && item.row === id).char}</span><small>${id === "a" ? "vogais" : id === "wa" ? "wa · n" : id}</small></button>`).join("");
+  };
+  const applyScope = () => {
+    if(scope!=='custom') selected=new Set((scope==='family' ? characterList().filter(item=>item.row===family || (family==='wa' && item.row==='n')) : scope==='one' ? characterList().slice(0,1) : scope==='recommended' ? characterList().slice(0,20) : characterList()).map(item=>item.char));
+    drawSelection();
+  };
   const drawSelection = () => {
+    drawFamilies();
     const choices = scope === "family" ? characterList().filter(item=>item.row===family || (family==='wa' && item.row==='n')) : characterList();
+    // Com uma família escolhida, a grade de famílias já mostra a seleção; no celular esta faixa some.
+    ctx.main.querySelector("#worksheet-characters").dataset.scope = scope;
     ctx.main.querySelector("#worksheet-characters").innerHTML = choices.map(item=>`<button class="worksheet-char" data-print-char="${item.char}" aria-pressed="${selected.has(item.char)}" aria-label="${item.char}, ${item.romaji}">${item.char}</button>`).join("");
   };
   async function draw() {
     const version = ++renderVersion;
     const isCurrent = () => !controller.signal.aborted && version === renderVersion;
     ctx.main.querySelector("#print-worksheet").disabled = true;
+    ctx.main.querySelector("#worksheet-previous").disabled = true;
+    ctx.main.querySelector("#worksheet-next").disabled = true;
     ctx.main.querySelector("#worksheet-script-control").hidden = kind !== "characters";
     ctx.main.querySelector("#worksheet-scope-control").hidden = kind !== "characters";
     ctx.main.querySelector("#worksheet-family-control").hidden = kind !== "characters" || scope !== "family";
@@ -117,6 +169,8 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     answerOption.parentElement.hidden = answerOption.disabled;
     const preview = ctx.main.querySelector("#worksheet-preview");
     preview.dataset.printColor = printColor;
+    delete preview.dataset.paginated;
+    ctx.main.querySelector("#worksheet-options-summary").textContent = `${printColor === "mono" ? "Preto e branco" : "Colorida"} · ${repeatPages ? `${repeatPages} ${repeatPages === 1 ? "folha extra" : "folhas extras"}` : "sem folhas extras"}`;
     let sheets = [], answerSheets = [], finalSheets = [];
     if (kind === "characters") {
       const kanaScripts = script==="all" ? ["hiragana","katakana"] : script==="kanji" ? [] : [script];
@@ -173,6 +227,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
       if (isCurrent()) {
         preview.replaceChildren();
         preview.dataset.ready = "false";
+        updatePreviewPage();
         ctx.main.querySelector("#worksheet-status").textContent = error.message?.includes("A4") ? error.message : "Não foi possível preparar todas as folhas. Reabra a página e tente novamente.";
       }
       return;
@@ -183,10 +238,11 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     }));
     const ready = ((kind !== "characters" && kind !== "book") || strokes) && sheets.length > 0;
     ctx.main.querySelector("#print-worksheet").disabled = !ready || printing;
-    previewScale.resize();
-    const count = `${pageCount} ${pageCount===1 ? "folha A4 preparada" : "folhas A4 preparadas"}.`;
-    const characters = kind==="characters" ? ` ${selected.size} ${selected.size===1 ? "caractere selecionado" : "caracteres selecionados"}.` : "";
-    const repetition = repeatPages ? ` ${repeatPages} ${repeatPages===1 ? "página de repetição em branco" : "páginas de repetição em branco"}.` : "";
+    updatePreviewPage();
+    // Resumo curto: ele mora na barra de impressão, que fica presa ao pé da tela.
+    const count = `${pageCount} ${pageCount===1 ? "folha A4" : "folhas A4"}`;
+    const characters = kind==="characters" ? ` · ${selected.size} ${selected.size===1 ? "caractere" : "caracteres"}` : "";
+    const repetition = repeatPages ? ` · ${repeatPages} em branco` : "";
     ctx.main.querySelector("#worksheet-status").textContent = !sheets.length ? "Selecione pelo menos um caractere." : (kind === "characters" || kind === "book") && !strokes ? "Preparando os modelos de traços…" : count+characters+repetition;
   }
   ctx.main.addEventListener("change",event=>{
@@ -199,10 +255,7 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     if(id==="worksheet-scope"){
       scope=value;
     }
-    if(['worksheet-script','worksheet-family','worksheet-scope'].includes(id)) {
-      if(scope!=='custom') selected=new Set((scope==='family' ? characterList().filter(item=>item.row===family || (family==='wa' && item.row==='n')) : scope==='one' ? characterList().slice(0,1) : scope==='recommended' ? characterList().slice(0,20) : characterList()).map(item=>item.char));
-      drawSelection();
-    }
+    if(['worksheet-script','worksheet-family','worksheet-scope'].includes(id)){previewPage=0;applyScope();}
     if(id==="worksheet-repeat-pages")repeatPages=Number(value);
     if(id==="worksheet-color")printColor=value;
     if(id==="worksheet-group")group=value;
@@ -212,8 +265,15 @@ export function renderWorksheets(ctx, initialKind = "characters") {
     draw();
   },{signal:controller.signal});
   ctx.main.addEventListener("click",async event=>{
+    if(event.target.closest("#worksheet-previous, #worksheet-next")){
+      previewPage += event.target.closest("#worksheet-next") ? 1 : -1;
+      updatePreviewPage();return;
+    }
+    const familyButton=event.target.closest("button[data-family]");
+    if(familyButton){previewPage=0;family=familyButton.dataset.family;ctx.main.querySelector("#worksheet-family").value=family;applyScope();draw();return;}
     const button=event.target.closest("button[data-print-char]");
     if(button){
+      previewPage=0;
       const char=button.dataset.printChar;
       if(scope==="one")selected=new Set([char]);
       else{
