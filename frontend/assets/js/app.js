@@ -149,7 +149,7 @@ function render() {
   const views = {
     home: () => renderDashboard(ctx),
     practice: () => renderArcadeHub(ctx),
-    arcade: () => renderArcade(ctx, id),
+    arcade: () => renderArcade(ctx, id, params),
     daily: () => renderDaily(ctx),
     journey: () => renderJourney(ctx, id),
     lesson: () => renderLesson(ctx, id),

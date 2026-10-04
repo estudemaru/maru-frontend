@@ -3,24 +3,26 @@ import { recordReview } from '/shared/progress.js';
 import { esc, icon, routeLink } from '../core/ui.js';
 import { renderShiritori, shiritoriBestKey } from './shiritori.js';
 import { renderKaruta } from './karuta.js';
+import { renderRenda } from './renda.js';
 import { dailyBanner } from './daily.js';
 import { kanaModeButton } from '../core/kanaInput.js';
 import { LEVELS } from '/shared/shiritori.js';
 
-const cardMeta = game => game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : game.kind === 'listen' ? `<b class="play-new">NOVO</b> ${icon('volume')} Com som <span>·</span> ${icon('clock')} Com tempo` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`;
+const cardMeta = game => game.kind === 'tap' ? `<b class="play-new">NOVO</b> Só tocar <span>·</span> ${icon('clock')} Com tempo` : game.kind === 'chain' ? `<b class="play-new">NOVO</b> Contra o Maru <span>·</span> ${icon('clock')} 20s por vez` : game.kind === 'listen' ? `<b class="play-new">NOVO</b> ${icon('volume')} Com som <span>·</span> ${icon('clock')} Com tempo` : `∞ Livre <span>·</span> ${icon('clock')} Com tempo`;
 export function gameCards() {
   // Jogos por turnos ocupam a linha inteira; um cartão comum sozinho na última linha também.
-  const regular = GAMES.filter(game => game.kind !== 'chain');
+  const regular = GAMES.filter(game => game.kind !== 'chain' && !game.featured);
   const span = game => regular.length % 2 === 1 && game === regular.at(-1);
-  return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.kind === 'chain' ? 'is-wide' : span(game) ? 'is-span' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${cardMeta(game)}</span></div></a>`).join('');
+  return GAMES.map((game, i) => `<a class="play-card ${game.color} ${game.featured ? 'is-featured' : game.kind === 'chain' ? 'is-wide' : span(game) ? 'is-span' : ''}" href="#/arcade/${game.id}"><div class="play-card-art"><span class="play-number">0${i + 1}</span><img src="/assets/img/irasutoya-${game.image}.png" width="150" height="150" alt="" loading="lazy"><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.subtitle}</span><h3>${game.title}</h3><p>${game.description}</p><span class="play-card-meta">${cardMeta(game)}</span></div></a>`).join('');
 }
 export function renderArcadeHub(ctx) {
   ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">UM POUQUINHO, TODO DIA</p><h1 tabindex="-1">Seu próximo acerto começa aqui.</h1><p>Escolha um jogo. Encontre seu ritmo. Tente mais uma vez.</p></header>${dailyBanner(ctx.progress)}<div class="play-grid">${gameCards()}</div><div class="play-note">${icon('spark')} Todos os jogos têm prática infinita e desafio com tempo. Seu progresso é salvo a cada resposta.</div></div>`;
 }
 const options = (items, current) => items.map(([value, label]) => `<option value="${value}" ${value === current ? 'selected' : ''}>${label}</option>`).join('');
 const detailList = items => items.length ? `<ul>${items.map(item => `<li><span>${esc(item.label)}</span><strong>${item.accuracy}% <small>· ${item.attempts} tentativas</small></strong></li>`).join('')}</ul>` : '<p class="muted">Ainda estamos conhecendo seu ritmo. Responda cada item pelo menos 3 vezes.</p>';
-export function renderArcade(ctx, id = 'sentences') {
-  const game = GAMES.find(game => game.id === id) || GAMES[0];
+export function renderArcade(ctx, id = 'sentences', params = {}) {
+  const game = GAMES.find(game => game.id === id) || GAMES.find(game => game.id === 'sentences');
+  if (game.kind === 'tap') return renderRenda(ctx, game, params);
   if (game.kind === 'chain') return renderShiritori(ctx, game);
   if (game.kind === 'listen') return renderKaruta(ctx, game);
   const config = { game: game.id, script: ['sentences', 'translate'].includes(game.id) ? 'all' : game.id === 'difference' ? 'kana' : 'hiragana', duration: 0 };
@@ -117,7 +119,7 @@ export function renderArcadeProgress(ctx) {
       const labels = new Map(buildPool({ game: game.id }).map(item => [item.id, item.label]));
       const bests = LEVELS.map(([level, label]) => [label.split(' · ')[0], Math.max(...[0, 20].map(duration => ctx.progress.arcade?.[shiritoriBestKey(level, duration)]?.score || 0))]);
       const used = words.sort(([, a], [, b]) => b.attempts - a.attempts).slice(0, 6).map(([key, item]) => `<li><span lang="ja">${esc(labels.get(key.split(':').slice(4).join(':')) || 'Palavra do Maru')}</span><strong>${item.attempts}× <small>usada em partidas</small></strong></li>`).join('');
-      return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.png" width="64" height="64" alt=""><h2>${game.title}</h2><span>${bests.some(([, score]) => score) ? bests.map(([label, score]) => `${label}: ${score} palavras`).join(' · ') : 'Sua primeira partida está esperando'}</span></div><details><summary>Vocabulário do Maru que você já usou</summary>${used ? `<ul>${used}</ul>` : '<p class="muted">Use palavras do vocabulário do Maru numa partida para vê-las aqui.</p>'}</details>${routeLink('arcade/' + game.id, 'Jogar →', 'text-link')}</section>`;
+      return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.png" width="64" height="64" alt=""><h2>${game.title}</h2><span>${bests.some(([, score]) => score) ? bests.map(([label, score]) => `${label}: ${score} palavras`).join(' · ') : 'Sua primeira partida está esperando'}</span></div>${used ? `<details><summary>Vocabulário do Maru que você já usou</summary><ul>${used}</ul></details>` : ''}${routeLink('arcade/' + game.id, 'Jogar →', 'text-link')}</section>`;
     }
     const rows = records.filter(([key]) => key.startsWith(`arcade:${game.id}:`));
     const attempts = rows.reduce((sum, [, item]) => sum + item.attempts, 0);
@@ -130,7 +132,7 @@ export function renderArcadeProgress(ctx) {
       if (item) labels.set(key, item.label);
     }
     const qualified = rows.filter(([, item]) => item.attempts >= 3).map(([key, item]) => ({ label: `${labels.get(key) || 'Item praticado'} · ${SCRIPTS.find(([script]) => script === key.split(':')[2])?.[1] || ''}`, attempts: item.attempts, accuracy: Math.round(100 * item.correct / item.attempts) }));
-    return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.png" width="64" height="64" alt=""><h2>${game.title}</h2><span>${attempts ? Math.round(correct / attempts * 100) + '% de acertos · ' + attempts + ' respostas' : 'Seu primeiro treino está esperando'}</span></div><details><summary>Pontos fortes e o que revisar</summary><h3>Pontos fortes</h3>${detailList(qualified.filter(item => item.accuracy >= 80).sort((a,b) => b.accuracy-a.accuracy).slice(0,4))}<h3>Próximos passos</h3>${detailList(qualified.filter(item => item.accuracy < 80).sort((a,b) => a.accuracy-b.accuracy).slice(0,4))}</details>${routeLink('arcade/' + game.id, 'Praticar →', 'text-link')}</section>`;
+    return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.png" width="64" height="64" alt=""><h2>${game.title}</h2><span>${attempts ? Math.round(correct / attempts * 100) + '% de acertos · ' + attempts + ' respostas' : 'Seu primeiro treino está esperando'}</span></div>${attempts ? `<details><summary>Pontos fortes e o que revisar</summary><h3>Pontos fortes</h3>${detailList(qualified.filter(item => item.accuracy >= 80).sort((a,b) => b.accuracy-a.accuracy).slice(0,4))}<h3>Próximos passos</h3>${detailList(qualified.filter(item => item.accuracy < 80).sort((a,b) => a.accuracy-b.accuracy).slice(0,4))}</details>` : ''}${routeLink('arcade/' + game.id, 'Praticar →', 'text-link')}</section>`;
   }).join('');
   ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">SEU JAPONÊS, EM MOVIMENTO</p><h1 tabindex="-1">Pequenas tentativas. Progresso real.</h1><p>${total ? `${total} respostas e ${Math.round(correct / total * 100)}% de acertos. Continue construindo seu ritmo.` : 'Jogue para descobrir o que já está ficando fácil e o que merece mais atenção.'}</p></header><div class="play-progress-grid">${sections}</div><p class="field-hint">Pontos fortes: pelo menos 80% de acertos, com 3 ou mais tentativas por item. Os resultados descrevem seus treinos; não são uma certificação de domínio.</p></div>`;
 }

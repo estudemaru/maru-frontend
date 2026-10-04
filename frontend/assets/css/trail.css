@@ -65,6 +65,58 @@ html[data-theme] .video-option { display: flex; align-items: center; gap: 10px; 
 .video-lesson-group-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 8px; }
 .video-lesson-group-head h3 { font-size: 15px; }
 
+/* ── Só mais um (renda) ────────────────────────────────── */
+.renda-how { display: grid; gap: 6px; margin: 16px 0 0; padding-left: 20px; text-align: left; font-size: 14px; line-height: 1.5; }
+#renda-range-field:not([hidden]) { display: contents; }
+.renda-from { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 13px; line-height: 1.5; }
+.renda-from .icon { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 2px; color: var(--accent); }
+html[data-theme] .renda-stage { display: grid; justify-items: center; gap: 18px; margin-top: 18px; padding: 26px 22px; background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); outline: 1.5px dashed var(--line); outline-offset: -9px; text-align: center; }
+.renda-prompt { display: grid; justify-items: center; gap: 6px; min-height: 140px; align-content: center; }
+.renda-prompt.is-glyph span { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: clamp(92px, 16vw, 132px); line-height: 1; }
+.renda-prompt.is-text span { font-family: var(--font-display); font-size: clamp(40px, 7vw, 60px); line-height: 1.1; }
+.renda-prompt small { font-size: 15px; color: var(--muted); }
+.renda-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: min(100%, 560px); }
+html[data-theme] .renda-choice { position: relative; display: grid; place-items: center; align-content: center; gap: 2px; min-height: 92px; padding: 14px 10px; background: var(--surface); color: var(--ink); border: 1.5px solid var(--accent); border-radius: 12px; outline: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); outline-offset: -6px; box-shadow: 3px 3px 0 var(--offset); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.renda-choice kbd { position: absolute; left: 10px; top: 7px; font: 700 10px var(--font-body); color: var(--accent); background: none; border: 0; }
+.renda-choice-main { font-size: 26px; font-weight: 650; line-height: 1.15; overflow-wrap: anywhere; }
+.renda-choice-main[lang="ja"] { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: 44px; font-weight: 400; }
+.renda-choice small { font-size: 12px; color: var(--muted); }
+html[data-theme] .renda-choice:hover:not(:disabled) { border-color: var(--accent-hover); }
+html[data-theme] .renda-choice:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 3px; }
+html[data-theme] .renda-choice:disabled { cursor: default; }
+html[data-theme] .renda-choice.is-right { background: var(--success-bg); border-color: var(--success); outline-color: color-mix(in srgb, var(--success) 55%, transparent); }
+html[data-theme] .renda-choice.is-right::after { content: "◎"; position: absolute; right: 9px; top: 5px; color: var(--accent); font-size: 22px; font-weight: 700; line-height: 1; }
+html[data-theme] .renda-choice.is-wrong { background: var(--accent-soft); }
+.renda-choice.is-out { opacity: .45; }
+html:not([data-motion="paused"]) .renda-choice { transition: transform .18s var(--ease-out, ease), background-color .15s ease, opacity .2s ease; }
+html:not([data-motion="paused"]) .renda-choice:active:not(:disabled) { transform: scale(.96); }
+html:not([data-motion="paused"]) .renda-choice.is-wrong { animation: renda-shake .32s ease; }
+@keyframes renda-shake { 25% { translate: -5px 0; } 75% { translate: 5px 0; } }
+.renda-feedback { width: min(100%, 560px); min-height: 34px; text-align: left; }
+.renda-hit { display: flex; justify-content: center; align-items: center; gap: 6px; color: var(--success); font-weight: 750; }
+.renda-hit .icon { width: 18px; height: 18px; }
+.renda-feedback .play-feedback { display: grid; gap: 10px; padding: 14px 16px; }
+.renda-hint { font-size: 14px; line-height: 1.5; }
+.renda-hint > span { display: block; margin-bottom: 2px; font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--kin, var(--accent)); }
+.renda-answer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.renda-feedback .play-feedback .btn { justify-self: start; margin-top: 4px; }
+.renda-answer .audio-button { flex: 0 0 auto; margin-top: 0; }
+.renda-review ul { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.renda-review li { display: flex; align-items: center; gap: 14px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.renda-review li > span:nth-child(2) { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.renda-review small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.renda-review-char { flex: 0 0 auto; font-size: 34px; line-height: 1; width: 48px; text-align: center; }
+html[data-theme] .renda-review { padding: 20px; margin-bottom: 12px; }
+
+/* No Arcade e na home, o "Só mais um" ocupa a linha inteira, com a arte ao lado do texto. */
+@media (min-width: 601px) {
+  html[data-theme] .play-card.is-featured { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
+  html[data-theme] .play-card.is-featured .play-card-art { flex: 0 0 min(42%, 400px); height: auto; min-height: 200px; margin: 9px 0 9px 9px; }
+  html[data-theme] .play-card.is-featured .play-card-copy { justify-content: center; padding: 26px 32px; }
+  html[data-theme] .play-card.is-featured h3 { font-size: clamp(24px, 2.6vw, 32px); }
+  html[data-theme] .play-card.is-featured p { font-size: 15px; max-width: 46ch; }
+}
+
 /* ── Celular e tablet ──────────────────────────────────── */
 @media (max-width: 820px) {
   .lesson-plan { grid-template-columns: minmax(0, 1fr); }
