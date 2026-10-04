@@ -1,0 +1,233 @@
+/* Celular (até 600 px): só o essencial em cada tela.
+   O celular mostra o que a pessoa precisa para agir (título, a escolha, o botão) e guarda o resto:
+   - .only-wide marca no HTML o que é extra: avisos, dicas longas, explicações de regra, notas de rodapé;
+   - os detalhes de cada cartão (frase de exemplo, contexto, revisão) ficam atrás de um toque (.card-more);
+   - decorações grandes (a paisagem da capa, rótulos em maiúsculas sobre os títulos) saem da frente.
+   No computador nada muda: lá o conteúdo do .card-more sai direto no cartão. Carregado depois de trail.css. */
+
+/* ── "Ver mais" dos cartões (só existe no celular; ver moreHTML em core/ui.js) ── */
+.card-more > summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-size: 13px; font-weight: 700; color: var(--accent); cursor: pointer; }
+.card-more > summary::-webkit-details-marker { display: none; }
+.card-more > summary .icon { width: 15px; height: 15px; transition: transform .2s ease; }
+.card-more[open] > summary .icon { transform: rotate(180deg); }
+.card-more-body { display: grid; gap: 12px; }
+.card-more-body > :is(.btn, button) { justify-self: start; }
+.card-more-body > .example, .card-more-body > .context-box, .card-more-body > .library-example { margin: 0; }
+.card-more { align-self: stretch; }
+
+/* Glossário no celular: o termo é o resumo; aberto, mostra a explicação. */
+.concept-card > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; }
+.concept-card > summary::-webkit-details-marker { display: none; }
+.concept-card > summary h2 { margin: 0; }
+.concept-card > summary .icon { flex: 0 0 16px; width: 16px; height: 16px; color: var(--muted); transition: transform .2s ease; }
+.concept-card[open] > summary { margin-bottom: 12px; }
+.concept-card[open] > summary .icon { transform: rotate(180deg); }
+
+@media (max-width: 600px) {
+  html[data-theme] .only-wide { display: none !important; }
+
+  /* Cabeçalhos: o nome da tela já está no topo; o rótulo em maiúsculas sai. */
+  html[data-theme] :is(.page-heading, .play-heading) .eyebrow { display: none; }
+  html[data-theme] .page-heading { margin-bottom: 16px; padding-bottom: 14px; }
+  html[data-theme] .page-heading h1 { margin-top: 0; }
+  html[data-theme] .art-credit { display: none; }
+
+  /* ── Início ── */
+  html[data-theme] .play-hero { min-height: 0; padding-bottom: 8px; }
+  html[data-theme] :is(.play-hero-art, .play-hero-foot, .play-hero .world-label) { display: none; }
+  html[data-theme] .play-hero h1 { margin-top: 4px; }
+  html[data-theme] :is(.play-section-title > .play-tag, .play-paper-link, .play-paused-note) { display: none; }
+  html[data-theme] .play-section-title { padding-top: 22px; }
+  /* Cartões de jogo: arte, o tipo de jogo e o nome. O texto longo fica no cartão grande do Só mais um. */
+  html[data-theme] .play-card:not(.is-featured) :is(p, .play-card-meta) { display: none; }
+  html[data-theme] .play-card.is-featured .play-card-meta { display: none; }
+  html[data-theme] .play-card:not(.is-featured) .play-card-art { height: 84px; }
+  html[data-theme] .play-card h3 { margin-bottom: 0; }
+  html[data-theme] .play-bottom { margin-top: 20px; }
+
+  /* ── Trilha ── */
+  html[data-theme] .trail-map, html[data-theme] .chip-extra, html[data-theme] .trail-station-subtitle { display: none; }
+  html[data-theme] .trail-next-copy > p:not(.eyebrow):not(.trail-chips) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  html[data-theme] .trail-next-copy .trail-chips { margin-top: 6px; }
+  html[data-theme] .trail-placement { margin: 0; font-size: 13px; }
+  html[data-theme] .trail-outcome { margin-top: 6px; font-size: 13px; }
+
+  /* ── Lição ── */
+  html[data-theme] :is(.lesson-plan, .lesson-controls > .small.muted, .video-panel-head .eyebrow) { display: none; }
+  html[data-theme] .lesson-controls { justify-content: space-between; }
+  html[data-theme] .lesson-controls.align-end, html[data-theme] .lesson-intro .lesson-controls { justify-content: flex-end; }
+  html[data-theme] .video-panel-head h3 { margin-top: 0; font-size: 16px; }
+  html[data-theme] .video-credit { font-size: 10.5px; }
+  html[data-theme] .lesson-goal { font-size: 14px; }
+
+  /* ── Jogos: preparação ── */
+  html[data-theme] .play-setup-intro p:not(.eyebrow) { font-size: 13px; }
+  html[data-theme] .play-setup-intro .eyebrow { display: none; }
+  html[data-theme] .play-setup-form label:first-of-type { margin-top: 10px; }
+
+  /* ── Meu desempenho ── */
+  html[data-theme] .play-progress-card > .text-link { margin-top: auto; padding-top: 6px; }
+
+  /* ── Consultar ── */
+  html[data-theme] :is(.explore-filters, #resource-count, .hub-section-heading p, .hub-card-action) { display: none; }
+  html[data-theme] .explore-controls { padding: 12px; }
+  html[data-theme] .explore-search label { display: none; }
+  html[data-theme] .explore-results-heading { margin: 0; min-height: 0; }
+  html[data-theme] .hub-section-heading { margin: 16px 0 10px; }
+  html[data-theme] .hub-card p { -webkit-line-clamp: 2; margin-bottom: 0; }
+  html[data-theme] .hub-card-symbol { margin-bottom: 6px; }
+
+  /* Faixa de destaque do kanji: fica só o botão de praticar. */
+  html[data-theme] .reference-banner:has(.btn) { padding: 0; background: none; border: 0; box-shadow: none; margin-bottom: 16px; }
+  html[data-theme] .reference-banner:has(.btn) > :not(.btn) { display: none; }
+  html[data-theme] .reference-banner .btn { width: 100%; margin: 0; justify-content: center; }
+
+  /* Grades de consulta: os cartões fechados ficam lado a lado; o aberto ocupa a linha inteira. */
+  html[data-theme] :is(.vocabulary-grid, .library-grid, .particle-grid, .concept-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
+  html[data-theme] :is(.word-card, .library-card, .particle-card):has(.card-more[open]), html[data-theme] .concept-card[open] { grid-column: 1 / -1; }
+  html[data-theme] .expression-grid { gap: 10px; }
+  html[data-theme] :is(.word-card, .library-card, .expression-card, .particle-card, .concept-card) { padding: 12px; }
+  html[data-theme] .card-more > summary { min-height: 36px; margin-top: 4px; font-size: 12px; }
+  html[data-theme] .card-more[open] > summary { margin-bottom: 8px; }
+  html[data-theme] .card-more-body { gap: 10px; }
+  html[data-theme] .card-more-body .example { padding: 12px; }
+  html[data-theme] .card-more-body > .library-example { padding-top: 10px; }
+
+  /* Palavras */
+  html[data-theme] .word-card .example-art { width: 48px; height: 48px; padding: 4px; margin-bottom: 6px; }
+  html[data-theme] .word-card-top { align-items: flex-start; }
+  html[data-theme] .word-card h2 { font-size: 22px; line-height: 1.5; }
+  html[data-theme] .word-card .word-reading { margin: 2px 0; font-size: 12px; overflow-wrap: anywhere; }
+  html[data-theme] .word-card .word-meaning { margin-bottom: 0; font-size: 14px; }
+  html[data-theme] .word-card .audio-button { flex: 0 0 auto; width: 34px; height: 34px; }
+  html[data-theme] #word-count { margin: 4px 0 10px; }
+  html[data-theme] .toolbar { gap: 8px; margin-bottom: 12px; }
+
+  /* Expressões: frase longa, um por linha. */
+  html[data-theme] .expression-card > .pill { display: none; }
+  html[data-theme] .expression-card .example { padding: 0; background: none; border: 0; }
+  html[data-theme] .expression-card .example-line > .jp { font-size: 19px; }
+  html[data-theme] .filter-chips { gap: 6px; }
+
+  /* Biblioteca */
+  html[data-theme] .library-card > .pill { display: none; }
+  html[data-theme] .library-card h2 { font-size: 22px; margin: 0; }
+  html[data-theme] .library-card > .romaji { margin: 0; font-size: 12px; }
+  html[data-theme] .library-card h3 { margin: 4px 0 0; font-size: 14px; }
+  html[data-theme] .library-toolbar { gap: 8px 10px; }
+
+  /* Partículas */
+  html[data-theme] .particle-card-head { gap: 10px; }
+  html[data-theme] .particle-symbol { width: 44px; height: 44px; font-size: 26px; }
+  html[data-theme] .particle-card-head h2 { font-size: 14px; line-height: 1.3; }
+  html[data-theme] .particle-card > p { margin: 10px 0 0; font-size: 12px; line-height: 1.45; }
+
+  /* Glossário: grade de termos. */
+  html[data-theme] .concept-card h2 { font-size: 15px; }
+  html[data-theme] .concept-card[open] > summary { margin-bottom: 8px; }
+  html[data-theme] .concept-card p { font-size: 14px; line-height: 1.6; }
+  html[data-theme] .concept-card .concept-example { margin-top: 10px; padding-top: 10px; font-size: 13px; }
+
+  /* Kanji: três por linha; o aberto ocupa a linha inteira. */
+  html[data-theme] .kanji-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  html[data-theme] .kanji-card[open] { grid-column: 1 / -1; }
+  html[data-theme] .kanji-card > summary { padding: 10px 6px 8px; }
+  html[data-theme] .kanji-card-symbol { font-size: 40px; line-height: 1.3; }
+  html[data-theme] .kanji-card h2 { margin: 4px 0 2px; font-size: 13px; }
+  html[data-theme] .kanji-card summary > p { font-size: 11px; }
+  html[data-theme] .kanji-card summary > .romaji { display: none; }
+  html[data-theme] .kanji-expand { margin-top: 4px; padding-top: 4px; font-size: 0; border: 0; }
+  html[data-theme] .kanji-expand .icon { width: 14px; height: 14px; }
+
+  /* Exercícios: dois por linha, com símbolo, nome e botão. */
+  html[data-theme] .exercise-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .exercise-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+  html[data-theme] .exercise-card > p { display: none; }
+  html[data-theme] .exercise-card h2 { margin: 0; font-size: 15px; line-height: 1.3; }
+  html[data-theme] .exercise-card .exercise-symbol { width: 40px; height: 40px; font-size: 22px; margin: 0; }
+  html[data-theme] .exercise-card .pill { margin: 0; }
+  html[data-theme] .exercise-card .btn { width: 100%; margin-top: auto; padding-inline: 10px; justify-content: center; font-size: 13px; }
+
+  /* ── Aulas gratuitas ── */
+  html[data-theme] .video-channels ul { gap: 8px; margin-bottom: 18px; }
+  html[data-theme] .video-channels li { gap: 4px; padding: 10px 12px; }
+  html[data-theme] .video-channels li strong { font-size: 14px; line-height: 1.3; }
+  html[data-theme] .video-lessons-player { margin: 0 0 16px; }
+
+  /* ── Papel e lápis: com uma família escolhida, a faixa de caracteres repete a grade. ── */
+  html[data-theme] .worksheet-selection[data-scope="family"] { display: none; }
+
+  /* ── Meu ritmo ── */
+  html[data-theme] :is(.account-panel > .eyebrow, .theme-card > small, .theme-card-sub, .jp-font-option > small, .about-panel > p.muted, .achievement > small, .stage-seal > small) { display: none; }
+  html[data-theme] .settings-panel > p.muted { margin-top: 0; }
+  html[data-theme] .theme-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .theme-card { padding: 8px; }
+  html[data-theme] .theme-preview { min-height: 64px; }
+  html[data-theme] .theme-preview > small { display: none; }
+  html[data-theme] .theme-card strong { margin: 8px 0 0; font-size: 15px; }
+  html[data-theme] .jp-font-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-theme] .jp-font-option { padding: 10px; }
+  html[data-theme] .jp-font-option strong { font-size: 13px; }
+  html[data-theme] .achievement-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-theme] .achievement p { font-size: 12px; line-height: 1.45; }
+  html[data-theme] .stage-seals { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  html[data-theme] .stage-seal { padding: 10px 4px; }
+  html[data-theme] .stage-seal .hanko { width: 38px; height: 38px; margin-bottom: 6px; font-size: 21px; }
+  html[data-theme] .stage-seal h3 { font-size: 11px; line-height: 1.3; }
+  html[data-theme] .stage-seal p { font-size: 10px; }
+}
+
+/* Segunda passada: espaços, ordem e tamanhos que só o celular precisa. */
+@media (max-width: 600px) {
+  /* Início: a trilha encosta menos nos botões; o texto do cartão fica em duas linhas. */
+  html[data-theme] .play-hero + .trail-banner { margin-top: 18px; }
+  html[data-theme] .trail-banner-copy small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  html[data-theme] .play-section-title .eyebrow { display: none; }
+
+  /* Lição: o botão de começar vem antes do vídeo, para aparecer sem rolar. */
+  html[data-theme] .lesson-intro { display: flex; flex-direction: column; gap: 16px; }
+  html[data-theme] .lesson-intro > .lesson-controls { order: 1; margin: 0; padding: 0; border: 0; }
+  html[data-theme] .lesson-intro > .video-panel { order: 2; }
+  html[data-theme] .lesson-intro .step-label { display: none; }
+  html[data-theme] .lesson-intro .lesson-controls .btn { width: 100%; justify-content: center; }
+  html[data-theme] .kana-tile-write { display: none; }
+  html[data-theme] .play-question > .play-tag { display: none; }
+
+  /* Palavras: a ilustração vai para o canto e não empurra o texto. */
+  html[data-theme] .word-card { position: relative; }
+  html[data-theme] .word-card > .example-art { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; margin: 0; padding: 3px; }
+  html[data-theme] .word-card:has(.card-more[open]) > .example-art { display: none; }
+  html[data-theme] :is(.word-card h2, .library-card h2) { overflow-wrap: break-word; word-break: keep-all; }
+  html[data-theme] .word-card-top > h2 { flex: 1 1 auto; min-width: 0; }
+
+  /* Expressões: duas por linha, com os filtros numa faixa que rola para o lado. */
+  html[data-theme] .expression-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  html[data-theme] .expression-card:has(.card-more[open]) { grid-column: 1 / -1; }
+  /* A expressão usa a largura toda do cartão; o botão de ouvir desce para a linha do romaji. */
+  html[data-theme] .expression-card .example { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "jp jp" "romaji audio" "pt pt"; align-items: center; column-gap: 6px; }
+  html[data-theme] .expression-card .example-line { display: contents; }
+  html[data-theme] .expression-card .example-line > .jp { grid-area: jp; font-size: clamp(12px, 3.7vw, 17px); line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+  html[data-theme] .expression-card .example-line > .audio-button { grid-area: audio; width: 34px; height: 34px; margin: 0; }
+  html[data-theme] .expression-card .romaji { grid-area: romaji; margin: 0; font-size: 11px; }
+  html[data-theme] .expression-card .translation { grid-area: pt; margin-top: 4px; font-size: 13px; line-height: 1.4; }
+  html[data-theme] .expression-card:has(.card-more[open]) .example-line > .jp { font-size: 20px; }
+  html[data-theme] #expression-filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 2px 16px 4px; scrollbar-width: none; }
+  html[data-theme] #expression-filters::-webkit-scrollbar { display: none; }
+  html[data-theme] #expression-filters .chip { flex: 0 0 auto; }
+
+  /* Exercícios: botão curto. */
+  html[data-theme] .exercise-card .btn { min-height: 40px; }
+
+  /* Aulas gratuitas: o link do canal alinhado ao texto. */
+  html[data-theme] .video-channels li .text-link { justify-self: start; font-size: 12px; }
+
+  /* Meu ritmo */
+  html[data-theme] .account-panel .source-note { display: none; }
+  html[data-theme] .account-page .account-panel .source-note { display: block; }
+  html[data-theme] .jp-font-sample { font-size: 17px; line-height: 1.45; word-break: keep-all; }
+  html[data-theme] .jp-font-option:has(input:checked)::after { top: auto; bottom: 8px; right: 10px; font-size: 16px; }
+  html[data-theme] .setting-row p { font-size: 12px; line-height: 1.5; }
+  html[data-theme] .progress-overview dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  html[data-theme] .progress-overview dl > div { gap: 8px; }
+  html[data-theme] .progress-overview > .jp { display: none; }
+}

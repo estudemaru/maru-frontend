@@ -34,20 +34,23 @@ function familySection(script, families, originalExamples = []) {
   };
 }
 
+// Words (not single kana or rows) give each printed lesson something to read at the end.
+const isWord = example => example.jp.length > 1 && !example.jp.includes('　');
+const wordsSection = lesson => lesson.sections.find(section => section.examples.some(isWord));
 export function interleaveKanaLesson(lesson) {
   const examples = lesson.sections.flatMap(section=>section.examples);
   if (lesson.id === 'h-vowels') return { ...lesson, sections: lesson.sections.map((section,index)=>index===0 ? {...section, practiceFamilies:['a']} : section) };
   if (lesson.id === 'h-rows') return { ...lesson, title: 'Conheça e escreva: KA até PA', goal: 'Aprender uma família de cada vez e praticar sua escrita logo em seguida.', sections: [
     ...groups.slice(1,6).map(families=>familySection('hiragana',families,examples)),
-    {...lesson.sections[1], title:'Junte os sons que você praticou', body:'Agora leia duas palavras com caracteres dessas famílias. Diga cada som e depois junte a palavra inteira.', examples:lesson.sections[1].examples.slice(2)}
+    {...wordsSection(lesson), title:'Junte os sons que você praticou', body:'Agora leia palavras com caracteres dessas famílias. Diga cada som e depois junte a palavra inteira.', examples:wordsSection(lesson).examples.filter(isWord)}
   ] };
   if (lesson.id === 'h-rest') return { ...lesson, sections: [
     ...groups.slice(6).map(families=>familySection('hiragana',families,examples)),
-    {...lesson.sections[1], title:'Leia mais duas palavras', body:'Você completou as 46 formas básicas e também praticou as famílias com marcas. Junte os sons nas palavras abaixo.', examples:lesson.sections[1].examples.slice(1), tip:'São 46 caracteres básicos. As formas com dakuten e handakuten ampliam a tabela; não são 71 básicos.'}
+    {...wordsSection(lesson), title:'Leia mais algumas palavras', body:'Você completou as 46 formas básicas e também praticou as famílias com marcas. Junte os sons nas palavras abaixo.', examples:wordsSection(lesson).examples.filter(isWord), tip:'São 46 caracteres básicos. As formas com dakuten e handakuten ampliam a tabela; não são 71 básicos.'}
   ] };
   if (lesson.id === 'k-basics') return { ...lesson, goal:'Conhecer cada família do katakana e praticar sua escrita antes de avançar.', sections: [
     ...groups.map(families=>familySection('katakana',families,examples)),
-    lesson.sections[1]
+    wordsSection(lesson)
   ] };
   return lesson;
 }

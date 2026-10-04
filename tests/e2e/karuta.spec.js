@@ -28,7 +28,8 @@ test('karuta waits out a 429, preloads the next round and records answers', asyn
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   const requested = await mockVoice(page, (text, count) => count === 1 ? { status: 429, headers: { 'Retry-After': '2' }, json: { error: 'A API de voz pediu um intervalo.', retryAfter: 2 } } : null);
   await page.goto('/#/home');
-  await expect(page.locator('.play-card')).toHaveCount(6);
+  await page.getByRole('link', { name: 'Ver todos os jogos' }).click();
+  await expect(page.locator('.play-card')).toHaveCount(7);
   await page.locator('.play-card[href="#/arcade/karuta"]').click();
   await expect(page.locator('.play-setup h1')).toHaveText('Ouviu, pegou');
   await page.locator('#karuta-duration').selectOption('60');

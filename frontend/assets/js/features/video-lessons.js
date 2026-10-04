@@ -1,12 +1,30 @@
-import { pageHeading, icon, routeLink } from '../core/ui.js';
+import { MODULES } from '/shared/curriculum.js';
+import { CHANNELS, VIDEOS, videosFor, videoThumbnail } from '/shared/videos.js';
+import { pageHeading, icon, routeLink, esc, wideScreen } from '../core/ui.js';
+import { videoPanelHTML, bindVideos } from '../core/videos.js';
 
-// Links published by the teachers themselves, checked on 2026-09-28.
-const lessons = [
-  {title:'123 Japonês',subtitle:'Aulas e explicações em português',description:'Abra o canal e procure as aulas de japonês básico. Escolha um tema por vez e volte para praticar aqui.',url:'https://youtube.com/123japones',source:'https://linktr.ee/123japones',practice:'challenge/hiragana',label:'Praticar hiragana',kind:'Canal oficial'},
-  {title:'Conheça o hiragana',subtitle:'Programa Japonês Online · Luiz Rafael',description:'Uma introdução aos caracteres e aos sons do hiragana. Tenha papel e lápis por perto para acompanhar.',url:'https://www.youtube.com/watch?v=A0AodhG0a7A',source:'https://www.aulasdejapones.com.br/hiragana/',practice:'writing',label:'Abrir caderno de escrita',kind:'Aula introdutória'},
-  {title:'Vamos ler hiragana',subtitle:'Programa Japonês Online · série de leitura',description:'Pratique a leitura de palavras em hiragana. Pause, tente ler sozinho e depois confira com o professor.',url:'https://www.youtube.com/playlist?list=PL47hZ7Mbf5Bm1yw9uvV_XrA-qyJbMjP24',source:'https://www.aulasdejapones.com.br/hiragana/',practice:'challenge/listening',label:'Treinar escuta',kind:'Playlist gratuita'}
-];
+const CHANNEL_NOTES = {
+  '123': 'Aulas em português sobre escrita, gramática e cultura, com professores japoneses.',
+  nanda: 'Séries completas de hiragana e katakana, uma família por aula, e aulas básicas de conversa.',
+  pjo: 'Introdução ao hiragana e treinos de leitura, em português.',
+  jp101: 'Desafios curtos de hiragana e katakana e um guia das partículas. Em inglês.'
+};
+
+// Todas as aulas ligadas à trilha, por etapa. Tocar numa aula a abre no player do topo.
 export function renderVideoLessons(ctx) {
-  ctx.main.innerHTML=pageHeading('ASSISTA, ANOTE, EXPERIMENTE','Aulas gratuitas para acompanhar seu estudo.','Conteúdo público no YouTube, em português. Comece por uma aula curta e pratique o que acabou de aprender.')+
-    `<ol class="study-routine"><li><strong>1. Assista um trecho</strong><span>Uma família de kana por vez.</span></li><li><strong>2. Pause e escreva</strong><span>Copie no papel e diga o som.</span></li><li><strong>3. Teste a memória</strong><span>Volte para uma rodada de prática.</span></li></ol><div class="video-lesson-grid">${lessons.map(item=>`<article class="panel video-lesson-card"><span class="pill">${item.kind}</span><h2>${item.title}</h2><p class="small muted">${item.subtitle}</p><p>${item.description}</p><a class="btn btn-primary" href="${item.url}" target="_blank" rel="noopener noreferrer">Assistir no YouTube ${icon('external')}<span class="sr-only"> · abre em outra aba</span></a>${routeLink(item.practice,item.label,'text-link')}<a class="source-note" href="${item.source}" target="_blank" rel="noopener noreferrer">Fonte do professor <span class="sr-only"> · abre em outra aba</span></a></article>`).join('')}</div><aside class="tip-box">${icon('pen')}<p>As aulas são de professores e canais independentes. Os links selecionados são públicos; outros produtos dos canais podem ser pagos. ${routeLink('worksheets','Preparar suas folhas para estudar','text-link')}</p></aside>`;
+  const controller = new AbortController();
+  const first = videosFor('h-vowels')[0] || VIDEOS[0];
+  const card = video => `<li><button type="button" class="video-option" data-play-video="${video.id}"><img src="${videoThumbnail(video)}" alt="" width="96" height="54" loading="lazy"><span><strong>${esc(video.title)}</strong><small>${esc(CHANNELS[video.channel].name)} · ${video.minutes} min${CHANNELS[video.channel].lang === 'en' ? ' · em inglês' : ''}</small></span></button></li>`;
+  ctx.main.innerHTML = pageHeading('ASSISTA, ANOTE, EXPERIMENTE', 'Aulas gratuitas para acompanhar a trilha.', `${VIDEOS.length} aulas públicas no YouTube, quase todas em português, organizadas pelas lições do Maru. Assista um trecho e pratique logo em seguida.`) +
+    `<ol class="study-routine only-wide"><li><strong>1. Assista um trecho</strong><span>Uma família de letras por vez.</span></li><li><strong>2. Pause e escreva</strong><span>Copie no papel e diga o som.</span></li><li><strong>3. Teste a memória</strong><span>Faça a lição e jogue o Só mais um.</span></li></ol>
+    <div class="video-lessons-player">${videoPanelHTML([first], { eyebrow: 'ASSISTINDO AGORA', heading: 'Escolha uma aula na lista abaixo' })}</div>
+    <section class="video-channels"><h2>Os canais</h2><ul>${Object.entries(CHANNELS).map(([id, channel]) => `<li class="panel"><strong>${channel.name}</strong><span class="pill small-pill">${channel.lang === 'en' ? 'Em inglês' : 'Em português'}</span><p class="only-wide">${CHANNEL_NOTES[id]}</p><a class="text-link" href="${channel.url}" target="_blank" rel="noopener noreferrer">Abrir o canal ${icon('external')}<span class="sr-only"> · abre em outra aba</span></a></li>`).join('')}</ul></section>
+    <div class="video-modules">${MODULES.map(module => {
+      const lessons = module.lessons.filter(lesson => videosFor(lesson.id).length);
+      if (!lessons.length) return '';
+      return `<details class="video-module panel" ${module.id === 'hiragana' && wideScreen() ? 'open' : ''}><summary><span class="module-symbol ${module.color} jp" lang="ja">${module.number}</span><span><span class="eyebrow">ETAPA ${module.number}</span><strong>${module.title}</strong></span><small>${lessons.reduce((sum, lesson) => sum + videosFor(lesson.id).length, 0)} aulas</small>${icon('down')}</summary>${lessons.map(lesson => `<div class="video-lesson-group"><div class="video-lesson-group-head"><h3>${lesson.title}</h3>${routeLink('lesson/' + lesson.id, 'Fazer a lição ' + icon('arrow'), 'text-link')}</div><ul class="video-list">${videosFor(lesson.id).map(card).join('')}</ul></div>`).join('')}</details>`;
+    }).join('')}</div>
+    <aside class="tip-box only-wide">${icon('pen')}<p>As aulas são de professores e canais independentes, sem ligação com o Maru. Os vídeos são públicos; outros produtos dos canais podem ser pagos. O player só carrega quando você toca no play. ${routeLink('worksheets', 'Preparar folhas para estudar', 'text-link')}</p></aside>`;
+  bindVideos(ctx.main, controller.signal, () => ctx.audio.stop());
+  return () => controller.abort();
 }

@@ -1,0 +1,429 @@
+/* Trilha, lição, aulas em vídeo e o jogo "Só mais um". Carregado depois de themes/mobile.css:
+   usa os mesmos tokens do tema (papel, moldura, sombra deslocada) e vale para os dois modos. */
+
+/* Cor de cada etapa, como as linhas de um mapa de trem (路線図). */
+:root {
+  --line-start: #b5342a; --line-hiragana: #2f6b4f; --line-katakana: #6a4c93; --line-kanji: #9a7020;
+  --line-sentences: #1f5f8b; --line-particles: #b8572a; --line-everyday: #2b7a72; --line-casual: #8d3a68;
+}
+:root[data-theme="arcade"] {
+  --line-start: #ef6d4f; --line-hiragana: #74c29a; --line-katakana: #b49be0; --line-kanji: #e4b65e;
+  --line-sentences: #79b4e0; --line-particles: #f0955f; --line-everyday: #6cc9bc; --line-casual: #e08bb9;
+}
+.line-start { --line: var(--line-start); } .line-hiragana { --line: var(--line-hiragana); } .line-katakana { --line: var(--line-katakana); }
+.line-kanji { --line: var(--line-kanji); } .line-sentences { --line: var(--line-sentences); } .line-particles { --line: var(--line-particles); }
+.line-everyday { --line: var(--line-everyday); } .line-casual { --line: var(--line-casual); }
+
+/* ── Trilha ─────────────────────────────────────────────── */
+.trail-page { display: grid; gap: 22px; }
+.trail-page > .page-heading { margin-bottom: 0; }
+html[data-theme] .trail-next { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "mark copy action" "progress progress progress"; align-items: center; gap: 18px 24px; padding: 26px 28px; box-shadow: 5px 5px 0 var(--offset); }
+.trail-next-mark { grid-area: mark; display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; border: 1.5px solid var(--frame); font-family: var(--font-jp-serif); font-size: 40px; line-height: 1; }
+.trail-next-copy { grid-area: copy; min-width: 0; }
+.trail-next-copy h2 { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.15; margin: 6px 0 6px; }
+.trail-next-copy > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
+.trail-next > .btn { grid-area: action; }
+.trail-next-progress { grid-area: progress; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 14px; padding-top: 16px; border-top: 1.5px dashed var(--line); font-size: 13px; color: var(--muted); }
+.trail-next-progress strong { color: var(--ink); }
+.trail-chips { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; padding: 0; list-style: none; font-size: 12px; color: var(--muted); }
+.trail-chips > span { display: inline-flex; align-items: center; gap: 5px; }
+.trail-chips .icon { width: 14px; height: 14px; flex-basis: 14px; }
+
+/* Cartão da trilha na home. */
+html[data-theme] .trail-banner { display: flex; align-items: center; gap: 18px; margin: 0 0 18px; padding: 18px 22px; text-decoration: none; color: var(--ink); background: var(--surface); border: 1.5px solid var(--frame); border-left: 6px solid var(--line); border-radius: var(--radius); box-shadow: 3px 3px 0 var(--offset); }
+.trail-banner .trail-next-mark { width: 58px; height: 58px; font-size: 30px; flex: 0 0 auto; }
+.trail-banner-copy { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.trail-banner-copy strong { font-family: var(--font-display); font-size: 22px; font-weight: 400; line-height: 1.2; }
+.trail-banner-copy small { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.trail-banner-count { display: grid; justify-items: center; font-size: 12px; color: var(--muted); }
+.trail-banner-count strong { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--line); line-height: 1; }
+.trail-banner:hover .next-stop-go { transform: translateX(2px); }
+
+/* Mapa das etapas: estações ligadas por uma linha, rolagem lateral no celular. */
+.trail-map { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(104px, 1fr); gap: 0; overflow-x: auto; padding: 6px 2px 10px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.trail-map-stop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 0 6px; text-align: center; text-decoration: none; color: var(--ink); scroll-snap-align: start; }
+.trail-map-stop::before { content: ""; position: absolute; top: 22px; left: 0; right: 0; height: 4px; background: var(--line); opacity: .35; z-index: 0; }
+.trail-map-stop:first-child::before { left: 50%; } .trail-map-stop:last-child::before { right: 50%; }
+.trail-map-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--surface); border: 3px solid var(--line); font-family: var(--font-jp-serif); font-size: 21px; color: var(--line); transition: transform .2s ease; }
+.trail-map-dot .icon { width: 20px; height: 20px; }
+.trail-map-stop.is-done .trail-map-dot { background: var(--line); color: var(--paper); }
+.trail-map-stop.is-current .trail-map-dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--line) 22%, transparent); }
+.trail-map-label { font-size: 12px; font-weight: 650; line-height: 1.25; }
+.trail-map-stop small { font-size: 11px; color: var(--muted); }
+.trail-map-stop:hover .trail-map-dot { transform: translateY(-2px); }
+.trail-map-stop:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 2px; border-radius: 10px; }
+.trail-placement { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.trail-placement > .icon { width: 16px; height: 16px; color: var(--kin, var(--accent)); }
+
+/* Cada etapa: um painel que abre a linha com as estações (lições). */
+.trail-stations { display: grid; gap: 16px; }
+html[data-theme] .trail-station { background: var(--surface); border: 1.5px solid var(--frame); border-left: 6px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.trail-station > summary { list-style: none; display: flex; align-items: center; gap: 18px; padding: 20px 24px; cursor: pointer; }
+.trail-station > summary::-webkit-details-marker { display: none; }
+.trail-station > summary > .icon { flex: 0 0 18px; width: 18px; color: var(--muted); transition: transform .2s ease; }
+.trail-station[open] > summary > .icon { transform: rotate(180deg); }
+.trail-station-copy { flex: 1; min-width: 0; }
+.trail-station-copy h2 { font-size: 21px; margin: 4px 0 4px; }
+.trail-station-copy > p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.trail-station-copy .pill { margin-left: 8px; vertical-align: middle; letter-spacing: 0; }
+.trail-outcome { display: flex; gap: 6px; align-items: flex-start; margin-top: 6px; color: var(--ink) !important; }
+.trail-outcome .icon { flex: 0 0 15px; width: 15px; height: 15px; margin-top: 2px; color: var(--line); }
+.trail-station-count { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.trail-station-count strong { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--line); }
+
+/* A linha: um trilho vertical na cor da etapa e uma estação por lição. */
+.trail-line { position: relative; margin: 0; padding: 4px 24px 22px; list-style: none; }
+.trail-line::before { content: ""; position: absolute; top: 0; bottom: 34px; left: 47px; width: 5px; border-radius: 3px; background: var(--line); opacity: .3; }
+.trail-stop { position: relative; }
+html[data-theme] .trail-line .lesson-row { display: flex; align-items: center; gap: 16px; padding: 10px 10px 10px 0; border: 0; border-radius: 12px; color: var(--ink); text-decoration: none; background: transparent; }
+html[data-theme] .trail-line .lesson-row:hover { background: color-mix(in srgb, var(--line) 7%, transparent); }
+.trail-line .lesson-row > .icon { flex: 0 0 16px; width: 16px; color: var(--muted); margin-left: auto; }
+.trail-node { position: relative; z-index: 1; flex: 0 0 auto; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: var(--surface); border: 4px solid var(--line); font-size: 13px; font-weight: 750; color: var(--line); font-variant-numeric: tabular-nums; }
+.trail-node .icon { width: 22px; height: 22px; stroke-width: 2.4; }
+.trail-stop.is-done .trail-node { background: var(--line); color: var(--paper); }
+.trail-stop.is-next .trail-node { width: 58px; height: 58px; margin-inline: -4px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--line) 22%, transparent); }
+.trail-stop-copy { display: grid; gap: 3px; min-width: 0; }
+.trail-stop-copy > strong { font-size: 15px; font-weight: 650; line-height: 1.35; }
+.trail-stop-copy > small { font-size: 13px; color: var(--muted); line-height: 1.45; }
+.trail-stop-copy .trail-chips { margin-top: 2px; gap: 4px 8px; font-size: 11px; }
+.trail-stop-copy .trail-chips > span { display: inline-flex; align-items: center; gap: 4px; }
+html[data-theme] .here-pill { margin-left: 8px; background: var(--line); color: var(--paper); border: 0; font-size: 10px; letter-spacing: .04em; vertical-align: 2px; }
+html:not([data-motion="paused"]) .trail-stop.is-next .trail-node { animation: trail-pulse 2.4s ease-in-out infinite; }
+@keyframes trail-pulse { 50% { box-shadow: 0 0 0 11px color-mix(in srgb, var(--line) 8%, transparent); } }
+
+/* ── Lição ─────────────────────────────────────────────── */
+.lesson-body { display: grid; gap: 12px; margin: 14px 0 4px; font-size: 16px; line-height: 1.7; color: var(--ink); }
+.lesson-body p { margin: 0; }
+.lesson-body ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.lesson-body li { position: relative; padding-left: 22px; }
+.lesson-body li::before { content: "◆"; position: absolute; left: 2px; top: .1em; color: var(--accent); font-size: 11px; }
+.lesson-body + .examples-grid, .lesson-body + .kana-tiles { margin-top: 20px; }
+/* Palavras curtas cabem duas por linha, inclusive no celular. */
+html[data-theme] .examples-grid.is-compact { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+
+.lesson-intro { display: grid; gap: 20px; }
+.lesson-intro-top { display: flex; align-items: center; gap: 20px; }
+html[data-theme] .lesson-intro-mark { flex: 0 0 auto; display: grid; place-items: center; width: 92px; height: 92px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); font-family: var(--font-jp-serif); font-size: 50px; line-height: 1; box-shadow: 3px 3px 0 var(--offset); }
+.lesson-intro-top h2 { margin-top: 6px; font-size: clamp(20px, 2.4vw, 26px); line-height: 1.3; }
+.lesson-plan { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+html[data-theme] .lesson-plan li { display: flex; align-items: flex-start; gap: 10px; padding: 14px; border: 1.5px dashed var(--line); border-radius: 12px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.lesson-plan li strong { display: block; color: var(--ink); font-size: 14px; }
+.lesson-plan .icon { flex: 0 0 20px; width: 20px; height: 20px; color: var(--accent); margin-top: 1px; }
+.lesson-goal { font-size: 15px; line-height: 1.6; }
+.lesson-goal strong { color: var(--accent); }
+
+/* Cartões de kana: o caractere grande toca o som; embaixo, o som e a dica de memória. */
+.kana-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; margin-top: 22px; }
+html[data-theme] .kana-tile { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; padding: 14px; background: var(--surface); border: 1.5px solid var(--frame); border-radius: 14px; box-shadow: 3px 3px 0 var(--offset); }
+html[data-theme] .kana-tile-char { position: relative; display: grid; place-items: center; width: 88px; height: 96px; border: 1.5px solid var(--accent); border-radius: 10px; outline: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: -6px; background: var(--paper); color: var(--ink); cursor: pointer; }
+.kana-tile-char .jp { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: 54px; line-height: 1; }
+.kana-tile-speaker { position: absolute; right: 5px; bottom: 4px; color: var(--accent); }
+.kana-tile-speaker .icon { width: 14px; height: 14px; }
+.kana-tile-char:hover { border-color: var(--accent-hover); }
+.kana-tile-char:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 3px; }
+.kana-tile-char.is-playing { background: var(--accent-soft); }
+.kana-tile-body { display: grid; gap: 8px; min-width: 0; }
+.kana-tile-sound { display: grid; gap: 2px; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.kana-tile-sound strong { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--ink); line-height: 1.1; }
+html[data-theme] .kana-tile-reveal { justify-self: start; min-height: 32px; padding: 4px 12px; border: 1.5px dashed var(--accent); border-radius: 999px; background: transparent; color: var(--accent); font-weight: 650; cursor: pointer; }
+.kana-tile-hint { font-size: 13px; line-height: 1.5; }
+.kana-tile-hint > span { display: block; margin-bottom: 2px; font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--kin, var(--accent)); }
+.kana-tile-write { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 650; color: var(--accent); text-decoration: none; }
+.kana-tile-write .icon { width: 13px; height: 13px; }
+
+/* A dica do Maru: o selo do Maru falando, em vez de uma caixa genérica. */
+html[data-theme] .maru-tip { display: flex; gap: 12px; align-items: flex-start; margin-top: 22px; }
+.maru-tip > img { flex: 0 0 34px; margin-top: 2px; }
+html[data-theme] .maru-tip > div { position: relative; flex: 1; padding: 12px 16px; background: var(--accent-soft); border: 1.5px solid var(--frame); border-radius: 4px 14px 14px 14px; font-size: 14px; line-height: 1.55; }
+.maru-tip strong { display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.maru-tip p { margin: 0; }
+
+html[data-theme] .lesson-recap { margin-top: 24px; padding: 18px 20px; background: var(--paper); border: 1.5px solid var(--frame); border-radius: 12px; outline: 1.5px dashed var(--line); outline-offset: -7px; }
+.lesson-recap ul { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; counter-reset: recap; }
+.lesson-recap li { position: relative; padding-left: 32px; font-size: 15px; line-height: 1.5; counter-increment: recap; }
+html[data-theme] .lesson-recap li::before { content: counter(recap); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); font-size: 12px; font-weight: 750; }
+
+/* Próxima parada: o convite principal ao terminar a lição. */
+html[data-theme] .next-stop { display: flex; align-items: center; gap: 16px; width: min(100%, 520px); margin: 22px auto 0; padding: 16px 18px; text-align: left; text-decoration: none; color: var(--ink); background: var(--surface); border: 1.5px solid var(--frame); border-radius: 14px; box-shadow: 4px 4px 0 var(--accent); }
+.next-stop-copy { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.next-stop-copy strong { font-size: 17px; }
+.next-stop-copy small { color: var(--muted); font-size: 13px; line-height: 1.45; }
+html[data-theme] .next-stop-go { display: grid; place-items: center; flex: 0 0 42px; height: 42px; border-radius: 50%; background: var(--button-bg); color: var(--button-ink); }
+.next-stop:hover .next-stop-go { transform: translateX(2px); }
+.completion-actions { flex-wrap: wrap; justify-content: center; }
+
+/* ── Aula em vídeo ─────────────────────────────────────── */
+html[data-theme] .video-panel { display: grid; gap: 12px; padding: 18px; background: var(--paper); border: 1.5px solid var(--frame); border-radius: 14px; }
+.video-panel-head h3 { margin-top: 4px; font-size: 18px; }
+.video-stage { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
+html[data-theme] .video-poster, .video-frame { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1.5px solid var(--frame); border-radius: 10px; background: #0b1222; padding: 0; cursor: pointer; }
+.video-poster img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s var(--ease-out, ease); }
+.video-poster:hover img { transform: scale(1.03); }
+html[data-theme] .video-play { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--seal); color: var(--seal-ink); box-shadow: 3px 3px 0 #0b122266; }
+.video-play .icon { width: 24px; height: 24px; fill: currentColor; margin-left: 3px; }
+.video-length { position: absolute; right: 8px; bottom: 8px; padding: 2px 7px; border-radius: 6px; background: #0b1222cc; color: #fff; font-size: 11px; font-weight: 650; }
+.video-poster:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 3px; }
+.video-frame { cursor: auto; }
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-stage:has(.video-frame) { grid-template-columns: minmax(0, 1fr); }
+.video-caption { display: grid; gap: 4px; min-width: 0; }
+.video-caption strong { font-size: 16px; line-height: 1.35; }
+.video-caption span { font-size: 13px; color: var(--muted); }
+.video-caption a { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 650; color: var(--accent); }
+.video-caption a .icon { width: 13px; height: 13px; }
+.video-more > summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.video-more > summary::-webkit-details-marker { display: none; }
+.video-more > summary .icon { width: 14px; height: 14px; transition: transform .2s ease; }
+.video-more[open] > summary .icon { transform: rotate(180deg); }
+.video-more[open] > summary { margin-bottom: 6px; }
+.video-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+html[data-theme] .video-option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 64px; padding: 6px; text-align: left; background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; }
+.video-option:hover { border-color: var(--accent); }
+.video-option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.video-option img { flex: 0 0 auto; width: 84px; height: 47px; object-fit: cover; border-radius: 6px; }
+.video-option span { display: grid; gap: 2px; min-width: 0; }
+.video-option strong { font-size: 13px; line-height: 1.3; }
+.video-option small { font-size: 11px; color: var(--muted); }
+.video-credit { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* Página de aulas gratuitas. */
+.video-lessons-player { margin: 22px 0; }
+.video-channels h2, .video-modules { margin-top: 8px; }
+.video-channels ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; margin: 12px 0 24px; padding: 0; list-style: none; }
+.video-channels li { display: grid; gap: 6px; align-content: start; padding: 16px; }
+.video-channels li .pill { justify-self: start; }
+.video-channels li p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.video-modules { display: grid; gap: 12px; margin-bottom: 24px; }
+.video-module > summary { list-style: none; display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; }
+.video-module > summary::-webkit-details-marker { display: none; }
+.video-module > summary > span:nth-child(2) { display: grid; gap: 2px; flex: 1; }
+.video-module > summary small { color: var(--muted); }
+.video-module[open] > summary > .icon { transform: rotate(180deg); }
+.video-lesson-group { padding: 0 18px 18px; }
+.video-lesson-group-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 8px; }
+.video-lesson-group-head h3 { font-size: 15px; }
+
+/* ── Só mais um (renda) ────────────────────────────────── */
+.renda-how { display: grid; gap: 6px; margin: 16px 0 0; padding-left: 20px; text-align: left; font-size: 14px; line-height: 1.5; }
+#renda-range-field:not([hidden]) { display: contents; }
+.renda-from { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 13px; line-height: 1.5; }
+.renda-from .icon { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 2px; color: var(--accent); }
+html[data-theme] .renda-stage { display: grid; justify-items: center; gap: 18px; margin-top: 18px; padding: 26px 22px; background: var(--surface); border: 1.5px solid var(--frame); border-radius: var(--radius); box-shadow: 5px 5px 0 var(--offset); outline: 1.5px dashed var(--line); outline-offset: -9px; text-align: center; }
+.renda-prompt { display: grid; justify-items: center; gap: 6px; min-height: 140px; align-content: center; }
+.renda-prompt.is-glyph span { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: clamp(92px, 16vw, 132px); line-height: 1; }
+.renda-prompt.is-text span { font-family: var(--font-display); font-size: clamp(40px, 7vw, 60px); line-height: 1.1; }
+.renda-prompt small { font-size: 15px; color: var(--muted); }
+.renda-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: min(100%, 560px); }
+html[data-theme] .renda-choice { position: relative; display: grid; place-items: center; align-content: center; gap: 2px; min-height: 92px; padding: 14px 10px; background: var(--surface); color: var(--ink); border: 1.5px solid var(--accent); border-radius: 12px; outline: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); outline-offset: -6px; box-shadow: 3px 3px 0 var(--offset); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.renda-choice kbd { position: absolute; left: 10px; top: 7px; font: 700 10px var(--font-body); color: var(--accent); background: none; border: 0; }
+.renda-choice-main { font-size: 26px; font-weight: 650; line-height: 1.15; overflow-wrap: anywhere; }
+.renda-choice-main[lang="ja"] { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: 44px; font-weight: 400; }
+.renda-choice small { font-size: 12px; color: var(--muted); }
+html[data-theme] .renda-choice:hover:not(:disabled) { border-color: var(--accent-hover); }
+html[data-theme] .renda-choice:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 3px; }
+html[data-theme] .renda-choice:disabled { cursor: default; }
+html[data-theme] .renda-choice.is-right { background: var(--success-bg); border-color: var(--success); outline-color: color-mix(in srgb, var(--success) 55%, transparent); }
+html[data-theme] .renda-choice.is-right::after { content: "◎"; position: absolute; right: 9px; top: 5px; color: var(--accent); font-size: 22px; font-weight: 700; line-height: 1; }
+html[data-theme] .renda-choice.is-wrong { background: var(--accent-soft); }
+.renda-choice.is-out { opacity: .45; }
+html:not([data-motion="paused"]) .renda-choice { transition: transform .18s var(--ease-out, ease), background-color .15s ease, opacity .2s ease; }
+html:not([data-motion="paused"]) .renda-choice:active:not(:disabled) { transform: scale(.96); }
+html:not([data-motion="paused"]) .renda-choice.is-wrong { animation: renda-shake .32s ease; }
+@keyframes renda-shake { 25% { translate: -5px 0; } 75% { translate: 5px 0; } }
+.renda-feedback { width: min(100%, 560px); min-height: 34px; text-align: left; }
+.renda-hit { display: flex; justify-content: center; align-items: center; gap: 6px; color: var(--success); font-weight: 750; }
+.renda-hit .icon { width: 18px; height: 18px; }
+.renda-feedback .play-feedback { display: grid; gap: 10px; padding: 14px 16px; }
+.renda-hint { font-size: 14px; line-height: 1.5; }
+.renda-hint > span { display: block; margin-bottom: 2px; font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; color: var(--kin, var(--accent)); }
+.renda-answer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.renda-feedback .play-feedback .btn { justify-self: start; margin-top: 4px; }
+.renda-answer .audio-button { flex: 0 0 auto; margin-top: 0; }
+.renda-review ul { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.renda-review li { display: flex; align-items: center; gap: 14px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.renda-review li > span:nth-child(2) { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.renda-review small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.renda-review-char { flex: 0 0 auto; font-size: 34px; line-height: 1; width: 48px; text-align: center; }
+html[data-theme] .renda-review { padding: 20px; margin-bottom: 12px; }
+
+/* No Arcade e na home, o "Só mais um" ocupa a linha inteira, com a arte ao lado do texto. */
+@media (min-width: 601px) {
+  html[data-theme] .play-card.is-featured { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
+  html[data-theme] .play-card.is-featured .play-card-art { flex: 0 0 min(42%, 400px); height: auto; min-height: 200px; margin: 9px 0 9px 9px; }
+  html[data-theme] .play-card.is-featured .play-card-copy { justify-content: center; padding: 26px 32px; }
+  html[data-theme] .play-card.is-featured h3 { font-size: clamp(24px, 2.6vw, 32px); }
+  html[data-theme] .play-card.is-featured p { font-size: 15px; max-width: 46ch; }
+}
+
+/* ── Celular e tablet ──────────────────────────────────── */
+@media (max-width: 820px) {
+  .lesson-plan { grid-template-columns: minmax(0, 1fr); }
+  .video-stage { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .trail-page { gap: 16px; }
+  html[data-theme] .trail-next { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "mark copy" "action action" "progress progress"; padding: 18px 16px; gap: 14px; }
+  .trail-next-mark { width: 54px; height: 54px; font-size: 28px; }
+  .trail-next > .btn { width: 100%; justify-content: center; }
+  .trail-next-progress { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  html[data-theme] .trail-banner { gap: 12px; padding: 14px; }
+  .trail-banner .trail-next-mark { width: 46px; height: 46px; font-size: 24px; }
+  .trail-banner-count { display: none; }
+  .trail-banner-copy strong { font-size: 18px; }
+  .trail-map { grid-auto-columns: 92px; margin-inline: -16px; padding-inline: 16px; }
+  .trail-station > summary { gap: 12px; padding: 16px 14px; align-items: flex-start; }
+  .trail-station-copy h2 { font-size: 18px; }
+  .trail-station-count strong { font-size: 20px; }
+  html[data-theme] .trail-station .hanko { display: none; }
+  .trail-line { padding: 2px 10px 16px; }
+  .trail-line::before { left: 29px; }
+  .trail-node { width: 42px; height: 42px; border-width: 3px; font-size: 12px; }
+  .trail-stop.is-next .trail-node { width: 48px; height: 48px; margin-inline: -3px; }
+  html[data-theme] .trail-line .lesson-row { gap: 12px; padding: 8px 4px 8px 0; }
+  .trail-stop-copy > strong { font-size: 14px; }
+  .trail-stop-copy > small { font-size: 12px; }
+  html[data-theme] .here-pill { display: inline-flex; margin: 4px 0 0; }
+
+  .lesson-body { font-size: 15px; }
+  .lesson-intro-top { gap: 14px; }
+  html[data-theme] .lesson-intro-mark { width: 64px; height: 64px; font-size: 34px; }
+  html[data-theme] .kana-tile { grid-template-columns: 76px minmax(0, 1fr); padding: 12px; gap: 12px; }
+  html[data-theme] .kana-tile-char { width: 76px; height: 84px; }
+  .kana-tile-char .jp { font-size: 46px; }
+  html[data-theme] .video-panel { padding: 14px; }
+  html[data-theme] .next-stop { padding: 14px; }
+
+  html[data-theme] .renda-stage { padding: 20px 16px; gap: 14px; }
+  .renda-prompt { min-height: 116px; }
+  .renda-choices { gap: 10px; }
+  html[data-theme] .renda-choice { min-height: 84px; }
+  .renda-choice-main[lang="ja"] { font-size: 40px; }
+  .renda-choice-main { font-size: 22px; }
+}
+/* ── Celular: grade em vez de lista, para ver várias coisas de uma vez ── */
+@media (max-width: 600px) {
+  /* Jogos: dois por linha; o "Só mais um" ocupa a linha inteira. */
+  html[data-theme] .play-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .play-card, html[data-theme] .play-card:nth-child(n) { display: flex; flex-direction: column; grid-column: auto; }
+  html[data-theme] .play-card .play-card-art { flex: none; height: 92px; margin: 6px 6px 0; }
+  html[data-theme] .play-card .play-card-art img, html[data-theme] .play-card:nth-child(n+4) .play-card-art img { width: 66px; height: 66px; }
+  html[data-theme] .play-arrow { top: 5px; bottom: auto; }
+  html[data-theme] .play-card-copy { flex: 1; padding: 9px 10px 11px; }
+  html[data-theme] .play-subtitle { font-size: 10px; line-height: 1.3; }
+  html[data-theme] .play-card h3 { margin: 3px 0 4px; font-size: 15px; }
+  html[data-theme] .play-card p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; font-size: 12px; line-height: 1.4; }
+  html[data-theme] .play-card-meta { padding-top: 6px; font-size: 10px; }
+  html[data-theme] .play-card.is-featured { grid-column: 1 / -1; flex-direction: row; }
+  html[data-theme] .play-card.is-featured .play-card-art { flex: 0 0 38%; height: auto; min-height: 120px; margin: 6px 0 6px 6px; }
+  html[data-theme] .play-card.is-featured .play-card-copy { justify-content: center; padding: 12px 14px; }
+  html[data-theme] .play-card.is-featured p { -webkit-line-clamp: 3; }
+
+  /* Etapas fechadas: cartões compactos, dois por linha; a etapa aberta ocupa a linha toda. */
+  .trail-stations { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .trail-station[open] { grid-column: 1 / -1; }
+  html[data-theme] .trail-station:not([open]) { border-left-width: 1.5px; border-top: 5px solid var(--line); }
+  .trail-station:not([open]) > summary { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "symbol count" "copy copy"; align-items: center; gap: 8px; padding: 12px; }
+  .trail-station:not([open]) > summary > .module-symbol { grid-area: symbol; }
+  .trail-station:not([open]) .trail-station-count { grid-area: count; justify-self: end; }
+  .trail-station:not([open]) .trail-station-copy { grid-area: copy; }
+  .trail-station:not([open]) .trail-station-copy h2 { font-size: 15px; margin: 2px 0 0; }
+  .trail-station:not([open]) .trail-station-copy > p, .trail-station:not([open]) .trail-station-copy .pill, .trail-station:not([open]) > summary > .icon { display: none; }
+
+  /* Mapa das etapas: as oito de uma vez, em duas linhas. */
+  .trail-map { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 4px; overflow: visible; margin-inline: 0; padding: 4px 0; }
+  .trail-map-stop { padding: 0 2px; }
+  .trail-map-stop::before { display: none; }
+  .trail-map-dot { width: 40px; height: 40px; font-size: 18px; border-width: 2.5px; }
+  .trail-map-label { font-size: 10.5px; }
+
+  /* Estações: duas por linha, como bilhetes, com a cor da linha no topo. */
+  .trail-line { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 2px 10px 14px; }
+  .trail-line::before { display: none; }
+  html[data-theme] .trail-line .lesson-row { position: relative; flex-direction: column; align-items: flex-start; gap: 6px; height: 100%; padding: 10px; background: var(--paper); border: 1.5px solid var(--line); border-top-width: 4px; border-radius: 10px; }
+  html[data-theme] .trail-line .lesson-row:hover { background: var(--paper); }
+  .trail-line .lesson-row > .icon { display: none; }
+  .trail-node, .trail-stop.is-next .trail-node { width: 32px; height: 32px; margin: 0; border-width: 2.5px; font-size: 11px; }
+  .trail-node .icon { width: 16px; height: 16px; }
+  html[data-theme] .trail-stop.is-next .lesson-row { background: color-mix(in srgb, var(--line) 10%, var(--paper)); box-shadow: 3px 3px 0 var(--offset); }
+  .trail-stop-copy > strong { font-size: 13px; line-height: 1.3; }
+  .trail-stop-copy > small { display: none; }
+  .trail-stop-copy .trail-chips { gap: 2px 6px; font-size: 10px; }
+  html[data-theme] .here-pill { position: absolute; top: 12px; right: 8px; margin: 0; font-size: 9px; padding: 3px 6px; }
+
+  /* Plano da lição: três quadradinhos lado a lado. */
+  .lesson-plan { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  html[data-theme] .lesson-plan li { flex-direction: column; gap: 6px; padding: 10px 8px; font-size: 11px; }
+  .lesson-plan li strong { font-size: 12px; }
+
+  /* Cartões de kana: dois por linha, com o caractere em cima. */
+  .kana-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  html[data-theme] .kana-tile { grid-template-columns: minmax(0, 1fr); padding: 8px; gap: 8px; box-shadow: 2px 2px 0 var(--offset); }
+  html[data-theme] .kana-tile-char { width: 100%; height: 78px; }
+  .kana-tile-char .jp { font-size: 46px; }
+  .kana-tile-sound { gap: 0; font-size: 11px; }
+  .kana-tile-sound strong { font-size: 22px; }
+  .kana-tile-hint { font-size: 12px; line-height: 1.45; }
+  .kana-tile-hint > span { font-size: 9px; }
+
+  /* Consultar: os materiais em dois por linha. */
+  .hub-grid, .hub-section:first-child .hub-grid, .practice-hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .hub-card { padding: 12px; }
+  html[data-theme] .hub-card-symbol { width: 34px; height: 34px; margin-bottom: 8px; }
+  html[data-theme] :is(.hub-card h2, .hub-card h3) { font-size: 14px; line-height: 1.3; margin-bottom: 4px; }
+  html[data-theme] .hub-card p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; font-size: 12px; line-height: 1.45; }
+  html[data-theme] .hub-card-action { margin-top: auto; padding-top: 8px; font-size: 12px; width: 100%; }
+
+  /* Meu desempenho: dois por linha; o cartão aberto ocupa a linha toda. */
+  html[data-theme] .play-progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .play-progress-card { display: flex; flex-direction: column; padding: 12px; }
+  html[data-theme] .play-progress-card:has(details[open]) { grid-column: 1 / -1; }
+  html[data-theme] .play-progress-card > div { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+  html[data-theme] .play-progress-card img { grid-row: auto; width: 44px; height: 44px; }
+  html[data-theme] .play-progress-card h2 { font-size: 15px; line-height: 1.25; }
+  html[data-theme] .play-progress-card > div > span { font-size: 11px; line-height: 1.4; }
+  html[data-theme] .play-progress-card details { padding: 4px 0; font-size: 12px; }
+  html[data-theme] .play-progress-card summary { min-height: 40px; font-size: 12px; }
+  html[data-theme] .play-progress-card > .text-link { margin-top: auto; }
+
+  /* Aulas em vídeo e canais: dois por linha, com a miniatura em cima. */
+  .video-list, .video-channels ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-theme] .video-option { flex-direction: column; align-items: stretch; gap: 6px; min-height: 0; height: 100%; }
+  .video-option img { width: 100%; height: auto; aspect-ratio: 16 / 9; }
+  .video-option strong { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 12px; }
+  .video-channels li { padding: 12px; }
+  .video-channels li p { font-size: 12px; }
+  .video-lesson-group { padding: 0 12px 14px; }
+}
+
+/* ── Papel e lápis ──────────────────────────────────────── */
+/* O resumo e o botão de imprimir ficam numa barra presa ao pé da tela, inclusive sobre a prévia. */
+html[data-theme] .worksheet-print-bar { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 6; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding: 8px 8px 8px 18px; background: var(--surface); border: 1.5px solid var(--frame); border-radius: 999px; box-shadow: 0 10px 26px #0b122230, 3px 3px 0 var(--offset); }
+.worksheet-print-status { font-size: 13px; color: var(--muted); line-height: 1.4; }
+.worksheet-print-bar .btn { flex: 0 0 auto; }
+html[data-theme] .worksheet-toolbar { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+.worksheet-family-picker { display: none; }
+html[data-theme] .worksheet-family { display: grid; place-items: center; align-content: center; gap: 1px; aspect-ratio: 1; padding: 0; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; }
+.worksheet-family .jp { font-family: var(--font-jp-serif); font-size: 24px; line-height: 1; }
+.worksheet-family small { font-size: 9px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+html[data-theme] .worksheet-family[aria-pressed="true"] { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); box-shadow: 2px 2px 0 var(--offset); }
+.worksheet-family[aria-pressed="true"] small { color: var(--seal-ink); }
+.worksheet-family:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 2px; }
+@media (max-width: 600px) {
+  html[data-theme] .worksheet-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; padding: 14px; margin-bottom: 14px; }
+  html[data-theme] .worksheet-toolbar label { margin-bottom: 4px; font-size: 12px; }
+  html[data-theme] .worksheet-toolbar select { min-width: 0; min-height: 46px; padding-inline: 10px 28px; text-overflow: ellipsis; }
+  html[data-theme] #worksheet-family-control { display: none; }
+  .worksheet-family-picker:not([hidden]) { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  html[data-theme] .worksheet-selection { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 6px; padding: 10px; margin: 12px 0; max-height: 220px; }
+  html[data-theme] .worksheet-selection .worksheet-char { width: 100%; height: 46px; }
+  .worksheets-page .play-paused-note { font-size: 12px; }
+  .worksheets-page .tip-box { font-size: 12px; }
+  html[data-theme] .worksheet-print-bar { gap: 8px; padding: 8px 8px 8px 14px; border-radius: 18px; }
+  .worksheet-print-status { font-size: 12px; }
+  html[data-theme] .worksheet-print-bar .btn { min-height: 46px; padding-inline: 16px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-stop.is-next .trail-node, .renda-choice.is-wrong { animation: none !important; }
+}
+@media print { .video-panel, .trail-map { display: none !important; } }

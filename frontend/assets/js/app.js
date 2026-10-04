@@ -17,7 +17,7 @@ import { renderKana } from "./features/kana.js";
 import { renderWriting } from "./features/writing.js";
 import { renderKanji, renderParticles, renderExpressions, renderLibrary, renderReview, addToReview } from "./features/reference.js";
 import { renderSettings } from "./features/settings.js";
-import { emptyState, routeLink, setReaderMode } from "./core/ui.js";
+import { emptyState, routeLink, setReaderMode, wideScreen } from "./core/ui.js";
 import { hasKanaFoundation } from './core/beginner.js';
 import { getLesson } from '/shared/curriculum.js';
 import { applyTheme, syncMotion, toggleMotion, THEMES } from "./core/theme.js";
@@ -67,11 +67,17 @@ app.innerHTML = `
     <nav aria-label="Navegação principal"><p class="nav-label">SEU ESPAÇO</p>${NAVIGATION.map(({route, icon: symbol, title}) => `<a class="nav-link" href="#/${route}" data-nav="${route}">${icon(symbol)}<span>${title}</span>${route === "progress" ? '<span class="nav-count" id="review-count" hidden></span>' : ""}</a>`).join("")}</nav>
     <div class="sidebar-bottom"><p class="sidebar-mode-label">Seu ambiente</p><button class="text-link motion-control" type="button" data-motion-toggle aria-pressed="false">Pausar animações</button><a class="profile-link" href="#/settings" data-nav="settings"><span class="profile-avatar">M</span><span><strong>Meu ritmo</strong><small id="save-status">${statusLabels[status]}</small></span>${icon("settings")}</a></div>
   </aside>
-  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="theme-identity">Caderno Sumi-e</span><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><button class="icon-button" id="theme-toggle" type="button" data-theme-choice="arcade" aria-label="Ativar modo escuro"><span aria-hidden="true">☾</span></button><a href="#/account" class="topbar-avatar" aria-label="Entrar ou ver minha conta">${store.account.user ? "Minha conta" : "Entrar"}</a></div></header>
-  <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Arte: Irasutoya / Mifune Takashi · Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer></div>
+  <div class="app-body"><header class="topbar"><div class="topbar-location"><button class="icon-button menu-button" id="menu-button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">${icon("menu")}</button><a class="mobile-brand" href="#/home" aria-label="Maru, início"><img src="/assets/img/maru-mark.svg" alt="" width="24" height="24"><span>maru<span class="brand-period">.</span></span></a><a class="topbar-parent" id="current-parent" href="#/home">Início</a><span id="breadcrumb-divider">${icon("chevron")}</span><strong id="current-location">Início</strong></div><div class="topbar-stats"><span class="theme-identity">Caderno Sumi-e</span><span class="topbar-streak">${icon("fire")}<strong id="streak-count">0 dias</strong></span><span class="topbar-divider"></span><span class="xp-label">${icon("spark")}<strong id="xp-total">0 XP</strong></span><button class="icon-button" id="theme-toggle" type="button" data-theme-choice="arcade" aria-label="Ativar modo escuro"><span aria-hidden="true">☾</span></button><a href="#/account" class="topbar-avatar" aria-label="Entrar ou ver minha conta">${store.account.user ? "Minha conta" : "Entrar"}</a></div></header>
+  <div id="arcade-hud" class="arcade-only arcade-hud" aria-label="Seu nível de experiência"></div><main id="main" class="main-content" tabindex="-1"></main><footer class="app-footer"><a href="#/home">maru.</a><span>Aprender é abrir espaço para um novo mundo. <span class="voice-credit">Arte: Irasutoya / Mifune Takashi · Voz: VOICEVOX:ずんだもん</span></span><a href="#/library">Recursos & referências ${icon("external")}</a></footer>
+  <nav class="mobile-nav" aria-label="Navegação no celular">${NAVIGATION.filter(item => ["home", "journey", "practice", "explore"].includes(item.route)).map(({ route, icon: symbol, title }) => `<a class="mobile-nav-link" href="#/${route}" data-nav="${route}" aria-label="${title}">${icon(symbol)}<span>${{ home: "Início", journey: "Trilha", practice: "Jogar", explore: "Consultar" }[route]}</span></a>`).join("")}<a class="mobile-nav-link" href="#/settings" data-nav="settings">${icon("settings")}<span>Meu ritmo</span></a></nav></div>
 `;
 const main = document.querySelector("#main");
 const kanaInput = setupKanaInput(main, () => store.snapshot.preferences.kanaInput !== false);
+// Celular: o cartão aberto ocupa a linha inteira e pode descer uma linha; ele continua à vista.
+main.addEventListener("toggle", event => {
+  const card = event.target.open && event.target.closest?.(".word-card, .library-card, .expression-card, .particle-card, .concept-card, .kanji-card");
+  if (card && !wideScreen()) card.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}, true);
 let cleanup;
 let routeParams = null;
 const ctx = {
@@ -149,7 +155,7 @@ function render() {
   const views = {
     home: () => renderDashboard(ctx),
     practice: () => renderArcadeHub(ctx),
-    arcade: () => renderArcade(ctx, id),
+    arcade: () => renderArcade(ctx, id, params),
     daily: () => renderDaily(ctx),
     journey: () => renderJourney(ctx, id),
     lesson: () => renderLesson(ctx, id),

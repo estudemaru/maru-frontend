@@ -19,7 +19,9 @@ credenciais e persistência vivem no repositório `maru-backend`.
 | Camada | Responsabilidade |
 | --- | --- |
 | `shared/lessons/` | Texto das lições, exemplos, objetivos e perguntas. |
-| `shared/curriculum.js` | Ordem das oito etapas, índice de lições e referências. |
+| `shared/curriculum.js` | Ordem das oito etapas (lista de IDs por etapa), resultado de cada etapa e referências. |
+| `shared/videos.js` | Aulas do YouTube ligadas às lições, canais e URLs de miniatura e player. |
+| `shared/renda.js` | Regras do jogo "Só mais um": conjunto de caracteres, alternativas e chaves de revisão. |
 | `shared/catalog.js` | Combinações, kanji iniciais, partículas, expressões e frases. |
 | `shared/vocabulary.js`, `glossary.js`, `exercises.js` | Vocabulário inicial, conceitos e perguntas por tipo. |
 | `shared/pronunciation.js` | Texto e leitura correta das pronúncias aceitas pela API. |
@@ -68,8 +70,8 @@ a busca. Nenhuma rota de conteúdo foi removida.
 ## Telas
 
 - Dashboard: próximo passo, meta diária e acesso às práticas.
-- Journey: etapas expansíveis e estado de cada lição.
-- Lesson: leitura, perguntas explicadas e recuperação dos erros.
+- Journey: mapa de linhas de trem; próxima parada, as oito etapas e uma estação por lição.
+- Lesson: abertura com objetivo e vídeo, partes curtas, resumo, perguntas explicadas, jogo e próxima parada.
 - Kana: tabela, fileiras e configuração das rodadas.
 - Practice: rodada reutilizável, respostas e repetição dos erros.
 - Writing: modelos, animação e canvas.
@@ -362,7 +364,62 @@ cadastro, login, recuperação e troca de senha no Supabase Auth; o adaptador No
 local não oferece esses endpoints. O funcionamento público depende das URLs
 permitidas e do SMTP descritos na documentação de publicação do backend.
 
-`#/videos` usa links externos de professores, sem carregar players incorporados.
-Os links do 123 Japonês vêm de seu Linktree oficial; o vídeo e a playlist do
-Programa Japonês Online vêm da página de hiragana do professor. As referências
-ficam visíveis em cada cartão. `beginner.css` contém os layouts destas telas.
+`#/videos` lista as aulas de `shared/videos.js` por etapa e lição. As lições e a
+página usam `core/videos.js`: até o clique há só a miniatura (i.ytimg.com); o
+player `youtube-nocookie.com` entra no lugar dela quando a pessoa toca no play.
+Cada aula tem link para abrir no YouTube e crédito do canal. `trail.css` contém os
+layouts destas telas; `mobile-calm.css`, carregado logo depois, guarda os extras
+de todas as telas no celular (abaixo).
+
+
+## Trilha do zero (01/10/2026)
+
+A trilha foi reescrita para quem começa do zero, em linguagem simples. São 51
+lições: o hiragana passou de 6 para 14 lições (uma família por vez, com dica de
+memória para cada caractere) e o katakana de 5 para 8. Os IDs antigos foram
+mantidos, então o progresso de quem já estudava continua valendo; `h-rows` virou a
+revisão de K a H e `h-rest` fecha a tabela com わ, を e ん.
+
+- `features/journey.js`: mapa de linhas de trem. Cada etapa tem uma cor
+  (`--line-*` em `trail.css`), o mapa no topo leva a cada etapa e a próxima lição
+  mostra "Você está aqui". `trailBanner` leva a próxima parada para a home.
+- `features/lesson.js`: abertura (objetivo, plano da lição e vídeo), uma parte por
+  seção, resumo na última parte, perguntas, jogo e conclusão com a próxima parada.
+  Exemplos de um kana com dica viram cartões que tocam o som. A conclusão das
+  lições de kana e kanji oferece o "Só mais um" já limitado às letras vistas.
+- `features/renda.js` + `shared/renda.js`: "Só mais um" (renda, 連打). Quatro
+  botões grandes, só toque (ou teclas 1–4), avanço automático no acerto e a dica
+  de memória da lição no erro. As respostas entram na revisão espaçada como
+  `arcade:renda:<escrita>:<read|find>:<id>` (por caractere, não pela seleção da
+  tela) e os recordes como `arcade["renda:<escrita>:<letras>:<modo>:<segundos>"]`.
+  Não há campo novo no snapshot.
+- No celular (até 600 px), jogos, estações, etapas fechadas, cartões de kana,
+  aulas, Consultar e Meu desempenho ficam em grade de duas colunas.
+- O Livro 1 impresso continua com as 36 lições originais (`ONLINE_ONLY`).
+- Papel e lápis: o campo de atividade (uma opção só) fica oculto; no celular, os
+  campos ficam em duas colunas, a família vira uma grade de toque (o select segue
+  no desktop) e o resumo com o botão de imprimir fica numa barra presa ao pé da tela.
+
+### Celular só com o essencial (`mobile-calm.css`)
+
+No celular (até 600 px) cada tela mostra o que a pessoa precisa para agir: o
+título, a escolha e o botão. O resto fica a um toque ou só aparece em tela larga.
+No computador nada muda.
+
+- `.only-wide` marca no HTML o que é extra: avisos e dicas longas (`tip-box`,
+  `learning-intro`), explicações de regra dos jogos (o relógio do desafio, as
+  teclas 1–4), notas de rodapé e o painel "Sobre este espaço". Créditos exigidos
+  (VOICEVOX, JMdict) e as regras do karuta e do shiritori continuam visíveis.
+- `moreHTML(label, body)` (`core/ui.js`): no celular, os detalhes de um cartão
+  (frase de exemplo, contexto, "Adicionar à revisão") ficam num `<details>`
+  fechado; em tela larga o conteúdo sai direto no cartão, com o HTML de antes.
+  Usado em Primeiras palavras, Expressões, Biblioteca e Partículas. O glossário
+  segue a mesma ideia com o termo como resumo. O cartão aberto ocupa a linha
+  inteira da grade e continua à vista (`app.js`, ouvinte de `toggle`).
+- Cortes só por CSS: a paisagem da capa, os rótulos em maiúsculas sobre os
+  títulos, o mapa da trilha (as etapas logo abaixo já levam a cada uma), o plano
+  da lição (o botão "Começar a lição" sobe para antes do vídeo), a descrição dos
+  cartões de jogo, dos materiais e dos exercícios, e as descrições de tema e de
+  letra em Meu ritmo.
+- Grades: Palavras, Biblioteca, Partículas, Expressões e o glossário em duas
+  colunas; kanji em três.

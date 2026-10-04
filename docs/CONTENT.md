@@ -6,14 +6,40 @@ tradução. A progressão é recomendada, sem bloqueios artificiais.
 
 | Etapa | Lições | Resultado esperado |
 | --- | --- | --- |
-| Primeiros passos | 5 | Reconhecer as escritas, perceber sons e cumprimentar. |
-| Hiragana | 5 | Ler fileiras, marcas e combinações; iniciar escrita. |
-| Katakana | 4 | Reconhecer empréstimos, formas parecidas e vogais longas. |
-| Primeiros kanji | 4 | Relacionar significado, leitura em palavras e traços. |
+| Primeiros passos | 6 | Reconhecer as escritas, perceber sons e cumprimentar. |
+| Hiragana | 14 | Uma família por lição (あ, か, さ, た, な, は, revisão, ま, や/ら, わをん), depois ゛゜, combinações, palavras e uma cena. |
+| Katakana | 8 | Vogais e K; S/T; N/H; M a ン; formas parecidas; ー e sons adaptados; palavras e cena. |
+| Primeiros kanji | 4 | Significado e leituras, números, natureza e peças. |
 | Construir frases | 5 | Apresentar-se, perguntar, negar e expressar ações. |
 | Partículas | 4 | Identificar tópico, sujeito, objeto, lugar e relações. |
 | Dia a dia | 5 | Pedir itens, encontrar lugares e pedir ajuda na conversa. |
 | Além dos livros | 5 | Entender registro, gírias e expressões de comunidades. |
+
+## Voz das lições
+
+Escreva como quem explica para um amigo que nunca estudou japonês: frases curtas,
+"você", exemplos do dia a dia brasileiro e nenhum termo técnico sem explicação na
+mesma frase. Cada lição tem:
+
+- `hook`: uma frase que abre a lição e diz por que ela vale a pena (aparece na
+  abertura, no mapa da trilha e no cartão da home);
+- seções curtas; no `body`, cada linha vira um parágrafo e linhas que começam
+  com `• ` viram lista;
+- `recap`: duas ou três frases que fecham a leitura antes das perguntas.
+
+Nas lições de kana, cada caractere é um exemplo próprio com o som de referência em
+português (`pt`) e uma dica de memória autoral (`note`). Exemplos assim viram
+cartões grandes que tocam o som. As dicas fixam a forma; não explicam a origem do
+caractere. O jogo "Só mais um" reaproveita essas dicas quando a pessoa erra.
+
+## Aulas em vídeo
+
+`shared/videos.js` liga aulas públicas do YouTube às lições (campo `lessons`).
+Antes de incluir um vídeo, confira pelo oEmbed
+(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=ID&format=json`)
+que ele existe, aceita incorporação e pertence ao canal indicado. Aulas em
+português aparecem antes das em inglês. O player usa `youtube-nocookie.com` e só
+carrega depois do clique; até lá a página mostra apenas a miniatura.
 
 ## Critérios editoriais
 
@@ -37,11 +63,12 @@ fluência, boa caligrafia ou capacidade de manter conversações espontâneas.
 ## Acrescentar uma lição
 
 1. Adicione-a ao arquivo temático em shared/lessons, com ID estável.
-2. Inclua objetivo, duração, seções, exemplos e perguntas explicadas.
+2. Inclua objetivo, duração, seções, exemplos, perguntas explicadas, `hook` e `recap`.
 3. Defina o índice da resposta correta em cada pergunta.
 4. Para prática complementar, informe uma rota existente e parâmetros.
-5. A etapa em curriculum.js compõe índices, contagens e navegação.
-6. Execute as verificações e teste leitura e prática.
+5. Coloque o ID na lista da etapa em curriculum.js, na posição recomendada.
+6. Se houver aula em vídeo, ligue o ID dela em shared/videos.js.
+7. Execute as verificações e teste leitura e prática.
 
 IDs existentes são usados no progresso: renomeá-los exige migração.
 Ao ampliar a trilha, atualize as contagens nos testes e neste guia.
@@ -60,6 +87,9 @@ afiliação ou aprovação do Maru por essas organizações.
   limites e competências associadas aos níveis.
 - [KanjiVG](https://kanjivg.tagaini.net/):
   modelos de ordem dos traços, Ulrich Apel e colaboradores, CC BY-SA 3.0.
+
+As aulas em vídeo vêm dos canais 123 Japonês, Nihongando com Nanda, Programa
+Japonês Online e JapanesePod101 (em inglês). Não há afiliação com o Maru.
 
 Os 120 itens anteriores foram mantidos como consulta complementar. Suas
 etiquetas de nível são orientativas. Gírias e jargões variam por comunidade,
@@ -100,7 +130,9 @@ o gerador reúne o exemplo de cada família e seus blocos de escrita na mesma
 folha. As famílias com marcas apresentam seu próprio exemplo acima dos blocos.
 Não há mais uma página separada apenas para apresentar cada grupo.
 O sumário aponta para a primeira explicação de cada etapa.
-São sete etapas em kana, com 36 lições adaptadas do currículo. Exemplos,
+São sete etapas em kana, com 36 lições adaptadas do currículo. As lições de uma
+família de kana por vez (`h-ka`, `k-sata` etc.) existem só no curso online: o livro
+já intercala todas as famílias e as ignora (`ONLINE_ONLY` em `book-content.js`). Exemplos,
 instruções, alternativas e gabaritos usam hiragana e katakana, com leituras
 provenientes do conteúdo. O módulo de kanji do curso online é substituído no
 livro por uma introdução final a dez caracteres: 一・二・三・人・日・月・山・川・木・水.

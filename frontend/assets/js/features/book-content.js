@@ -11,10 +11,14 @@ import { furiganaSegments } from '../../../../shared/furigana.js';
 // retains its own modules and complete kanji catalogue.
 export const BOOK_KANJI = [...'一二三人日月山川木水'].map(char => BEGINNER_KANJI.find(item => item.char === char));
 export const BOOK_KANA_ORDER = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', 'ha', 'ba', 'pa', 'ma', 'ya', 'ra', 'wa'];
+// The online journey later split hiragana and katakana into one lesson per row; the
+// printed book already interleaves every family, so it keeps its original lessons.
+const ONLINE_ONLY = new Set(['h-ka', 'h-sa', 'h-ta', 'h-na', 'h-ha', 'h-ma', 'h-yara', 'h-dakuten', 'k-sata', 'k-naha', 'k-mawa']);
+const flat = text => String(text || '').replace(/\n• /g, ' · ').replace(/\n/g, ' ');
 export const BOOK_MODULES = MODULES.filter(module => module.id !== 'kanji').map((module, index) => ({
   ...module, number: String(index + 1).padStart(2, '0'),
-  lessons: module.lessons.map(source => {
-    const lesson = { ...source, sections: source.sections.map((section, index) => ({ ...section, body: BOOK_NOTES[source.id]?.[index] || section.body })) };
+  lessons: module.lessons.filter(source => !ONLINE_ONLY.has(source.id)).map(source => {
+    const lesson = { ...source, sections: source.sections.map((section, index) => ({ ...section, body: BOOK_NOTES[source.id]?.[index] || flat(section.body) })) };
     if (lesson.id !== 'welcome') return interleaveKanaLesson(lesson);
     return { ...lesson, goal: 'Começar pelos sons, pelo hiragana e pelo katakana.', sections: lesson.sections.map((section, index) => {
       if (index === 1) return { ...section, title: 'Primeiro, hiragana e katakana', examples: section.examples.slice(0, 2), tip: 'Aprenda os sons com calma. Romaji é um apoio de leitura em letras latinas.' };

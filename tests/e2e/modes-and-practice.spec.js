@@ -56,7 +56,8 @@ test("palette and motion preferences persist",async({page})=>{
   await page.getByRole('button',{name:'Ativar modo claro',exact:true}).click();
   await expect(page.locator('html')).toHaveCSS('color-scheme','light');
   await expect(page.locator(".play-hero h1")).toHaveCSS("font-family", /Shippori Mincho/);
-  await expect(page.locator(".book-scene")).toBeVisible();
+  // No celular a paisagem da capa sai da frente; os jogos sobem para perto do topo.
+  await expect(page.locator(".book-scene")).toBeHidden();
   await expect(page.locator('#toast')).toContainText('Estilo Sumi-e ativado');
   await page.locator('#toast').evaluate(el => { el.hidden = true; });
   await page.screenshot({path:'test-results/sumi-book-mobile.png',fullPage:true});

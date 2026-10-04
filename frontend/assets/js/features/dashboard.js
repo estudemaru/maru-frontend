@@ -1,5 +1,4 @@
-import { activeReviews } from '/shared/arcade.js';
-import { gameCards } from './arcade.js';
+import { GAMES } from '/shared/arcade.js';
 import { dailyBanner } from './daily.js';
 import { nextLesson } from '/shared/learningPath.js';
 import { esc, icon, routeLink } from '../core/ui.js';
@@ -14,6 +13,22 @@ const HERO_BADGE = `<span class="hero-badge"><svg viewBox="0 0 100 100"><defs><p
 
 export function renderDashboard(ctx) {
   const next = nextLesson(ctx.progress);
-  const attempts = activeReviews(ctx.progress.reviews).reduce((sum, [, item]) => sum + item.attempts, 0);
-  ctx.main.innerHTML = `<div class="play-page"><section class="play-hero"><div class="play-hero-copy"><span class="world-label"><span class="world-label-mark" aria-hidden="true">ま</span>UM CADERNO PARA O SEU JAPONÊS</span><h1 tabindex="-1"><span class="hero-line">Um traço.</span> <em class="hero-line">Um novo começo.</em></h1><p>Entre uma página e outra, seu japonês cresce. Leia, escreva e descubra. Um pouquinho por dia.</p><div class="play-actions">${routeLink('arcade/pictures', 'Começar a jogar ' + icon('arrow'), 'btn btn-primary')}${routeLink(next ? 'lesson/' + next.id : 'journey', next && Object.keys(ctx.progress.lessons).length ? 'Continuar a trilha ↗' : 'Aprender do zero na trilha ↗', 'text-link')}</div><div class="play-hero-foot"><span>むりなく、たのしく。</span><small>Sem pressa. Com vontade.</small></div></div><div class="play-hero-art"><div class="book-scene" aria-hidden="true">${HERO_BADGE}${HERO_SCENE}<span class="book-vertical" lang="ja">日々の、ひと筆。</span><span class="book-seal" lang="ja">まる</span></div><span class="hero-petals" aria-hidden="true">${'<i></i>'.repeat(8)}</span><span class="play-art-caption">今日も、ちょっとずつ。<small>Hoje também, um pouquinho.</small></span></div></section>${dailyBanner(ctx.progress)}<section class="play-games"><div class="play-section-title"><div><p class="eyebrow">ESCOLHA SUA PRÓXIMA DESCOBERTA</p><h2>As páginas de hoje.</h2></div><span class="play-tag">∞ Sem pressa <span> / </span> ◷ Contra o tempo</span></div><div class="play-grid">${gameCards()}</div></section><section class="play-bottom"><a class="play-paper-link" href="#/worksheets">${icon('pen')}<div><h2>Prefere lápis e papel?</h2><p>Folhas de repetição para treinar sua escrita.</p></div><span aria-hidden="true">↗</span></a><div class="play-small-note"><strong>${attempts ? `${attempts} tentativas. Cada uma conta.` : 'Comece pequeno. Volte quando quiser.'}</strong><p>${ctx.account.user ? `Bom ter você aqui, ${esc(ctx.account.user.name)}.` : 'Jogue sem cadastro ou crie uma conta para levar seu progresso com você.'}</p>${!ctx.account.user ? routeLink('account', 'Criar minha conta →', 'text-link') : ''}</div></section><p class="play-paused-note">Na trilha, cada lição termina num jogo. Trilhas temáticas e atividades impressas seguem em pausa; as folhas de repetição continuam disponíveis.</p></div>`;
+  const started = Object.values(ctx.progress.lessons).some(lesson => lesson.completedAt);
+  const startLabel = next ? started ? 'Continuar minha trilha' : 'Começar minha trilha' : 'Rever minha trilha';
+  const games = GAMES.filter(game => ['renda', 'pictures'].includes(game.id));
+  ctx.main.innerHTML = `<div class="play-page home-page">
+    <section class="play-hero">
+      <div class="play-hero-copy">
+        <h1 tabindex="-1"><span class="hero-line">Um traço.</span> <em class="hero-line">Um novo começo.</em></h1>
+        <p>Um pouquinho de japonês. No seu ritmo.</p>
+        <div class="play-actions">${routeLink(next ? 'lesson/' + next.id : 'journey', startLabel + icon('arrow'), 'btn btn-primary home-start')}</div>
+      </div>
+      <div class="play-hero-art" aria-hidden="true"><div class="book-scene">${HERO_BADGE}${HERO_SCENE}</div><span class="hero-petals">${'<i></i>'.repeat(8)}</span></div>
+    </section>
+    <section class="play-games" aria-labelledby="home-practice-title">
+      <div class="play-section-title"><h2 id="home-practice-title">Para praticar.</h2>${routeLink('practice', 'Ver todos ' + icon('arrow'), 'text-link home-all-games', 'aria-label="Ver todos os jogos"')}</div>
+      <div class="play-grid">${games.map(game => `<a class="play-card home-game ${game.color}" href="#/arcade/${game.id}"><div class="play-card-art"><img src="/assets/img/irasutoya-${game.image}.png" width="96" height="96" alt=""><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.id === 'renda' ? 'Kana com um toque' : 'Palavras por imagens'}</span><h3>${esc(game.title)}</h3></div></a>`).join('')}</div>
+    </section>
+    ${dailyBanner(ctx.progress)}
+  </div>`;
 }

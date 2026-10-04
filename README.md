@@ -6,11 +6,13 @@ O Maru organiza o estudo em uma trilha clara e acolhedora: a pessoa aprende o al
 
 ## O que a interface oferece
 
-- 40 lições distribuídas em 8 etapas, do primeiro contato a conversas cotidianas;
+- 51 lições curtas em 8 etapas, do primeiro contato a conversas cotidianas, com o hiragana e o katakana ensinados uma família por vez, com dicas de memória;
+- trilha em forma de mapa de linhas de trem: cada lição abre com o objetivo e uma aula em vídeo, segue em partes curtas, fecha com um resumo, perguntas e um jogo;
 - hiragana, katakana, kanji, vocabulário, partículas e construção de frases;
 - jogos curtos de escrita e escuta com 15, 30 ou 60 segundos por tentativa, modo sem tempo e indicação do que revisar;
+- Só mais um (renda), treino de kana e kanji só com toque, pensado para o celular;
 - prática de escrita com ordem dos traços, áudio e revisão espaçada;
-- aulas gratuitas no YouTube, incluindo o 123 Japonês, com sugestões de prática no papel;
+- mais de 100 aulas gratuitas no YouTube (123 Japonês, Nihongando com Nanda, Programa Japonês Online e JapanesePod101) ligadas às lições, com player que só carrega após o clique;
 - folhas A4 por família, começando pelas vogais, ou por seleção livre de caracteres; modelos de traços e opções colorida e preto e branco de alto contraste;
 - atividades A4 de associação entre imagens e palavras, diálogos para completar e perguntas de compreensão, separadas ou em um pacote, com gabarito opcional;
 - Livro 1 colorido para imprimir, com sumário paginado, 36 lições em kana, atividades e gabaritos; uma introdução a dez kanji básicos aparece somente na última parte;

@@ -14,6 +14,24 @@ export const audioButton = (text, label = "Ouvir pronúncia") => `<button type="
 export const IRASUTOYA_CREDIT = "Ilustração: Mifune Takashi / Irasutoya · www.irasutoya.com";
 export const irasutoyaImg = (slug, alt) => `<img class="example-art" src="/assets/img/irasutoya-${slug}.png" alt="${esc(alt)}" width="96" height="96" loading="lazy"><small class="art-credit">${IRASUTOYA_CREDIT}</small>`;
 export const exampleHTML = (example, romaji = true) => `<div class="example">${example.image ? irasutoyaImg(example.image, example.pt) : ""}<div class="example-line"><span class="jp" lang="ja">${jpHTML(example.jp, example.reading)}</span>${audioButton(example.jp)}</div>${romaji ? `<p class="romaji">${esc(example.romaji)}</p>` : ""}<p class="translation">${esc(example.pt)}</p>${example.note ? `<p class="example-note">${esc(beginnerText(example.note))}</p>` : ""}</div>`;
+// Texto das lições: cada linha vira um parágrafo e linhas que começam com "• " viram lista.
+// O conteúdo é autoral (shared/lessons), como o resto do texto das lições.
+export function richText(text) {
+  const blocks = [];
+  let items = [];
+  const flush = () => { if (items.length) blocks.push(`<ul>${items.join("")}</ul>`); items = []; };
+  for (const line of String(text || "").split("\n")) {
+    if (line.startsWith("• ")) { items.push(`<li>${line.slice(2)}</li>`); continue; }
+    flush();
+    if (line.trim()) blocks.push(`<p>${line}</p>`);
+  }
+  flush();
+  return blocks.join("");
+}
+// Detalhe que o celular guarda atrás de um toque. Em tela larga o conteúdo sai direto no
+// cartão, como sempre; no celular fica num <details> fechado, com o resumo como botão.
+export const wideScreen = () => matchMedia("(min-width: 601px)").matches;
+export const moreHTML = (label, body) => !body || wideScreen() ? body : `<details class="card-more"><summary>${label}${icon("down")}</summary><div class="card-more-body">${body}</div></details>`;
 export const emptyState = (title, body, action = "") => `<div class="empty-state"><div class="empty-symbol" lang="ja">空</div><h2>${title}</h2><p>${body}</p>${action}</div>`;
 export function shuffle(items) {
   const result = items.slice();

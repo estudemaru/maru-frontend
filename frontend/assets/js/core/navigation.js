@@ -19,7 +19,7 @@ export const RESOURCE_GROUPS = [
   { id: "materials", title: "Materiais de apoio", description: "Tire dúvidas, conheça outras fontes e leve a escrita para o papel." }
 ];
 const ALL_RESOURCES = [
-  { route: "videos", group: "materials", icon: "volume", title: "Aulas gratuitas", description: "Vídeos em português do 123 Japonês e de outros professores, com prática depois de assistir.", keywords: "youtube aula video online professor 123 japones", color: "sage" },
+  { route: "videos", group: "materials", icon: "volume", title: "Aulas gratuitas", description: "Mais de 100 aulas no YouTube, do 123 Japonês, Nihongando com Nanda, JapanesePod101 e outros, organizadas pelas lições.", keywords: "youtube aula video online professor 123 japones nanda nihongando japanesepod101 101 programa japones online", color: "sage" },
   { route: "kana", group: "basics", icon: "あ", title: "Hiragana e katakana", description: "As duas tabelas de kana, com sons, combinações e prática.", keywords: "alfabeto vogais silabas letras leitura", color: "sage" },
   { route: "kanji", group: "basics", icon: "日", title: "Primeiros kanji", description: "Significados, leituras e exemplos dos seus primeiros caracteres.", keywords: "ideogramas simbolos", color: "sand" },
   { route: "vocabulary", group: "basics", icon: "book", title: "Primeiras palavras", description: "Vocabulário do cotidiano com pronúncia e frases de exemplo.", keywords: "vocabulario dicionario", color: "sky" },
@@ -39,6 +39,7 @@ const pages = [
   ...PRACTICE_TOOLS.map(item => ({ ...item, section: "practice" })),
   ...RESOURCES.map(item => ({ ...item, section: "explore" })),
   { route: "lesson", title: "Lição", section: "journey" },
+  { route: "review", title: "Minha revisão", section: "progress" },
   { route: "package", title: "Pacote de estudo", section: "teacher" },
   { route: "placement", title: "Encontre seu começo", section: "journey" },
   { route: "settings", title: "Meu ritmo", section: "settings" },

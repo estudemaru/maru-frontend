@@ -17,6 +17,7 @@ test('shiritori chains words, explains invalid moves and records the best chain'
   // Maru sorteia as respostas: com uma semente fixa, a partida é sempre a mesma.
   await page.addInitScript(() => { let seed = 42; Math.random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646; });
   await page.goto('/#/home');
+  await page.getByRole('link', { name: 'Ver todos os jogos' }).click();
   await page.locator('.play-card.is-wide').click();
   await expect(page.locator('.play-setup h1')).toHaveText('Palavra puxa palavra');
   await page.getByRole('button', { name: 'Vamos jogar' }).click();
