@@ -63,6 +63,66 @@ test('a kana lesson opens with its goal and video, teaches with tiles and ends w
   await expect(page.locator('[data-lesson="next"]')).toHaveText(/Praticar o que aprendi/);
 });
 
+test('kana cards switch by touch, keyboard and swipe without losing their sound or memory hint', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#/settings');
+  await page.locator('#setting-romaji').uncheck();
+  await page.goto('/#/lesson/h-vowels');
+  await page.locator('[data-lesson="next"]').click();
+  await expect(page.locator('.lesson-stages [aria-current="step"]')).toHaveText('Aprender');
+  await expect(page.locator('.kana-deck-position')).toHaveText('1 de 5');
+  await expect(page.locator('.kana-tile').first().locator('.kana-tile-sound strong')).toHaveCount(0);
+  await page.locator('[data-reveal="a"]').click();
+  await expect(page.locator('.kana-tile').first().locator('.kana-tile-sound strong')).toHaveText('a');
+  await page.locator('[data-kana-card="3"]').click();
+  await expect(page.locator('.kana-deck-position')).toHaveText('4 de 5');
+  await expect(page.locator('.kana-tile').nth(3).locator('.kana-tile-char')).toBeInViewport();
+  await expect(page.locator('.kana-tile').nth(3)).toContainText('Dica de memória');
+  await expect(page.locator('.kana-tile').nth(3).locator('.kana-tile-char')).toHaveAttribute('data-speak', 'え');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('[data-kana-card="4"]')).toBeFocused();
+  await expect(page.locator('[data-kana-card="4"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Home');
+  await expect(page.locator('.kana-deck-position')).toHaveText('1 de 5');
+  await page.locator('.kana-tiles').evaluate(deck => { deck.scrollLeft = deck.children[2].offsetLeft; });
+  await expect(page.locator('[data-kana-card="2"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.kana-deck-position')).toHaveText('3 de 5');
+  expect(await fits(page)).toBe(true);
+  await page.locator('[data-lesson="next"]').click();
+  await page.locator('[data-lesson="back"]').click();
+  await expect(page.locator('.kana-deck-position')).toHaveText('1 de 5');
+  await page.locator('[data-kana-card="4"]').click();
+  await expect(page.locator('.kana-deck-position')).toHaveText('5 de 5');
+});
+
+test('lesson stages and answer feedback follow mistakes, a retry and completion on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const lesson = getLesson('h-vowels');
+  await page.goto('/#/lesson/h-vowels');
+  for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();
+  await expect(page.locator('.lesson-stages [aria-current="step"]')).toHaveText('Praticar');
+  await expect(page.locator('.lesson-question-mark')).toHaveText('あ');
+  const wrong = (lesson.quiz[0].answer + 1) % lesson.quiz[0].choices.length;
+  await page.locator(`input[name="answer"][value="${wrong}"]`).check();
+  await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
+  await expect(page.locator('.answer-option.is-wrong')).toHaveCount(1);
+  await expect(page.locator('.answer-option.is-correct')).toHaveCount(1);
+  await expect(page.locator('.feedback.retry')).toContainText(lesson.quiz[0].explanation);
+  await page.locator('[data-lesson="question-next"]').click();
+  for (const question of [...lesson.quiz.slice(1), lesson.quiz[0]]) {
+    await page.locator(`input[name="answer"][value="${question.answer}"]`).check();
+    await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
+    await expect(page.locator('.feedback.success')).toContainText('Isso mesmo!');
+    await page.locator('[data-lesson="question-next"]').click();
+  }
+  await expect(page.locator('.lesson-stages [aria-current="step"]')).toHaveText('Jogar');
+  await page.getByRole('button', { name: 'Pular o jogo' }).click();
+  await expect(page.locator('.lesson-stages .is-done')).toHaveCount(3);
+  await expect(page.locator('#xp-total')).toHaveText('30 XP');
+  expect(await fits(page)).toBe(true);
+});
+
 for (const theme of ['dojo', 'arcade']) {
   test(`mobile lessons keep reading and quiz actions reachable in ${theme}`, async ({ page }) => {
     const errors = []; page.on('pageerror', error => errors.push(error.message));
