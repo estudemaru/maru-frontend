@@ -39,6 +39,7 @@ const pages = [
   ...PRACTICE_TOOLS.map(item => ({ ...item, section: "practice" })),
   ...RESOURCES.map(item => ({ ...item, section: "explore" })),
   { route: "lesson", title: "Lição", section: "journey" },
+  { route: "review", title: "Minha revisão", section: "progress" },
   { route: "package", title: "Pacote de estudo", section: "teacher" },
   { route: "placement", title: "Encontre seu começo", section: "journey" },
   { route: "settings", title: "Meu ritmo", section: "settings" },

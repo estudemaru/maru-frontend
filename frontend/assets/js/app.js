@@ -17,7 +17,7 @@ import { renderKana } from "./features/kana.js";
 import { renderWriting } from "./features/writing.js";
 import { renderKanji, renderParticles, renderExpressions, renderLibrary, renderReview, addToReview } from "./features/reference.js";
 import { renderSettings } from "./features/settings.js";
-import { emptyState, routeLink, setReaderMode } from "./core/ui.js";
+import { emptyState, routeLink, setReaderMode, wideScreen } from "./core/ui.js";
 import { hasKanaFoundation } from './core/beginner.js';
 import { getLesson } from '/shared/curriculum.js';
 import { applyTheme, syncMotion, toggleMotion, THEMES } from "./core/theme.js";
@@ -72,6 +72,11 @@ app.innerHTML = `
 `;
 const main = document.querySelector("#main");
 const kanaInput = setupKanaInput(main, () => store.snapshot.preferences.kanaInput !== false);
+// Celular: o cartão aberto ocupa a linha inteira e pode descer uma linha; ele continua à vista.
+main.addEventListener("toggle", event => {
+  const card = event.target.open && event.target.closest?.(".word-card, .library-card, .expression-card, .particle-card, .concept-card, .kanji-card");
+  if (card && !wideScreen()) card.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}, true);
 let cleanup;
 let routeParams = null;
 const ctx = {

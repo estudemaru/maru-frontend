@@ -26,7 +26,7 @@ export function renderChallenge(ctx, initial = 'hiragana') {
       <label ${mode==='sentences'?'hidden':''}>Família<select class="text-input" name="family">${KANA_ROWS.filter(row=>row.id!=='n').map(row=>`<option value="${row.id}" ${family===row.id?'selected':''}>${row.id==='a'?'Vogais · a, i, u, e, o':row.id==='wa'?'WA, WO e N':row.id.toUpperCase()}</option>`).join('')}<option value="all" ${family==='all'?'selected':''}>Todas · para revisar</option></select></label>
       <label>Tempo por tentativa<select class="text-input" name="seconds">${[[0,'Sem tempo · aprender'],[15,'15 segundos'],[30,'30 segundos'],[60,'60 segundos']].map(([value,label])=>`<option value="${value}" ${seconds===value?'selected':''}>${label}</option>`).join('')}</select></label></div>
       <p>Se o tempo acabar, você perde aquela tentativa e recebe a resposta para estudar. Seus acertos anteriores continuam salvos.</p><button class="btn btn-primary" type="submit">Começar rodada ${icon('arrow')}</button></form>
-      <aside class="tip-box">${icon('pen')}<p>Depois da rodada, escreva os caracteres difíceis no papel e leia em voz alta. ${routeLink('worksheets','Preparar uma folha de escrita','text-link')}</p></aside>`;
+      <aside class="tip-box only-wide">${icon('pen')}<p>Depois da rodada, escreva os caracteres difíceis no papel e leia em voz alta. ${routeLink('worksheets','Preparar uma folha de escrita','text-link')}</p></aside>`;
   }
   function finish(result) {
     if (!result) return;
