@@ -45,6 +45,8 @@ test('a kana lesson opens with its goal and video, teaches with tiles and ends w
   await expect(page.locator('[data-lesson="next"]')).toBeInViewport();
   // O player só aparece depois do toque, no domínio sem cookies do YouTube.
   await expect(page.locator('.video-panel iframe')).toHaveCount(0);
+  await expect(page.locator('.video-poster')).toBeHidden();
+  await page.locator('.lesson-video > summary').click();
   await page.locator('.video-poster').click();
   await expect(page.locator('.video-panel iframe')).toHaveAttribute('src', new RegExp(`youtube-nocookie\\.com/embed/${videosFor('h-vowels')[0].id}`));
   // As outras aulas ficam recolhidas no celular.
@@ -60,6 +62,69 @@ test('a kana lesson opens with its goal and video, teaches with tiles and ends w
   await expect(page.locator('.lesson-recap li')).toHaveCount(lesson.recap.length);
   await expect(page.locator('[data-lesson="next"]')).toHaveText(/Praticar o que aprendi/);
 });
+
+for (const theme of ['dojo', 'arcade']) {
+  test(`mobile lessons keep reading and quiz actions reachable in ${theme}`, async ({ page }) => {
+    const errors = []; page.on('pageerror', error => errors.push(error.message));
+    const lesson = getLesson('h-vowels');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/#/journey');
+    if (theme === 'arcade') await page.locator('#theme-toggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+
+    const reachable = async button => {
+      await expect(button).toBeInViewport();
+      await expect.poll(() => button.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return element.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+      })).toBe(true);
+      expect(await fits(page)).toBe(true);
+    };
+
+    for (const width of [320, 390, 768, 820]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/#/journey');
+      await reachable(page.locator('.trail-stop.is-next .lesson-row'));
+      await page.locator('#etapa-hiragana > summary').click();
+      await expect(page.locator('.trail-station[open]')).toHaveCount(1);
+      await page.goto('/#/lesson/h-vowels');
+      await expect(page.locator('.lesson-video')).not.toHaveAttribute('open', '');
+      await reachable(page.locator('[data-lesson="next"]'));
+      await page.locator('[data-lesson="next"]').click();
+      if (await page.locator('#toast').isVisible()) {
+        const toast = await page.locator('#toast').boundingBox();
+        const controls = await page.locator('.lesson-controls').boundingBox();
+        expect(toast.y + toast.height).toBeLessThanOrEqual(controls.y);
+      }
+      await reachable(page.locator('[data-lesson="next"]'));
+      await page.locator('.kana-tile').last().scrollIntoViewIfNeeded();
+      await reachable(page.locator('[data-lesson="next"]'));
+      await page.locator('[data-lesson="next"]').click();
+      await page.locator('[data-lesson="next"]').click();
+      await reachable(page.getByRole('button', { name: 'Verificar resposta', exact: true }));
+    }
+
+    await page.setViewportSize({ width: 320, height: 844 });
+    for (const question of lesson.quiz) {
+      await page.locator(`input[name="answer"][value="${question.answer}"]`).check();
+      await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
+      await reachable(page.locator('[data-lesson="question-next"]'));
+      await page.locator('[data-lesson="question-next"]').click();
+    }
+    await page.getByRole('button', { name: 'Pular o jogo' }).click();
+    await expect(page.locator('.completion')).toContainText('+30 XP');
+    await expect(page.locator('.next-stop')).toHaveAttribute('href', '#/lesson/h-ka');
+    await expect(page.locator('#xp-total')).toHaveText('30 XP');
+    expect(await fits(page)).toBe(true);
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.reload();
+    await expect(page.locator('.video-poster')).toBeVisible();
+    await expect(page.locator('.lesson-plan')).toBeVisible();
+    await expect(page.locator('.lesson-video > summary')).toBeHidden();
+    expect(errors).toEqual([]);
+  });
+}
 
 test('Só mais um plays by touch on a phone, gives the memory hint on a miss and saves reviews', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));

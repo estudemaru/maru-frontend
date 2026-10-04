@@ -56,7 +56,8 @@ export function renderLesson(ctx, id) {
   const position = `ETAPA ${module.number} · LIÇÃO ${String(lesson.index + 1).padStart(2, "0")} DE ${String(module.lessons.length).padStart(2, "0")}`;
   const shell = content => {
     const progress = step >= DONE ? 100 : (step + (step === QUIZ ? questionIndex / queue.length : 0)) / DONE * 100;
-    ctx.main.innerHTML = `<div class="lesson-reader">${routeLink("journey/" + lesson.moduleId, icon("back") + lesson.moduleTitle, "back-link")}<div class="lesson-reader-head"><div><p class="eyebrow">${position}</p><h1 tabindex="-1">${lesson.title}</h1></div><span class="pill">${icon("clock")} ${lesson.minutes} min</span></div>${progressBar(progress, "Progresso da lição")}<div class="lesson-content panel">${content}</div></div>`;
+    const phase = step === 0 ? "intro" : step <= SECTIONS ? "reading" : step === QUIZ ? "quiz" : step === GAME ? "game" : "done";
+    ctx.main.innerHTML = `<div class="lesson-reader" data-lesson-phase="${phase}">${routeLink("journey/" + lesson.moduleId, icon("back") + lesson.moduleTitle, "back-link")}<div class="lesson-reader-head"><div><p class="eyebrow">${position}</p><h1 tabindex="-1">${lesson.title}</h1></div><span class="pill">${icon("clock")} ${lesson.minutes} min</span></div>${progressBar(progress, "Progresso da lição")}<div class="lesson-content panel">${content}</div></div>`;
   };
   const recapHTML = () => source.recap.length ? `<aside class="lesson-recap"><p class="eyebrow">RESUMINDO</p><ul>${source.recap.map(item => `<li>${esc(beginnerText(item))}</li>`).join("")}</ul></aside>` : "";
   function intro() {
@@ -64,7 +65,7 @@ export function renderLesson(ctx, id) {
     shell(`<div class="lesson-intro"><div class="lesson-intro-top"><span class="lesson-intro-mark jp" lang="ja" aria-hidden="true">${mark}</span><div><span class="step-label">ANTES DE COMEÇAR</span><h2 data-focus tabindex="-1">${esc(lesson.hook)}</h2></div></div>
       <ul class="lesson-plan"><li>${icon("book")}<span><strong>${SECTIONS} ${SECTIONS === 1 ? "parte curta" : "partes curtas"}</strong> para ler e ouvir</span></li><li>${icon("check")}<span><strong>${lesson.quiz.length} perguntas</strong> com explicação</span></li><li>${icon("target")}<span><strong>Jogo: ${game}</strong> com os exemplos da lição</span></li></ul>
       <p class="lesson-goal"><strong>No fim, você vai</strong> ${esc(lesson.goal.charAt(0).toLowerCase() + lesson.goal.slice(1))}</p>
-      ${videoPanelHTML(videos)}
+      ${videos.length ? `<details class="lesson-video"${matchMedia("(min-width: 821px)").matches ? " open" : ""}><summary>${icon("play")}<span>Vídeo de apoio<small>Opcional · veja quando quiser</small></span>${icon("down")}</summary>${videoPanelHTML(videos)}</details>` : ""}
       <div class="lesson-controls"><span class="small muted">${videos.length ? "O vídeo é opcional: dá para ir direto à leitura." : "Leia, ouça e experimente."}</span><button class="btn btn-primary" data-lesson="next">Começar a lição ${icon("arrow")}</button></div></div>`);
   }
   function section(index) {
