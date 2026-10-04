@@ -1,6 +1,7 @@
 import { lessonGame, LESSON_GAME_KINDS } from '/shared/lessonGame.js';
 import { esc, icon } from '../core/ui.js';
 import { createVoiceGate } from './voice.js';
+import { lessonArt } from './lessonScenes.js';
 
 // O jogo que fecha cada lição. Vive dentro da lição e avisa o fim por onFinish({ correct, total }).
 // Se a voz falhar, a pessoa pode continuar lendo: nenhuma rodada depende só do áudio.
@@ -32,7 +33,7 @@ export function mountLessonGame(ctx, container, lesson, onFinish) {
 
   function draw() {
     if (index < 0) {
-      container.innerHTML = `<div class="lesson-game-intro"><span class="step-label">HORA DO JOGO</span><h2 data-focus tabindex="-1">${LESSON_GAME_KINDS[kind]}</h2><p>${kind === 'listen' ? 'O Maru lê um exemplo desta lição. Pegue a carta certa na mesa.' : 'Veja um exemplo desta lição e escolha como ele se lê.'} São ${game.rounds.length} rodadas, sem relógio.</p>${kind === 'listen' ? '<p class="muted small">Ligue o som. Se a voz não estiver disponível, dá para continuar lendo.</p>' : ''}<div class="lesson-controls"><button class="btn btn-ghost" type="button" data-game="skip">Pular o jogo</button><button class="btn btn-primary" type="button" data-game="start">Começar o jogo ${icon('arrow')}</button></div></div>`;
+      container.innerHTML = `<div class="lesson-game-intro"><div class="lesson-scene"><div class="lesson-scene-copy"><span class="step-label">HORA DO JOGO</span><h2 data-focus tabindex="-1">${LESSON_GAME_KINDS[kind]}</h2></div>${lessonArt()}</div><p>${kind === 'listen' ? 'O Maru lê um exemplo desta lição. Pegue a carta certa na mesa.' : 'Veja um exemplo desta lição e escolha como ele se lê.'} São ${game.rounds.length} rodadas, sem relógio.</p>${kind === 'listen' ? '<p class="muted small">Ligue o som. Se a voz não estiver disponível, dá para continuar lendo.</p>' : ''}<div class="lesson-controls"><button class="btn btn-ghost" type="button" data-game="skip">Pular o jogo</button><button class="btn btn-primary" type="button" data-game="start">Começar o jogo ${icon('arrow')}</button></div></div>`;
       return;
     }
     const { target, cards } = round();
