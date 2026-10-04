@@ -138,7 +138,7 @@ test("mobile navigation works with keyboard and browser history", async ({ page 
   await go(page);
   await page.locator("#menu-button").click();
   await expect(page.locator("#menu-button")).toHaveAttribute("aria-expanded", "true");
-  await page.locator('[data-nav="explore"]').click();
+  await page.locator('#sidebar [data-nav="explore"]').click();
   await page.locator('.hub-card[href="#/kana"]').click();
   await expect(page.locator("h1")).toHaveText("Cada símbolo tem um som.");
   await expect(page.locator("#menu-button")).toHaveAttribute("aria-expanded", "false");

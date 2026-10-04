@@ -39,3 +39,33 @@ test('mobile navigation traps focus and closes with Escape',async({page})=>{
     await expect(page.locator('#menu-button')).toBeFocused();
   }
 });
+
+test('phone tabs navigate between sections, retain lesson context and give the keyboard room', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/home');
+  const tabs = page.getByRole('navigation', { name: 'Navegação no celular' });
+  await expect(tabs).toBeVisible();
+  await expect(tabs.locator('[data-nav="home"]')).toHaveAttribute('aria-current', 'page');
+  await tabs.getByRole('link', { name: 'Minha trilha' }).click();
+  await expect(page).toHaveURL(/#\/journey$/);
+  await expect(tabs.locator('[data-nav="journey"]')).toHaveAttribute('aria-current', 'page');
+  await page.locator('.trail-line .lesson-row').first().click();
+  await expect(page).toHaveURL(/#\/lesson\//);
+  await expect(tabs.locator('[data-nav="journey"]')).toHaveAttribute('aria-current', 'location');
+  await tabs.getByRole('link', { name: 'Consultar' }).click();
+  await expect(page.locator('#resource-search')).toBeVisible();
+  await tabs.getByRole('link', { name: 'Meu ritmo' }).click();
+  await expect(page.locator('.theme-options')).toBeVisible();
+  await tabs.getByRole('link', { name: 'Arcade' }).click();
+  await page.locator('.play-card[href="#/arcade/pictures"]').click();
+  await expect(tabs.locator('[data-nav="practice"]')).toHaveAttribute('aria-current', 'location');
+  await page.getByRole('button', { name: 'Vamos jogar' }).click();
+  await page.locator('#arcade-answer').focus();
+  await expect(tabs).toBeHidden();
+  await page.locator('#arcade-answer').evaluate(input => input.blur());
+  await expect(tabs).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(tabs).toBeHidden();
+  await expect(page.locator('.mobile-brand')).toBeHidden();
+  await expect(page.locator('.sidebar')).toBeVisible();
+});

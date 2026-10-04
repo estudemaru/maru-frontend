@@ -1,211 +1,341 @@
-/* Celular (até 600 px): a escala final de tamanhos e espaços dos dois temas. As folhas anteriores empilham
-   tamanhos de desktop e de temas passados (responsive.css, play.css, interface.css, sumi-*.css); aqui o
-   celular ganha uma escala só, mais compacta:
-   - títulos de página com 26 px (a capa fica em wagara.css), de painel com 17–18 px e de cartão com 16–17 px;
-   - texto corrido com 14 px e entrelinha 1,6; rótulos em maiúsculas com 11 px; nada abaixo de 10 px;
-   - painéis e cartões com 16 px de respiro; botões e campos com 44 px de altura;
-   - campos de texto mantêm 16 px de letra, para o iPhone não dar zoom ao focar.
-   Carregado depois de wagara.css. */
+/* Escala mobile dos dois temas. Última camada de tela: as escolhas de conteúdo
+   de mobile-calm.css vêm antes; as regras de impressão vêm depois. */
+.mobile-brand, .mobile-nav { display: none; }
+
+@media (max-width: 820px) {
+  :root[data-theme] {
+    --mobile-nav-height: 66px;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --frame: color-mix(in srgb, var(--ink) 20%, transparent);
+    --offset: transparent;
+    --pattern-page: .009;
+    --pattern-art: .065;
+  }
+  html { scroll-padding-top: 76px; scroll-padding-bottom: calc(var(--mobile-nav-height) + 16px + env(safe-area-inset-bottom)); }
+  html[data-theme] .app-body { padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)); }
+  html[data-theme] .topbar {
+    position: sticky; top: 0; z-index: 30; flex: 0 0 auto;
+    height: calc(56px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+    gap: 12px; border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  }
+  html[data-theme] .topbar-location { gap: 8px; min-width: 0; }
+  html[data-theme] .topbar-location > :is(.topbar-parent, #breadcrumb-divider, #current-location) { display: none; }
+  html[data-theme] .menu-button { width: 40px; height: 44px; color: var(--muted); }
+  .mobile-brand { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--ink); }
+  .mobile-brand > span { font-family: var(--font-display); font-size: 25px; line-height: 1; letter-spacing: -1px; }
+  .mobile-brand .brand-period { color: var(--accent); }
+  .mobile-brand img { width: 23px; height: 23px; }
+  html[data-theme] .topbar-stats { gap: 6px; }
+  html[data-theme] :is(.theme-identity, .topbar-streak, .topbar-divider, .xp-label) { display: none; }
+  html[data-theme] #theme-toggle { width: 44px; height: 44px; border: 0; background: transparent; font-size: 22px; }
+  html[data-theme] .topbar-avatar { min-height: 36px; height: auto; padding: 7px 13px; font-size: 12px; line-height: 1.4; border: 1px solid var(--frame); }
+  html[data-theme] .main-content { max-width: 760px; padding: 22px max(20px, env(safe-area-inset-right)) 28px max(20px, env(safe-area-inset-left)); }
+  .mobile-nav {
+    position: fixed; inset: auto 0 0; z-index: 35;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    min-height: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+    padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    box-shadow: 0 -4px 24px #00000006;
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  }
+  .mobile-nav-link {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; min-height: 52px; min-width: 0; border-radius: 12px;
+    color: var(--muted); font-size: 10px; font-weight: 600; line-height: 1.4;
+  }
+  .mobile-nav-link .icon { width: 20px; height: 20px; flex-basis: 20px; }
+  .mobile-nav-link.is-active { background: var(--accent-soft); color: var(--accent); }
+  .mobile-nav-link:active { background: var(--surface-soft); }
+  .mobile-nav-link:focus-visible { outline-offset: -3px; }
+  /* O teclado tem prioridade durante uma resposta digitada. */
+  body:has(.play-session :is(input, textarea):focus) .mobile-nav { display: none; }
+  html[data-theme] .toast { bottom: calc(var(--mobile-nav-height) + 12px + env(safe-area-inset-bottom)); border-radius: 12px; font-size: 13px; }
+  html[data-theme] .sidebar { width: min(300px, calc(100vw - 48px)); padding: max(24px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom)); }
+  html[data-theme] .sidebar-brand { padding-bottom: 22px; margin-bottom: 20px; }
+  html[data-theme] .sidebar .nav-link { min-height: 48px; padding: 12px 14px; font-size: 14px; }
+  html[data-theme] .sidebar .profile-link { padding-block: 16px; }
+  html[data-theme] .app-footer { margin-inline: 20px; padding: 18px 0 22px; gap: 8px 12px; border-top: 1px solid var(--line); font-size: 11px; }
+  html[data-theme] .app-footer::before { display: none; }
+  html[data-theme] .app-footer > span { font-size: 10px; line-height: 1.7; }
+  html[data-theme] .btn { min-height: 44px; padding: 10px 16px; border-radius: 12px; font-size: 13px; line-height: 1.4; box-shadow: none; }
+  html[data-theme] .btn-primary:hover:not(:disabled) { box-shadow: none; }
+  html[data-theme] .btn-primary:active:not(:disabled) { translate: 0 1px; box-shadow: none; }
+  html[data-theme] .btn-primary .icon { width: 18px; height: 18px; flex-basis: 18px; padding: 0; background: none; color: inherit; }
+  html[data-theme] .text-input { min-height: 44px; font-size: 16px; border-width: 1px; }
+  html[data-theme] :is(.panel, .play-card, .play-setup, .play-question, .lesson-content, .play-results-stats, .explore-controls) { border-width: 1px; border-radius: var(--radius); box-shadow: none; }
+  /* Os modelos A4 ainda sem escala ficam contidos enquanto a prévia carrega. */
+  html[data-theme] .worksheet-preview { position: relative; min-width: 0; }
+}
+
 @media (max-width: 600px) {
-  /* Moldura: topo, margens e rodapé. */
-  html[data-theme] .topbar { height: 56px; }
-  html[data-theme] #theme-toggle { width: 40px; height: 40px; font-size: 20px; }
-  html[data-theme] .topbar-avatar { height: auto; min-height: 40px; padding-inline: 14px; }
-  html[data-theme] .main-content { padding: 18px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left)); }
-  html[data-theme] .app-footer { margin-inline: 16px; }
-
-  /* Cabeçalhos de página. */
-  html[data-theme] .play-heading { padding: 6px 0 18px; }
-  html[data-theme] .page-heading { margin-bottom: 18px; padding-bottom: 16px; }
-  html[data-theme] .page-heading .eyebrow { margin-bottom: 8px; }
-  html[data-theme] :is(.play-heading, .page-heading) h1 { font-size: 26px; line-height: 1.2; }
-  html[data-theme] .play-heading h1 { margin: 10px 0 8px; }
-  html[data-theme] :is(.page-description, .play-heading > p:last-child) { margin-top: 8px; font-size: 14px; line-height: 1.6; }
-  html[data-theme] .lesson-reader-head { margin-bottom: 16px; }
-  html[data-theme] .lesson-reader-head h1 { font-size: 22px; }
-
-  /* Controles: 44 px de altura; o botão principal da capa não ocupa a linha inteira. */
-  html[data-theme] .btn { min-height: 44px; padding-inline: 18px; }
-  html[data-theme] .btn-primary .icon { width: 20px; height: 20px; }
-  html[data-theme] .text-input { min-height: 44px; }
-  html[data-theme] .kana-mode { flex-basis: 44px; width: 44px; min-height: 44px; }
-  html[data-theme] .play-hero .play-actions .btn { flex: 0 0 auto; }
-
-  /* Texto corrido: sem palavra sozinha na última linha, onde o navegador permite. */
+  html[data-theme] .main-content { padding: 20px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left)); }
+  html[data-theme] .app-footer { margin-inline: 16px; flex-wrap: wrap; }
+  html[data-theme] .app-footer > a:last-child { margin-left: 0; width: 100%; min-height: 32px; display: flex; align-items: center; }
+  html[data-theme] .page-heading { gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  html[data-theme] .play-heading { padding: 0 0 16px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+  html[data-theme] :is(.page-heading, .play-heading)::after { display: none; }
+  html[data-theme] :is(.play-heading, .page-heading) h1 { font-size: 25px; line-height: 1.2; margin: 0; text-wrap: pretty; }
+  html[data-theme] :is(.page-description, .play-heading > p:last-child) { margin-top: 8px; font-size: 13px; line-height: 1.6; }
+  html[data-theme] :is(.page-heading, .play-heading) .eyebrow { display: none; }
+  html[data-theme] :is(.page-heading, .play-heading) > .btn { padding-inline: 12px; }
+  html[data-theme] :is(.eyebrow, .world-label, .play-tag, .step-label) { font-size: 10px; }
+  html[data-theme] :is(.pill, .pill.light, .lesson-reader-head .pill) { font-size: 10px; }
+  html[data-theme] :is(.back-link, .play-session-heading > .text-link) { min-height: 40px; align-items: center; font-size: 12px; }
+  html[data-theme] .back-link { margin-bottom: 12px; }
   html[data-theme] :is(.play-hero-copy > p, .page-description, .play-heading > p:last-child, .play-card p, .hub-card p) { text-wrap: pretty; }
-  html[data-theme] :is(.account-panel > p, .settings-panel > p, .setting-row p, .hub-card p, .play-setup-intro p:last-child, .play-setup-form > p, .play-progress-card details p) { line-height: 1.6; }
-  html[data-theme] :is(.account-panel > p:not(.eyebrow), .settings-panel > p.muted) { font-size: 14px; margin-block: 10px; }
-  html[data-theme] :is(.settings-panel, .account-panel) > h2 { font-size: 18px; margin-bottom: 12px; }
-  html[data-theme] .source-note { margin-top: 18px; }
-  html[data-theme] .account-panel .source-note { padding-top: 16px; }
 
-  /* Seção de jogos: título e cartões em lista, com a arte em miniatura. */
-  html[data-theme] .play-section-title { padding-top: 20px; margin-bottom: 14px; gap: 8px; }
-  html[data-theme] .play-section-title h2 { font-size: 22px; margin-top: 4px; }
-  html[data-theme] .play-grid { gap: 12px; }
-  html[data-theme] .play-card { grid-template-columns: 78px minmax(0, 1fr); box-shadow: 3px 3px 0 var(--offset); }
-  html[data-theme] .play-card .play-card-art { margin: 6px; border-radius: 8px; }
-  html[data-theme] .play-card .play-card-art img { width: 52px; height: 62px; }
-  html[data-theme] .play-number { left: 5px; top: 5px; width: 22px; height: 22px; }
-  html[data-theme] .play-arrow { right: 5px; bottom: 5px; width: 22px; height: 22px; font-size: 12px; }
-  html[data-theme] .play-card-copy { padding: 11px 12px 12px 4px; }
-  html[data-theme] .play-card h3 { margin: 2px 0 4px; font-size: 17px; line-height: 1.25; }
-  html[data-theme] .play-card p { margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
-  html[data-theme] .play-card-meta { padding-top: 8px; gap: 3px 6px; }
-
-  /* Fim da home. */
-  html[data-theme] .play-bottom { gap: 12px; margin: 28px 0 16px; }
-  html[data-theme] .play-paper-link { gap: 14px; padding: 14px 16px; }
-  html[data-theme] .play-paper-link > .icon { width: 40px; height: 40px; padding: 10px; }
-  html[data-theme] .play-paper-link h2 { font-size: 17px; }
-  html[data-theme] :is(.play-paper-link p, .play-small-note p) { font-size: 13px; line-height: 1.5; }
-  html[data-theme] .play-small-note { padding: 16px; }
+  /* Início: introdução curta, seguida pelas ações e pelos jogos. */
+  html[data-theme] .play-hero { min-height: 0; grid-template-columns: minmax(0, 1fr); padding: 0 0 18px; gap: 0; }
+  html[data-theme] .play-hero::after { display: none; }
+  html[data-theme] :is(.play-hero-art, .play-hero-foot, .play-hero .world-label) { display: none; }
+  html[data-theme] .play-hero h1 { font-size: clamp(27px, 7.4vw, 31px); line-height: 1.12; margin: 0 0 12px; }
+  html[data-theme] .play-hero h1 em::after { height: .07em; opacity: .35; }
+  html[data-theme] .play-hero-copy > p { max-width: 40ch; font-size: 13px; line-height: 1.6; }
+  html[data-theme] .play-hero .play-actions { margin-top: 16px; gap: 10px; }
+  html[data-theme] .play-hero .play-actions .btn { flex: 0 0 auto; }
+  html[data-theme] .play-hero .play-actions .text-link { display: none; }
+  html[data-theme] .trail-banner { gap: 10px; padding: 12px; margin: 0 0 12px; border-width: 1px; border-left-width: 3px; box-shadow: none; }
+  html[data-theme] .play-hero + .trail-banner { margin-top: 0; }
+  html[data-theme] .trail-banner .trail-next-mark { width: 36px; height: 36px; font-size: 21px; }
+  html[data-theme] .trail-banner-copy { gap: 3px; }
+  html[data-theme] .trail-banner-copy .eyebrow { font-size: 9px; letter-spacing: .12em; }
+  html[data-theme] .trail-banner-copy strong { font-size: 16px; line-height: 1.25; }
+  html[data-theme] .trail-banner-copy small { display: none; }
+  html[data-theme] .trail-banner .next-stop-go { flex-basis: 30px; height: 30px; }
+  html[data-theme] .trail-banner .next-stop-go .icon { width: 16px; height: 16px; }
+  html[data-theme] .play-daily {
+    grid-template-columns: 42px minmax(0, 1fr) 30px;
+    grid-template-areas: "cal date go" "cal copy go";
+    column-gap: 10px; row-gap: 3px; align-items: center;
+    padding: 12px; margin: 0 0 8px; border: 1px solid var(--frame); border-radius: 14px; box-shadow: none;
+  }
+  html[data-theme] .daily-cal { width: 42px; padding-bottom: 5px; border-width: 1px; box-shadow: none; }
+  html[data-theme] .daily-cal::before { display: none; }
+  html[data-theme] .daily-cal-month { padding: 5px 0 3px; font-size: 10px; letter-spacing: .1em; }
+  html[data-theme] .daily-cal b { margin-top: 3px; font-size: 22px; }
+  html[data-theme] .daily-cal-weekday { display: none; }
+  html[data-theme] .play-daily.is-done .daily-cal::after { width: 30px; height: 30px; border-width: 1px; font-size: 15px; }
+  html[data-theme] .play-daily-date { padding: 0; border: 0; }
+  html[data-theme] .play-daily-date small { padding: 0; background: none; color: var(--accent); font-size: 9px; line-height: 1.4; letter-spacing: .1em; }
+  html[data-theme] .play-daily-date strong { display: none; }
+  html[data-theme] .play-daily-copy strong { font-size: 14px; line-height: 1.3; }
+  html[data-theme] .play-daily-copy > span { display: none; }
+  html[data-theme] .play-daily-go { justify-self: end; margin: 0; width: 30px; height: 30px; padding: 0; border: 0; background: var(--accent-soft); color: var(--accent); font-size: 0; }
+  html[data-theme] .play-daily-go .icon { width: 16px; height: 16px; }
+  html[data-theme] .play-section-title { padding-top: 16px; margin-bottom: 12px; gap: 8px; }
+  html[data-theme] .play-section-title .eyebrow { display: none; }
+  html[data-theme] .play-section-title h2 { margin: 0; font-size: 21px; }
+  html[data-theme] .play-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-theme] .play-card, html[data-theme] .play-card:nth-child(n) { display: flex; flex-direction: column; grid-column: auto; min-width: 0; }
+  html[data-theme] .play-card .play-card-art { flex: none; height: 76px; margin: 6px 6px 0; border: 0; border-radius: 9px; }
+  html[data-theme] .play-card .play-card-art img, html[data-theme] .play-card:nth-child(n+4) .play-card-art img { width: 58px; height: 58px; }
+  html[data-theme] .play-number { top: 5px; left: 5px; width: 18px; height: 18px; font-size: 9px; }
+  html[data-theme] .play-arrow { top: 5px; right: 5px; width: 20px; height: 20px; font-size: 12px; }
+  html[data-theme] .play-card-copy { flex: 1; min-width: 0; padding: 9px 10px 12px; }
+  html[data-theme] .play-subtitle { font-size: 10px; line-height: 1.4; letter-spacing: .025em; }
+  html[data-theme] .play-card h3 { margin: 4px 0 0; font-size: 16px; line-height: 1.2; }
+  html[data-theme] .play-card:not(.is-featured) :is(p, .play-card-meta) { display: none; }
+  html[data-theme] .play-card.is-featured { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
+  html[data-theme] .play-card.is-featured .play-card-art { flex: 0 0 88px; height: auto; min-height: 92px; margin: 6px 0 6px 6px; }
+  html[data-theme] .play-card.is-featured .play-card-copy { padding: 12px; justify-content: center; }
+  html[data-theme] .play-card.is-featured p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 5px 0 0; font-size: 12px; line-height: 1.5; }
+  html[data-theme] .play-card.is-featured .play-card-meta { display: none; }
+  html[data-theme] .play-bottom { margin: 20px 0 8px; gap: 12px; }
+  html[data-theme] .play-small-note { padding: 14px 16px; border-width: 1px; box-shadow: none; }
   html[data-theme] .play-small-note strong { font-size: 17px; }
-  html[data-theme] .play-paused-note { font-size: 12px; line-height: 1.6; }
-  html[data-theme] .play-note { padding: 18px 0; }
+  html[data-theme] .play-small-note p { font-size: 12px; line-height: 1.6; }
+  html[data-theme] .play-small-note > .text-link { display: inline-flex; align-items: center; min-height: 40px; font-size: 12px; }
 
-  /* Preparação do jogo. */
-  html[data-theme] .play-setup-intro { padding: 16px; }
-  html[data-theme] .play-setup-intro img { width: 56px; height: 64px; margin: 0 0 6px 10px; }
-  html[data-theme] .play-setup-intro h1 { margin: 8px 0 6px; font-size: 24px; }
-  html[data-theme] .play-setup-intro p:last-child { font-size: 13px; }
-  html[data-theme] .play-setup-form { padding: 18px 16px; }
+  /* Trilha: etapas em lista, com as lições alinhadas e títulos por extenso. */
+  html[data-theme] .trail-next { grid-template-columns: 40px minmax(0, 1fr); padding: 16px; gap: 12px; margin-bottom: 14px; }
+  html[data-theme] .trail-next-mark { width: 40px; height: 40px; font-size: 24px; }
+  html[data-theme] .trail-next-copy h2 { margin: 5px 0 6px; font-size: 20px; line-height: 1.2; }
+  html[data-theme] .trail-next-copy > p:not(.eyebrow):not(.trail-chips) { font-size: 13px; line-height: 1.5; }
+  html[data-theme] .trail-next-copy .eyebrow { font-size: 9px; }
+  html[data-theme] .trail-next > .btn { width: 100%; justify-content: center; }
+  html[data-theme] .trail-next-progress { padding-top: 12px; gap: 8px; font-size: 12px; }
+  html[data-theme] .trail-placement { margin: 0 0 16px; font-size: 12px; }
+  html[data-theme] .trail-stations { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  html[data-theme] .trail-station, html[data-theme] .trail-station:not([open]) { border-width: 1px; border-left: 3px solid var(--line); border-top: 1px solid var(--frame); }
+  html[data-theme] .trail-station > summary, html[data-theme] .trail-station:not([open]) > summary { display: flex; gap: 10px; padding: 12px; align-items: center; }
+  html[data-theme] .module-symbol { width: 34px; height: 36px; font-size: 23px; border-radius: 8px; flex-shrink: 0; }
+  html[data-theme] .trail-station-copy h2, html[data-theme] .trail-station:not([open]) .trail-station-copy h2 { font-size: 15px; line-height: 1.3; margin: 3px 0 0; }
+  html[data-theme] .trail-station-copy .eyebrow { font-size: 9px; letter-spacing: .1em; }
+  html[data-theme] .trail-station-count { font-size: 11px; }
+  html[data-theme] .trail-station-count strong { font-size: 18px; }
+  html[data-theme] .trail-station > summary > .icon, html[data-theme] .trail-station:not([open]) > summary > .icon { display: block; width: 14px; height: 14px; flex-basis: 14px; }
+  html[data-theme] .trail-outcome { font-size: 12px; line-height: 1.5; }
+  html[data-theme] .trail-line { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 12px 8px; }
+  html[data-theme] .trail-line .lesson-row { flex-direction: row; align-items: center; gap: 10px; padding: 12px 2px; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 20%, transparent); border-radius: 0; background: none; }
+  html[data-theme] .trail-line .trail-stop:last-child .lesson-row { border-bottom: 0; }
+  html[data-theme] .trail-stop.is-next .lesson-row { padding: 10px; margin-bottom: 2px; border: 0; border-radius: 10px; box-shadow: none; background: color-mix(in srgb, var(--line) 9%, var(--surface)); }
+  html[data-theme] .trail-node, html[data-theme] .trail-stop.is-next .trail-node { width: 28px; height: 28px; border-width: 2px; flex: 0 0 28px; font-size: 10px; }
+  html[data-theme] .trail-stop-copy > strong { font-size: 13px; line-height: 1.4; }
+  html[data-theme] .here-pill { position: static; display: table; margin: 4px 0 0; padding: 2px 5px; font-size: 9px; }
+  html[data-theme] .trail-chips { font-size: 11px; }
+  html[data-theme] .trail-stop-copy .trail-chips { font-size: 10px; }
+
+  /* Jogos: preparação curta, sem diminuir os alvos de toque das respostas. */
+  html[data-theme] .play-session-heading { margin-bottom: 12px; gap: 8px; font-size: 11px; }
+  html[data-theme] .play-setup { grid-template-columns: minmax(0, 1fr); }
+  html[data-theme] .play-setup-intro { padding: 16px; border-right: 0; border-bottom: 1px solid var(--frame); }
+  html[data-theme] .play-setup-intro img { width: 52px; height: 58px; margin: 0 0 0 10px; }
+  html[data-theme] .play-setup-intro h1 { margin: 3px 0 6px; font-size: 23px; line-height: 1.2; }
+  html[data-theme] .play-setup-intro p:last-child { font-size: 13px; line-height: 1.5; }
+  html[data-theme] .play-setup-form { padding: 16px; }
   html[data-theme] .play-setup-form h2 { font-size: 20px; }
-  html[data-theme] .play-setup-form > p { margin: 6px 0 4px; font-size: 13px; }
-  html[data-theme] .play-setup-form label { margin: 16px 0 6px; font-size: 13px; }
-  html[data-theme] .field-hint { margin-top: 8px; line-height: 1.5; }
-  html[data-theme] .play-start { margin-top: 20px; }
+  html[data-theme] .play-setup-form > p { margin: 6px 0 4px; font-size: 12px; line-height: 1.5; }
+  html[data-theme] .play-setup-form label { margin: 14px 0 6px; font-size: 12px; }
+  html[data-theme] .field-hint { margin-top: 7px; font-size: 12px; line-height: 1.5; }
+  html[data-theme] .play-start { margin-top: 16px; }
+  html[data-theme] .play-scoreboard { padding: 10px 14px; gap: 12px; margin-bottom: 12px; border-width: 1px; border-radius: 12px; box-shadow: none; }
+  html[data-theme] .play-scoreboard strong { font-size: 23px; }
+  html[data-theme] .play-scoreboard small { font-size: 9px; letter-spacing: .07em; }
+  html[data-theme] .play-question { padding: 18px 14px; outline: 0; }
+  html[data-theme] .play-prompt { margin: 14px 0; }
+  html[data-theme] .play-prompt-short { font-size: 44px; }
+  html[data-theme] .play-picture { min-height: 148px; margin: 10px 0; }
+  html[data-theme] .play-picture img { width: 140px; height: 140px; }
+  html[data-theme] #arcade-answer-form { gap: 8px; margin-top: 16px; }
+  html[data-theme] .kana-mode { width: 44px; min-height: 44px; flex-basis: 44px; }
+  html[data-theme] .play-feedback { padding: 14px; margin-top: 16px; border-width: 1px; border-left-width: 3px; }
+  html[data-theme] .play-feedback p { font-size: 13px; line-height: 1.6; }
+  html[data-theme] .play-session-note { margin: 12px 0; }
+  html[data-theme] .daily-choice.play-choice { min-height: 48px; padding: 10px; }
+  html[data-theme] .daily-choices { gap: 8px; }
+  html[data-theme] .play-result-hero h1 { font-size: 25px; }
+  html[data-theme] .play-results-stats { margin: 18px 0; padding: 16px 10px; gap: 14px; }
+  html[data-theme] .play-results-stats strong { font-size: 25px; }
+  html[data-theme] .play-insights .panel { padding: 16px; }
+  html[data-theme] .play-insights h2 { font-size: 18px; }
 
-  /* Durante o jogo e no desafio do dia. */
-  html[data-theme] .play-session-heading { margin-bottom: 14px; }
-  html[data-theme] .play-scoreboard { padding-block: 10px; margin-bottom: 14px; }
-  html[data-theme] .play-question { padding: 20px 14px; }
-  html[data-theme] .play-question { outline-offset: -6px; }
-  html[data-theme] .play-prompt { margin: 20px 0 16px; }
-  html[data-theme] .play-prompt-short { font-size: 46px; }
-  html[data-theme] .daily-choice.play-choice { min-height: 50px; padding: 10px; }
-  html[data-theme] .daily-choices { gap: 10px; }
-  html[data-theme] .play-feedback { padding: 16px; }
-  html[data-theme] .play-session-note { margin: 16px 0; }
-  html[data-theme] .play-result-hero h1 { font-size: 26px; }
-  html[data-theme] .play-results-stats { margin: 20px 0; padding: 18px 10px; gap: 16px; }
-  html[data-theme] .play-results-stats strong { font-size: 26px; }
-  html[data-theme] .play-insights .panel { padding: 18px 16px; }
-  html[data-theme] .play-insights h2 { font-size: 17px; }
-
-  /* Trilha. */
-  html[data-theme] .journey-summary { gap: 12px 14px; padding: 16px; margin-bottom: 20px; }
-  html[data-theme] .summary-symbol { font-size: 32px; }
-  html[data-theme] .journey-module > summary { gap: 12px; padding: 14px; }
-  html[data-theme] .journey-module > summary h2 { font-size: 16px; }
-  html[data-theme] .module-symbol { width: 38px; height: 38px; font-size: 22px; }
-  html[data-theme] .lesson-list { padding: 0 14px 6px; }
-  html[data-theme] .lesson-row { gap: 10px; padding: 12px 0; }
-
-  /* Lição. */
-  html[data-theme] .lesson-content { margin: 16px 0; padding: 18px 16px; }
-  html[data-theme] .lesson-content h2 { margin-bottom: 12px; font-size: 20px; }
+  /* Lições: leitura confortável do japonês e das explicações. */
+  html[data-theme] .lesson-reader-head { margin-bottom: 14px; gap: 10px; }
+  html[data-theme] .lesson-reader-head h1 { font-size: 22px; line-height: 1.25; }
+  html[data-theme] .lesson-content { margin: 14px 0; padding: 16px; }
+  html[data-theme] .lesson-content h2 { margin-bottom: 10px; font-size: 20px; }
   :root[data-theme] .lesson-body { font-size: 15px; line-height: 1.7; }
-  html[data-theme] .example { padding: 14px; }
+  html[data-theme] .example { padding: 12px; }
   html[data-theme] .example-line > .jp { font-size: 20px; }
+  html[data-theme] .lesson-controls { margin-top: 18px; padding-top: 14px; gap: 8px; }
+  html[data-theme] .lesson-controls .btn { font-size: 12px; padding-inline: 12px; }
   html[data-theme] .tip-box { padding: 14px; font-size: 13px; }
-  html[data-theme] .concept-help { margin: 18px 0; padding: 14px 16px; }
-  /* O resumo de uma linha ganha altura de toque sem mudar o espaço visível. */
+  html[data-theme] .concept-help { margin: 16px 0; padding: 12px 14px; }
   html[data-theme] .concept-help summary { padding-block: 9px; margin-block: -9px; }
-  html[data-theme] .lesson-controls { margin-top: 20px; padding-top: 16px; }
+  html[data-theme] .video-panel { padding: 12px; }
+  html[data-theme] .lesson-recap { margin-top: 18px; padding: 14px; outline: 0; }
 
-  /* Desempenho. */
-  html[data-theme] .play-progress-grid { gap: 12px; }
-  html[data-theme] .play-progress-card { padding: 16px; }
-  html[data-theme] .play-progress-card > div { grid-template-columns: 48px 1fr; column-gap: 14px; }
-  html[data-theme] .play-progress-card img { width: 48px; height: 48px; }
-  html[data-theme] .play-progress-card h2 { font-size: 17px; }
-  html[data-theme] .play-progress-card details { padding: 8px 0; }
-
-  /* Ajustes e conta. */
-  html[data-theme] .settings-panel { padding: 18px 16px; }
-  html[data-theme] .account-page .account-panel { margin-bottom: 18px; padding: 18px 16px; }
-  html[data-theme] .account-page .page-heading { margin-bottom: 18px; }
-  html[data-theme] .settings-layout { gap: 14px; }
-  html[data-theme] .theme-options { gap: 12px; margin-top: 14px; }
-  html[data-theme] .theme-card { padding: 12px; }
-  html[data-theme] .theme-preview { min-height: 96px; }
-  html[data-theme] .theme-card strong { margin: 12px 0 4px; font-size: 17px; line-height: 1.3; }
-  html[data-theme] .theme-card small { font-size: 13px; line-height: 1.5; }
-  html[data-theme] .jp-font-options { gap: 10px; margin-top: 14px; }
-  html[data-theme] .jp-font-option { gap: 4px; padding: 12px 14px; }
-  html[data-theme] .jp-font-sample { font-size: 21px; }
-  html[data-theme] .setting-row { gap: 14px; padding: 16px 0; }
-  html[data-theme] .setting-row h3 { font-size: 14px; }
-  html[data-theme] .goal-options { gap: 8px; margin-top: 12px; }
-  html[data-theme] .goal-option { padding: 11px 14px; }
-  html[data-theme] .progress-overview { padding: 18px 16px; }
-  html[data-theme] .progress-overview > .jp { font-size: 40px; margin-bottom: 4px; }
-  html[data-theme] .progress-overview h2 { font-size: 20px; }
-  html[data-theme] .progress-overview dl { margin: 14px 0; }
-  html[data-theme] .progress-overview dl > div { padding: 10px 0; font-size: 12px; }
-  html[data-theme] .achievement-grid { gap: 10px; }
-  html[data-theme] .achievement { padding: 14px 12px; }
-  html[data-theme] .achievement .badge-symbol { margin-bottom: 8px; font-size: 22px; }
-  html[data-theme] .stage-seals { gap: 10px; margin-top: 16px; }
-  html[data-theme] .stage-seal { padding: 14px 10px; }
-  html[data-theme] .stage-seal .hanko { width: 48px; height: 48px; margin-bottom: 10px; font-size: 27px; }
-
-  /* Consultar. */
-  html[data-theme] .explore-controls { padding: 16px; }
-  html[data-theme] .explore-filters { margin-top: 14px; }
-  html[data-theme] .hub-section { margin-bottom: 28px; }
-  html[data-theme] .hub-section-heading { margin: 18px 0 12px; }
-  html[data-theme] .hub-section-heading h2 { font-size: 20px; }
-  html[data-theme] .hub-grid { gap: 12px; }
-  html[data-theme] .hub-card { padding: 16px; }
-  html[data-theme] .hub-card-symbol { width: 40px; height: 40px; margin-bottom: 12px; }
+  /* Consultas: cartões que respeitam a largura disponível. */
+  html[data-theme] .explore-controls { padding: 10px; }
+  html[data-theme] .explore-search .search-field { min-height: 44px; padding: 5px 10px; border-width: 1px; border-radius: 10px; }
+  html[data-theme] .explore-search input, html[data-theme] .search-field input { min-width: 0; font-size: 16px; }
+  html[data-theme] .hub-section { margin-bottom: 22px; }
+  html[data-theme] .hub-section-heading { margin: 18px 0 10px; }
+  html[data-theme] .hub-section-heading h2 { font-size: 19px; }
+  html[data-theme] .hub-card { min-width: 0; padding: 12px; border-width: 1px; border-radius: 12px; }
+  html[data-theme] .hub-card-symbol { width: 34px; height: 34px; margin-bottom: 8px; }
   html[data-theme] .hub-card-symbol > .jp { font-size: 22px; }
-  html[data-theme] :is(.hub-card h2, .hub-card h3) { margin-bottom: 6px; font-size: 16px; line-height: 1.4; }
-  html[data-theme] .hub-card p { margin-bottom: 12px; }
-  html[data-theme] .hub-card-action { padding-top: 12px; }
-  html[data-theme] .hub-note { padding: 16px; }
-  html[data-theme] .hub-recommendation { padding: 16px; }
-
-  /* Kana. */
-  html[data-theme] .tab-bar button { min-height: 44px; }
+  html[data-theme] :is(.hub-card h2, .hub-card h3) { margin: 0 0 5px; font-size: 14px; line-height: 1.35; }
+  html[data-theme] .hub-card p { margin: 0; font-size: 12px; line-height: 1.5; }
+  html[data-theme] :is(.word-card, .library-card, .expression-card, .particle-card, .concept-card) { min-width: 0; padding: 12px; border-width: 1px; border-radius: 12px; }
+  html[data-theme] :is(.word-card h2, .library-card h2) { font-size: 21px; }
+  html[data-theme] .card-more > summary { min-height: 40px; font-size: 12px; }
+  html[data-theme] :is(.audio-button, .word-card .audio-button, .expression-card .example-line > .audio-button) { width: 40px; height: 40px; flex-shrink: 0; }
+  html[data-theme] .kanji-card { border-width: 1px; }
+  html[data-theme] .kanji-card-symbol { font-size: 38px; }
+  html[data-theme] .toolbar { gap: 8px; margin-bottom: 14px; }
+  html[data-theme] #expression-filters { max-width: 100%; margin-inline: 0; padding-inline: 0; }
+  html[data-theme] .chip { min-height: 38px; padding: 8px 11px; font-size: 11px; }
+  html[data-theme] .segmented button { min-height: 40px; font-size: 12px; padding-inline: 10px; }
+  html[data-theme] .tab-bar { gap: 16px; }
+  html[data-theme] .tab-bar button { min-height: 44px; font-size: 12px; }
   html[data-theme] .kana-table { padding: 14px 10px; }
   html[data-theme] .kana-cell { min-height: 54px; }
   html[data-theme] .kana-cell .jp { font-size: 21px; }
-  html[data-theme] .kana-sidebar { gap: 12px; }
-  html[data-theme] .kana-detail { grid-template-columns: 76px 1fr; column-gap: 14px; padding: 16px; }
-  html[data-theme] .detail-character { font-size: 58px; }
-  html[data-theme] .kana-detail > .btn { margin-top: 12px; }
-  html[data-theme] .practice-setup { padding: 16px; }
-
-  /* Papel e lápis. */
-  html[data-theme] .worksheet-toolbar { gap: 12px; padding: 16px; }
-  html[data-theme] .worksheet-selection { padding: 14px; }
-
-  /* Piso de legibilidade: regras antigas encolhiam rótulos e notas para 8–10 px. Rótulos em maiúsculas
-     ficam com 11 px, notas com 12 px, e só selos e números com 10 px. */
-  html[data-theme] :is(.eyebrow, .page-heading .eyebrow, .journey-module > summary .eyebrow, .kana-detail > .eyebrow, .context-box .eyebrow, .play-setup-intro .eyebrow) { font-size: 11px; }
-  html[data-theme] :is(.world-label, .play-tag, .play-section-title > .play-tag, .step-label, .kana-column-head, .module-count, .play-subtitle, .play-card-meta, .play-art-caption small, .small-segmented button, .chip, .explore-filters .chip, .section-heading > .text-link, .kanji-card-details .romaji, .stat-card p, .card-actions .btn, .word-token small, .token-meaning, .exercise-item > span) { font-size: 11px; }
-  html[data-theme] :is(.pill, .pill.light, .lesson-reader-head .pill, .sentence-workspace .section-heading > .pill) { font-size: 11px; }
-  html[data-theme] :is(.journey-module > summary p:not(.eyebrow), .lesson-row p, .setting-note, .goal-option span, .kana-detail p, .tab-bar button, .practice-card p) { font-size: 12px; }
-  html[data-theme] :is(.play-new, .play-daily-date small, .daily-cal-month, .voice-credit, .play-number) { font-size: 10px; }
-  html[data-theme] .play-scoreboard small { font-size: 10px; }
-  html[data-theme] :is(.kana-cell small, .kana-column-head > span:first-child) { font-size: 10px; }
-  /* A coluna das fileiras tem 40–45 px: a caixinha fica em cima do nome para "Vogais" caber inteiro. */
+  html[data-theme] :is(.kana-cell small, .kana-column-head) { font-size: 10px; }
   html[data-theme] .row-toggle { flex-direction: column; justify-content: center; gap: 4px; font-size: 10px; text-align: center; }
-  html[data-theme] .topbar-location strong { font-size: 12px; }
-  html[data-theme] .app-footer { font-size: 11px; }
-  html[data-theme] .app-footer > span { font-size: 10px; }
+  html[data-theme] .kana-sidebar { gap: 12px; }
+  html[data-theme] .kana-detail { grid-template-columns: 64px minmax(0, 1fr); column-gap: 14px; padding: 16px; }
+  html[data-theme] .detail-character { font-size: 54px; }
+  html[data-theme] .kana-detail p { font-size: 12px; }
+  html[data-theme] .practice-setup { padding: 16px; }
+  html[data-theme] .writing-grid { gap: 14px; }
+  html[data-theme] .writing-panel { padding: 16px; }
+  html[data-theme] .writing-panel h2 { font-size: 18px; }
+  html[data-theme] .writing-panel .section-heading { margin-bottom: 14px; }
+  html[data-theme] .stroke-model { max-width: 220px; }
+  html[data-theme] .exercise-card h2 { font-size: 15px; }
+  html[data-theme] .exercise-card .btn { min-height: 44px; }
 
-  /* Alvos de toque soltos: pelo menos 38–40 px, com o texto centrado na altura. */
-  html[data-theme] :is(.back-link, .play-actions .text-link, .play-small-note > .text-link, .play-session-heading > .text-link, .play-progress-card .text-link) { min-height: 40px; align-items: center; }
-  html[data-theme] .play-small-note > .text-link { display: inline-flex; margin-top: 4px; }
-  html[data-theme] .explore-search .search-field { min-height: 46px; padding-block: 3px; }
-  html[data-theme] .explore-search input { min-height: 38px; }
-  html[data-theme] :is(.chip, .explore-filters .chip) { min-height: 38px; }
-  html[data-theme] .segmented button { min-height: 40px; }
-  html[data-theme] .play-progress-card summary { padding-block: 10px; }
+  /* Ajustes e desempenho seguem a mesma escala das outras telas. */
+  html[data-theme] .play-progress-card { padding: 12px; border-width: 1px; border-radius: 12px; }
+  html[data-theme] .play-progress-card h2 { font-size: 16px; }
+  html[data-theme] .play-progress-card img { width: 40px; height: 40px; }
+  html[data-theme] .play-progress-card summary { min-height: 40px; font-size: 12px; }
+  html[data-theme] .play-progress-card > .text-link { min-height: 40px; display: inline-flex; align-items: center; font-size: 12px; }
+  html[data-theme] .settings-panel { padding: 16px; }
+  html[data-theme] :is(.settings-panel, .account-panel) > h2 { margin-bottom: 10px; font-size: 19px; line-height: 1.3; }
+  html[data-theme] :is(.account-panel > p:not(.eyebrow), .settings-panel > p.muted) { margin: 8px 0; font-size: 13px; line-height: 1.6; }
+  html[data-theme] .settings-layout { gap: 12px; }
+  html[data-theme] .theme-options { gap: 10px; margin-top: 12px; }
+  html[data-theme] .theme-card { padding: 8px; border-width: 1px; }
+  html[data-theme] .theme-preview { min-height: 70px; }
+  html[data-theme] .theme-card strong { margin: 8px 0 2px; font-size: 15px; }
+  html[data-theme] .jp-font-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  html[data-theme] .jp-font-option { padding: 10px; gap: 5px; border-width: 1px; }
+  html[data-theme] .jp-font-sample { font-size: 17px; line-height: 1.5; }
+  html[data-theme] .jp-font-option strong { font-size: 12px; }
+  html[data-theme] .setting-row { gap: 12px; padding: 14px 0; }
+  html[data-theme] .setting-row > div { min-width: 0; }
+  html[data-theme] .setting-row h3 { font-size: 14px; line-height: 1.35; }
+  html[data-theme] .setting-row p { margin-top: 5px; font-size: 12px; line-height: 1.6; }
+  html[data-theme] .setting-row .btn { flex-shrink: 0; padding-inline: 12px; font-size: 12px; }
+  html[data-theme] .goal-options { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+  html[data-theme] .goal-option { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 10px; }
+  html[data-theme] .goal-option strong { font-size: 12px; line-height: 1.4; }
+  html[data-theme] .goal-option span { font-size: 10px; line-height: 1.4; }
+  html[data-theme] .progress-overview { padding: 16px; }
+  html[data-theme] .progress-overview h2 { font-size: 20px; }
+  html[data-theme] .progress-overview dl { margin: 12px 0; gap: 0 12px; }
+  html[data-theme] .progress-overview dl > div { padding: 10px 0; font-size: 11px; }
+  html[data-theme] .achievement-grid { gap: 8px; }
+  html[data-theme] .achievement { padding: 12px; }
+  html[data-theme] .achievement .badge-symbol { margin-bottom: 6px; font-size: 22px; }
+  html[data-theme] .stage-seals { gap: 8px; margin-top: 14px; }
+  html[data-theme] .stage-seal { padding: 12px 8px; }
+  html[data-theme] .stage-seal .hanko { width: 40px; height: 40px; margin-bottom: 8px; font-size: 24px; }
+  html[data-theme] .account-page .account-panel { padding: 16px; margin-bottom: 16px; }
+  html[data-theme] .account-panel .source-note { padding-top: 14px; font-size: 12px; line-height: 1.6; }
+
+  /* A impressão não disputa espaço com a navegação inferior. */
+  html[data-theme] .worksheet-print-bar { bottom: calc(var(--mobile-nav-height) + 12px + env(safe-area-inset-bottom)); padding: 8px 8px 8px 12px; gap: 8px; border-width: 1px; border-radius: 14px; box-shadow: 0 4px 20px #0000000d; }
+  html[data-theme] .worksheet-print-bar .btn { min-height: 44px; padding-inline: 14px; font-size: 13px; }
+  html[data-theme] .worksheet-print-status { font-size: 11px; }
+  html[data-theme] .worksheet-toolbar { gap: 10px; padding: 12px; }
+  html[data-theme] .worksheet-toolbar label { font-size: 12px; }
+  html[data-theme] .worksheet-toolbar select { min-width: 0; min-height: 44px; }
 }
+
 @media (max-width: 360px) {
-  html[data-theme] .world-label { font-size: 10px; letter-spacing: .08em; }
+  html[data-theme] .main-content { padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
+  html[data-theme] .topbar { gap: 6px; padding-inline: 8px; }
+  .mobile-brand { gap: 5px; }
+  html[data-theme] .play-card h3 { font-size: 15px; }
+  html[data-theme] .play-card.is-featured .play-card-art { flex-basis: 76px; }
+  html[data-theme] .play-card.is-featured .play-card-copy { padding: 10px; }
+  html[data-theme] .trail-next { padding: 14px; gap: 10px; }
+  html[data-theme] .setting-row { flex-wrap: wrap; }
+  html[data-theme] .setting-row .switch { margin-left: auto; }
+}
+
+@media print {
+  .mobile-nav, .mobile-brand { display: none !important; }
+  html[data-theme] .app-body { padding-bottom: 0; }
+  html[data-theme] .worksheet-preview { position: static; }
 }
