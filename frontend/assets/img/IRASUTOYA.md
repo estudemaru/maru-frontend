@@ -19,6 +19,13 @@ vocabulário, associadas às respectivas palavras. As páginas ilustradas mantê
 o crédito a Mifune Takashi / Irasutoya no rodapé. Os desenhos esquemáticos dos
 significados na seção final de kanji são vetores próprios do projeto.
 
+As lições na tela reutilizam os objetos nos exemplos de vocabulário e cenas
+individuais na abertura, leitura, prática e conclusão. As cenas são exibidas
+inteiras, sem montagem ou redesenho; os novos PNGs foram apenas reduzidos para
+440 px, preservando a transparência. Cada tela da lição mantém o crédito do
+artista. As perguntas usam uma cena de estudo sem letras legíveis; as poses de
+reflexão e descoberta aparecem somente depois da resposta.
+
 | Arquivo local | Uso | Página oficial |
 | --- | --- | --- |
 | `irasutoya-study-nihongo.png` | Capa do Livro 1 | https://www.irasutoya.com/2015/08/blog-post_26.html |
@@ -37,6 +44,11 @@ significados na seção final de kanji são vetores próprios do projeto.
 | `irasutoya-cake.png` | Associação de imagem e palavra: bolo; mnemônico de katakana | https://www.irasutoya.com/2019/09/blog-post_32.html |
 | `irasutoya-umbrella.png` | Associação de imagem e palavra: guarda-chuva | https://www.irasutoya.com/2020/09/blog-post_737.html |
 | `irasutoya-train.png` | Associação de imagem e palavra: trem | https://www.irasutoya.com/2013/04/blog-post_3537.html |
+| `irasutoya-lesson-study.png` | Personagem estudando; abertura, leitura, perguntas e jogo | https://www.irasutoya.com/2013/04/blog-post_3826.html |
+| `irasutoya-lesson-cafe.png` | Cena de conversa no café nas lições com café ou bolo | https://www.irasutoya.com/2018/08/blog-post_165.html |
+| `irasutoya-lesson-think.png` | Personagem refletindo depois de uma resposta incorreta | https://www.irasutoya.com/2015/03/blog-post_644.html |
+| `irasutoya-lesson-idea.png` | Personagem com uma descoberta depois de uma resposta correta | https://www.irasutoya.com/2015/03/blog-post_644.html |
+| `irasutoya-lesson-celebrate.png` | Cena de comemoração na conclusão da lição | https://www.irasutoya.com/2018/06/blog-post_62.html |
 
 Adicionar cada nova ilustração a este inventário e manter os créditos nos
 materiais impressos. Os testes verificam a presença de uma fonte para cada
