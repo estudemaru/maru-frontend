@@ -1,0 +1,66 @@
+/* Lista de lições no celular, com as cores do tema escolhido. */
+.trail-description-mobile { display: none; }
+
+@media (max-width: 820px) {
+  html[data-theme] body:has(.trail-page, .lesson-reader)::before { opacity: .004; }
+  html[data-theme] .trail-page { gap: 16px; }
+  html[data-theme] .trail-page > .page-heading { margin: 0; padding: 0; border: 0; }
+  html[data-theme] .trail-page .page-heading h1 { font-size: 26px; line-height: 1.2; }
+  html[data-theme] .trail-page .page-heading::after,
+  .trail-description-wide { display: none; }
+  .trail-description-mobile { display: inline; }
+  html[data-theme] .trail-page .page-description { margin-top: 6px; font-size: 12px; }
+
+  html[data-theme] .trail-next {
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas: "mark copy" "action action" "progress progress";
+    gap: 12px; margin: 0; padding: 16px;
+    border: 1px solid var(--frame); box-shadow: none;
+  }
+  html[data-theme] .trail-next-mark { width: 40px; height: 40px; font-size: 23px; }
+  html[data-theme] .trail-next-copy h2 { margin: 4px 0 0; font-size: 19px; line-height: 1.25; text-wrap: pretty; }
+  html[data-theme] .trail-next-copy > p:not(.eyebrow):not(.trail-chips) { display: none; }
+  html[data-theme] .trail-next-copy .eyebrow { font-size: 9px; letter-spacing: .1em; }
+  html[data-theme] .trail-next-copy .trail-chips { margin-top: 6px; }
+  html[data-theme] .trail-next > .btn { width: 100%; justify-content: center; }
+  html[data-theme] .trail-next-progress { grid-template-columns: minmax(0, 1fr); gap: 7px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11px; }
+  html[data-theme] .trail-next-progress .progress-track { height: 4px; }
+  html[data-theme] .trail-placement { order: 1; gap: 4px; margin: 2px 0 0; padding: 12px; border-radius: 12px; background: var(--surface-soft); font-size: 12px; line-height: 1.6; }
+  html[data-theme] .trail-placement .text-link { min-height: 32px; }
+  html[data-theme] .trail-map { display: none; }
+
+  html[data-theme] .trail-stations { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  html[data-theme] .trail-station,
+  html[data-theme] .trail-station:not([open]) { border: 1px solid var(--frame); border-left: 3px solid var(--line); border-radius: 14px; }
+  html[data-theme] .trail-station > summary,
+  html[data-theme] .trail-station:not([open]) > summary { display: flex; align-items: center; gap: 10px; padding: 13px 12px; }
+  html[data-theme] .trail-station .module-symbol { width: 34px; height: 36px; flex-shrink: 0; font-size: 22px; border-radius: 9px; }
+  html[data-theme] .trail-station-copy h2,
+  html[data-theme] .trail-station:not([open]) .trail-station-copy h2 { margin: 3px 0 0; font-size: 14px; line-height: 1.35; }
+  html[data-theme] .trail-station-copy .eyebrow { font-size: 9px; letter-spacing: .08em; }
+  html[data-theme] .trail-station-copy > p,
+  html[data-theme] .trail-station-copy .caution-pill { display: none; }
+  html[data-theme] .trail-station-count { font-size: 11px; }
+  html[data-theme] .trail-station-count strong { font-family: var(--font-body); font-size: 12px; font-weight: 650; }
+  html[data-theme] .trail-station > summary > .icon,
+  html[data-theme] .trail-station:not([open]) > summary > .icon { display: block; width: 14px; height: 14px; flex: 0 0 14px; }
+  html[data-theme] .trail-station .hanko { display: none; }
+
+  html[data-theme] .trail-line { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 10px 8px; }
+  html[data-theme] .trail-line::before { display: none; }
+  html[data-theme] .trail-line .lesson-row { min-height: 64px; flex-direction: row; align-items: center; gap: 11px; padding: 10px 4px; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 15%, transparent); border-radius: 0; background: transparent; }
+  html[data-theme] .trail-line .trail-stop:last-child .lesson-row { border-bottom: 0; }
+  html[data-theme] .trail-stop.is-next .lesson-row { padding: 11px 9px; margin-bottom: 2px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--line) 7%, var(--surface)); }
+  html[data-theme] .trail-node,
+  html[data-theme] .trail-stop.is-next .trail-node { width: 28px; height: 28px; margin: 0; flex: 0 0 28px; border-width: 1px; box-shadow: none; font-size: 10px; animation: none; }
+  html[data-theme] .trail-stop-copy { flex: 1; gap: 5px; }
+  html[data-theme] .trail-stop-copy > strong { font-size: 13px; line-height: 1.4; }
+  html[data-theme] .trail-stop-copy > small,
+  html[data-theme] .trail-chips .chip-extra { display: none; }
+  html[data-theme] .trail-stop-copy .trail-chips { margin: 0; font-size: 10px; }
+  html[data-theme] .here-pill { display: block; margin: 4px 0 0; padding: 0; background: transparent; color: var(--line); border: 0; font-size: 10px; font-weight: 650; letter-spacing: 0; }
+  html[data-theme] .trail-line .lesson-row > .icon { display: block; width: 14px; height: 14px; flex: 0 0 14px; }
+
+  html[data-theme] .trail-station > summary:focus-visible,
+  html[data-theme] .trail-line .lesson-row:focus-visible { outline-offset: -4px; }
+}

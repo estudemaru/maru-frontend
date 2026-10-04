@@ -23,6 +23,7 @@ test('the journey lists stages on a phone, and the desktop line map opens a stag
   expect(await fits(page)).toBe(true);
   await page.locator('#etapa-katakana > summary').click();
   await expect(page.locator('#etapa-katakana')).toHaveAttribute('open', '');
+  await expect(page.locator('#etapa-start')).not.toHaveAttribute('open', '');
   await expect(page.locator('#etapa-katakana .trail-stop')).toHaveCount(8);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/#/journey');
