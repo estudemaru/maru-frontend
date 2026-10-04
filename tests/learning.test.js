@@ -10,12 +10,14 @@ import { kanaToRomaji, isTypedAnswerCorrect } from "../shared/romaji.js";
 
 test("the curriculum has complete, addressable lessons and answer explanations", () => {
   assert.equal(MODULES.length, 8);
-  assert.equal(LESSONS.length, 40);
+  assert.equal(LESSONS.length, 51);
   assert.equal(new Set(LESSONS.map(item => item.id)).size, LESSONS.length);
   assert.equal(getLesson("welcome").moduleId, "start");
   for (const lesson of LESSONS) {
     assert.ok(lesson.sections.length >= 2);
     assert.equal(lesson.quiz.length, 3);
+    assert.ok(lesson.hook.length > 20, lesson.id + ": abre com uma frase");
+    assert.ok(lesson.recap.length >= 2 && lesson.recap.length <= 3, lesson.id + ": fecha com um resumo curto");
     for (const question of lesson.quiz) {
       assert.ok(question.choices[question.answer]);
       assert.ok(question.explanation.length > 10);
