@@ -103,22 +103,26 @@ test('lesson stages and answer feedback follow mistakes, a retry and completion 
   for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();
   await expect(page.locator('.lesson-stages [aria-current="step"]')).toHaveText('Praticar');
   await expect(page.locator('.lesson-question-mark')).toHaveText('あ');
+  await expect(page.locator('.lesson-question-scene img')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-study.png');
   const wrong = (lesson.quiz[0].answer + 1) % lesson.quiz[0].choices.length;
   await page.locator(`input[name="answer"][value="${wrong}"]`).check();
   await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
   await expect(page.locator('.answer-option.is-wrong')).toHaveCount(1);
   await expect(page.locator('.answer-option.is-correct')).toHaveCount(1);
   await expect(page.locator('.feedback.retry')).toContainText(lesson.quiz[0].explanation);
+  await expect(page.locator('.lesson-question-scene img')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-think.png');
   await page.locator('[data-lesson="question-next"]').click();
   for (const question of [...lesson.quiz.slice(1), lesson.quiz[0]]) {
     await page.locator(`input[name="answer"][value="${question.answer}"]`).check();
     await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
     await expect(page.locator('.feedback.success')).toContainText('Isso mesmo!');
+    await expect(page.locator('.lesson-question-scene img')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-idea.png');
     await page.locator('[data-lesson="question-next"]').click();
   }
   await expect(page.locator('.lesson-stages [aria-current="step"]')).toHaveText('Jogar');
   await page.getByRole('button', { name: 'Pular o jogo' }).click();
   await expect(page.locator('.lesson-stages .is-done')).toHaveCount(3);
+  await expect(page.locator('.lesson-celebration img')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-celebrate.png');
   await expect(page.locator('#xp-total')).toHaveText('30 XP');
   expect(await fits(page)).toBe(true);
 });
@@ -151,6 +155,10 @@ for (const theme of ['dojo', 'arcade']) {
       await expect(page.locator('.lesson-video')).not.toHaveAttribute('open', '');
       await reachable(page.locator('[data-lesson="next"]'));
       await page.locator('[data-lesson="next"]').click();
+      await expect(page.locator('.topbar')).toBeHidden();
+      await expect(page.locator('.mobile-nav')).toBeHidden();
+      await reachable(page.getByRole('link', { name: 'Voltar à trilha: Aprenda hiragana', exact: true }));
+      await expect.poll(() => page.locator('.lesson-scene-art').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
       if (await page.locator('#toast').isVisible()) {
         const toast = await page.locator('#toast').boundingBox();
         const controls = await page.locator('.lesson-controls').boundingBox();
@@ -173,6 +181,8 @@ for (const theme of ['dojo', 'arcade']) {
     }
     await page.getByRole('button', { name: 'Pular o jogo' }).click();
     await expect(page.locator('.completion')).toContainText('+30 XP');
+    await expect(page.locator('.topbar')).toBeVisible();
+    await expect(page.locator('.mobile-nav')).toBeVisible();
     await expect(page.locator('.next-stop')).toHaveAttribute('href', '#/lesson/h-ka');
     await expect(page.locator('#xp-total')).toHaveText('30 XP');
     expect(await fits(page)).toBe(true);
@@ -185,6 +195,37 @@ for (const theme of ['dojo', 'arcade']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('illustrated lessons use Irasutoya scenes and matching vocabulary, and restore navigation on exit', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/lesson/h-words');
+  await page.locator('[data-lesson="next"]').click();
+  const art = page.locator('.lesson-word-art');
+  await expect(art).toHaveCount(3);
+  await expect(art.nth(0)).toHaveAttribute('src', '/assets/img/irasutoya-cat.png');
+  await expect(art.nth(1)).toHaveAttribute('src', '/assets/img/irasutoya-dog.png');
+  await expect(art.nth(2)).toHaveAttribute('src', '/assets/img/irasutoya-fish.png');
+  await expect.poll(() => page.locator('.lesson-reader img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
+  await expect(page.locator('.lesson-art-credit')).toContainText('Mifune Takashi / Irasutoya');
+  await page.getByRole('link', { name: 'Voltar à trilha: Aprenda hiragana', exact: true }).click();
+  await expect(page.locator('.trail-page')).toBeVisible();
+  await expect(page.locator('.topbar')).toBeVisible();
+  await expect(page.locator('.mobile-nav')).toBeVisible();
+
+  await page.goto('/#/lesson/daily-order');
+  await page.locator('[data-lesson="next"]').click();
+  await expect(page.locator('.lesson-scene-art')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-cafe.png');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(page.locator('.topbar')).toBeVisible();
+  expect(await fits(page)).toBe(true);
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(page.locator('.topbar')).toBeHidden();
+  expect(await fits(page)).toBe(true);
+  await page.locator('[data-lesson="next"]').click();
+  await page.locator('[data-lesson="next"]').click();
+  // A cena das perguntas é neutra, mesmo quando o conteúdo da aula é um café.
+  await expect(page.locator('.lesson-question-scene img')).toHaveAttribute('src', '/assets/img/irasutoya-lesson-study.png');
+});
 
 test('Só mais um plays by touch on a phone, gives the memory hint on a miss and saves reviews', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
