@@ -19,9 +19,17 @@ npm test
 npm run build
 ```
 
-O build copia `frontend/` e `shared/` para `dist/`. Nenhuma credencial entra nos
-arquivos estáticos. A configuração da Vercel em `vercel.json` define `dist/` como
-saída e encaminha `/api/*` para a Edge Function do projeto informado.
+O build usa o esbuild para gerar `dist/`: CSS num só arquivo e JavaScript em
+módulos minificados, um por tela, todos em `assets/build/` com hash no nome.
+Imagens e dados são copiados como estão. Nenhuma credencial entra nos arquivos
+estáticos. A configuração da Vercel em `vercel.json` define `dist/` como saída,
+encaminha `/api/*` para a Edge Function do projeto informado e define o cache:
+`assets/build/` fica guardado por um ano (o hash muda a cada versão), imagens e
+dados por um dia, e o `index.html` é sempre conferido.
+
+Para testar o build antes de publicar, use `npm run preview` (serve `dist/` em
+`http://127.0.0.1:4173`) ou rode o E2E contra ele com
+`npm run build && MARU_STATIC_DIR=dist npm run test:e2e`.
 
 ## Projeto Vercel
 

@@ -8,5 +8,25 @@
       "source": "/api/:path*",
       "destination": "https://qxtgaalmyzyldmcpwooo.supabase.co/functions/v1/maru-api/api/:path*"
     }
+  ],
+  "headers": [
+    {
+      "source": "/assets/build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(img|data)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
   ]
 }
