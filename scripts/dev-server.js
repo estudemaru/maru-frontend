@@ -8,6 +8,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const host = process.env.HOST || "127.0.0.1";
 const port = Number(process.env.PORT) || 4173;
 const apiOrigin = new URL(process.env.MARU_API_ORIGIN || "http://127.0.0.1:5173");
+// MARU_STATIC_DIR=dist serve o build de produção (npm run preview) em vez dos arquivos-fonte.
+const staticDir = process.env.MARU_STATIC_DIR ? path.resolve(root, process.env.MARU_STATIC_DIR) : null;
 
 const types = {
   ".css": "text/css; charset=utf-8",
@@ -68,6 +70,12 @@ http.createServer((req, res) => {
   const url = new URL(req.url || "/", "http://localhost");
   if (url.pathname.startsWith("/api/")) return proxyApi(req, res);
 
+  if (staticDir) {
+    const filename = url.pathname === "/" ? null : safeFile(staticDir, url.pathname);
+    try { if (filename && statSync(filename).isFile()) return serveFile(res, filename); } catch {}
+    return serveFile(res, path.join(staticDir, "index.html"));
+  }
+
   if (url.pathname.startsWith("/shared/")) {
     const filename = safeFile(path.join(root, "shared"), url.pathname.slice("/shared".length));
     return filename ? serveFile(res, filename) : serveFile(res, "");
@@ -84,6 +92,6 @@ http.createServer((req, res) => {
 
   return serveFile(res, path.join(root, "frontend", "index.html"));
 }).listen(port, host, () => {
-  console.log(`Frontend do Maru em http://${host}:${port}`);
+  console.log(`Frontend do Maru em http://${host}:${port}${staticDir ? " (build em " + path.relative(root, staticDir) + "/)" : ""}`);
   console.log(`Encaminhando /api para ${apiOrigin.origin}`);
 });

@@ -104,7 +104,8 @@ test('all selected characters keep their families on separate A4 pages in both t
   expect(await page.locator('.print-sheet:has(.paper-kana-family)').evaluateAll(papers => papers.every(paper => paper.querySelectorAll('.paper-kana-family').length === 1))).toBe(true);
   await expect(page.locator('.paper-row[data-print-char="を"]')).toContainText('wo/o');
   for (const theme of ['dojo', 'arcade']) {
-    await page.evaluate(async theme => (await import("/assets/js/core/theme.js")).applyTheme(theme), theme);
+    // O CSS do tema depende só de html[data-theme]; vale para os fontes e para o build.
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme; }, theme);
     await ready(page);
     await expect(page.locator('.print-sheet').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
     await checkPaper(page);

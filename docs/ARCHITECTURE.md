@@ -10,7 +10,9 @@ As seções abaixo registram também módulos preservados para reativação futu
 
 O produto começa com uma trilha para quem ainda não conhece japonês. Conteúdo
 didático, regras de aprendizado, infraestrutura e interface são separados.
-JavaScript nativo e CSS dão conta da aplicação sem compilação de código. Este
+JavaScript nativo e CSS dão conta da aplicação: o código-fonte roda direto no
+navegador durante o desenvolvimento, e só a publicação passa pelo esbuild, que
+empacota e minifica os mesmos arquivos. Este
 repositório contém a interface e as regras executadas no navegador; serviços,
 credenciais e persistência vivem no repositório `maru-backend`.
 
@@ -43,9 +45,11 @@ chamam as regras de domínio sem reimplementar XP, migração ou revisão.
 
 ## Inicialização e navegação
 
-1. O build copia `frontend/` e `shared/` para `dist/`, publicado na Vercel.
+1. O build (`scripts/build.js`) gera `dist/`, publicado na Vercel: o esbuild junta
+   o CSS num arquivo e o JavaScript em módulos minificados com hash no nome, em
+   `assets/build/`; imagens e dados são copiados como estão.
 2. Em produção, `/api` é encaminhado à função Supabase; localmente, ao adaptador Node.
-3. O HTML carrega o agregador de CSS e o módulo `app.js`.
+3. O HTML carrega o CSS e o módulo `app.js` (no build, já pedindo os módulos de que ele depende).
 4. O store lê o estado local, migra dados antigos e mescla o snapshot da API.
 5. O app monta o shell e escolhe a tela pela URL, como `#/lesson/welcome`.
 6. Cada tela renderiza em main e devolve um cleanup para eventos e recursos.
@@ -173,9 +177,9 @@ O canvas usa coordenadas normalizadas e redesenha ao mudar de tamanho.
 Pointer Events permitem mouse, toque e caneta. Mostrar o guia não limpa o
 desenho. Animações respeitam a preferência por movimento reduzido.
 
-## Bibliotecas de terceiros (sem etapa de build)
+## Bibliotecas de terceiros
 
-O site não tem bundler: as bibliotecas ficam como arquivos ES module copiados de
+As bibliotecas ficam como arquivos ES module copiados de
 `node_modules` por `npm run vendor` (`scripts/vendor.js`), com o aviso de licença
 MIT ao lado. Para atualizar, mude a versão em `package.json`, rode `npm install`
 e `npm run vendor`, e copie `shared/vendor/` para o `maru-backend`.

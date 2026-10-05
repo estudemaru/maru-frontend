@@ -70,6 +70,7 @@ Nenhum segredo deve ser colocado no frontend. Credenciais SMTP, chave de voz e c
 
 ```bash
 npm run dev          # frontend local com proxy para /api
+npm run preview      # gera e serve o build de produção (dist/)
 npm run check        # sintaxe dos módulos e imports de CSS
 npm run vendor       # copia ts-fsrs e wanakana de node_modules (sem build)
 npm test             # regras de aprendizado e conteúdo
@@ -93,8 +94,8 @@ Consulte [a arquitetura](docs/ARCHITECTURE.md), [o guia de conteúdo](docs/CONTE
 
 ## Publicação
 
-O site é estático. `npm run build` gera `dist/` com `frontend/` e `shared/`, e
-`vercel.json` publica essa pasta na Vercel. As requisições `/api/*` são
+O site é estático. `npm run build` gera `dist/` com o JavaScript e o CSS
+empacotados pelo esbuild, e `vercel.json` publica essa pasta na Vercel. As requisições `/api/*` são
 encaminhadas à Edge Function `maru-api` no Supabase, sob o domínio do site.
 A origem pública confirmada é `https://maru-frontend.vercel.app`; mantenha-a
 igual na função Supabase e nas URLs permitidas do Auth antes de liberar o cadastro por e-mail. SMTP próprio é necessário para entregar confirmações e recuperações ao público.

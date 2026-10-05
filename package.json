@@ -6,6 +6,7 @@
   "description": "Interface web da plataforma Maru para aprender japonês em português.",
   "scripts": {
     "build": "node scripts/build.js",
+    "preview": "npm run build && MARU_STATIC_DIR=dist node --env-file-if-exists=.env scripts/dev-server.js",
     "dev": "node --env-file-if-exists=.env scripts/dev-server.js",
     "start": "node --env-file-if-exists=.env scripts/dev-server.js",
     "check": "node scripts/check.js",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",
+    "esbuild": "0.28.2",
     "ts-fsrs": "5.4.2",
     "wanakana": "5.3.1"
   }
