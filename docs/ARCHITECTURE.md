@@ -51,6 +51,14 @@ chamam as regras de domínio sem reimplementar XP, migração ou revisão.
 6. Cada tela renderiza em main e devolve um cleanup para eventos e recursos.
 7. Ao navegar, o app limpa os recursos, interrompe o áudio e foca o título.
 
+O `app.js` importa só o início (`dashboard.js`). As outras telas ficam em `SCREENS`
+e são baixadas com `import()` na primeira vez que a rota abre (`SCREEN_OF` liga cada
+rota ao seu módulo). Depois da primeira tela, o navegador ocioso pré-carrega as
+demais, então as navegações seguintes não esperam a rede. Uma navegação mais nova
+durante um download descarta a anterior. Se o módulo não chegar (sem conexão, ou
+uma versão nova publicada com a aba aberta), a tela oferece recarregar a página.
+Uma tela nova precisa entrar em `SCREENS`/`SCREEN_OF` e na lista de `views`.
+
 Histórico, links diretos e recarga funcionam com rotas por hash. O shell fica
 montado entre telas. Alterações de progresso atualizam seus contadores sem
 reconstruir uma atividade em andamento. Na navegação móvel, as regiões

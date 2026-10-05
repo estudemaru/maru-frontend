@@ -1,22 +1,9 @@
-import { renderArcade, renderArcadeHub, renderArcadeProgress } from "./features/arcade.js";
-import { renderDaily } from "./features/daily.js";
-import { renderJourney } from "./features/journey.js";
-import { renderLesson } from "./features/lesson.js";
-import { renderPlacement } from "./features/placement.js";
-import { renderExplore } from "./features/hubs.js";
-import { renderVideoLessons } from "./features/video-lessons.js";
 import { NAVIGATION, navigationFor } from "./core/navigation.js";
-import { renderVocabulary, renderGlossary, renderExercises } from "./features/study.js";
-import { renderWorksheets } from "./features/worksheets.js";
 import { createStore } from "./core/store.js";
 import { createAudio } from "./core/audio.js";
 import { icon } from "./core/icons.js";
 import { dueReviews, currentStreak } from "/shared/progress.js";
 import { renderDashboard } from "./features/dashboard.js";
-import { renderKana } from "./features/kana.js";
-import { renderWriting } from "./features/writing.js";
-import { renderKanji, renderParticles, renderExpressions, renderLibrary, renderReview, addToReview } from "./features/reference.js";
-import { renderSettings } from "./features/settings.js";
 import { emptyState, routeLink, setReaderMode, wideScreen } from "./core/ui.js";
 import { hasKanaFoundation } from './core/beginner.js';
 import { getLesson } from '/shared/curriculum.js';
@@ -39,6 +26,39 @@ if (/^#(?:access_token=|error=)/.test(location.hash)) {
       history.replaceState(null, "", "/#/settings/" + (kind === "recovery" ? "password-reset" : "email-confirmed"));
     } catch { /* The settings page explains how to request a fresh link. */ }
   }
+}
+
+// O início vem junto com o app; as outras telas são baixadas quando abertas pela
+// primeira vez e, depois da primeira tela, pré-carregadas com o navegador ocioso.
+// O botão "Adicionar à revisão" (reference.js) também aparece no vocabulário, então
+// study.js chega junto com ele e o clique grava na hora.
+let reference = null;
+const loadReference = () => import("./features/reference.js").then(module => (reference = module));
+const SCREENS = {
+  arcade: () => import("./features/arcade.js"),
+  daily: () => import("./features/daily.js"),
+  journey: () => import("./features/journey.js"),
+  lesson: () => import("./features/lesson.js"),
+  placement: () => import("./features/placement.js"),
+  hubs: () => import("./features/hubs.js"),
+  videos: () => import("./features/video-lessons.js"),
+  study: () => Promise.all([import("./features/study.js"), loadReference()]).then(([screen]) => screen),
+  worksheets: () => import("./features/worksheets.js"),
+  kana: () => import("./features/kana.js"),
+  writing: () => import("./features/writing.js"),
+  reference: loadReference,
+  settings: () => import("./features/settings.js")
+};
+const SCREEN_OF = {
+  practice: "arcade", arcade: "arcade", progress: "arcade", challenge: "arcade", sentences: "arcade",
+  daily: "daily", journey: "journey", lesson: "lesson", placement: "placement", videos: "videos", explore: "hubs",
+  kana: "kana", writing: "writing", kanji: "reference", particles: "reference", expressions: "reference",
+  library: "reference", review: "reference", vocabulary: "study", glossary: "study", exercises: "study",
+  worksheets: "worksheets", settings: "settings", account: "settings"
+};
+function preloadScreens() {
+  const idle = window.requestIdleCallback || (callback => setTimeout(callback, 1200));
+  idle(() => { for (const load of Object.values(SCREENS)) load().catch(() => {}); }, { timeout: 4000 });
 }
 
 const app = document.querySelector("#app");
@@ -131,7 +151,9 @@ function setMenu(open) {
   if (open) (document.querySelector(".sidebar .nav-link.is-active") || document.querySelector(".sidebar .nav-link"))?.focus();
 }
 matchMedia("(max-width: 820px)").addEventListener("change", () => setMenu(false));
-function render() {
+let renderTicket = 0;
+async function render() {
+  const ticket = ++renderTicket;
   cleanup?.(); cleanup = undefined; audio.stop(); setMenu(false);
   let route = "home", id = "";
   try { [route = "home", id = ""] = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/"); } catch { route = "missing"; }
@@ -154,34 +176,42 @@ function render() {
   document.title = locationInfo.title + " · Maru";
   const views = {
     home: () => renderDashboard(ctx),
-    practice: () => renderArcadeHub(ctx),
-    arcade: () => renderArcade(ctx, id, params),
-    daily: () => renderDaily(ctx),
-    journey: () => renderJourney(ctx, id),
-    lesson: () => renderLesson(ctx, id),
-    placement: () => renderPlacement(ctx),
-    progress: () => renderArcadeProgress(ctx),
-    challenge: () => renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),
-    videos: () => renderVideoLessons(ctx),
-    explore: () => renderExplore(ctx),
-    kana: () => renderKana(ctx, params),
-    writing: () => renderWriting(ctx, id || params.char || "あ"),
-    sentences: () => renderArcade(ctx, "sentences"),
-    kanji: () => renderKanji(ctx),
-    particles: () => renderParticles(ctx),
-    expressions: () => renderExpressions(ctx),
-    library: () => renderLibrary(ctx),
-    review: () => renderReview(ctx),
-    vocabulary: () => renderVocabulary(ctx),
-    glossary: () => renderGlossary(ctx),
-    exercises: () => renderExercises(ctx),
-    worksheets: () => renderWorksheets(ctx, id),
-    settings: () => renderSettings(ctx, id),
-    account: () => renderSettings(ctx, id, true)
+    practice: screen => screen.renderArcadeHub(ctx),
+    arcade: screen => screen.renderArcade(ctx, id, params),
+    daily: screen => screen.renderDaily(ctx),
+    journey: screen => screen.renderJourney(ctx, id),
+    lesson: screen => screen.renderLesson(ctx, id),
+    placement: screen => screen.renderPlacement(ctx),
+    progress: screen => screen.renderArcadeProgress(ctx),
+    challenge: screen => screen.renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),
+    videos: screen => screen.renderVideoLessons(ctx),
+    explore: screen => screen.renderExplore(ctx),
+    kana: screen => screen.renderKana(ctx, params),
+    writing: screen => screen.renderWriting(ctx, id || params.char || "あ"),
+    sentences: screen => screen.renderArcade(ctx, "sentences"),
+    kanji: screen => screen.renderKanji(ctx),
+    particles: screen => screen.renderParticles(ctx),
+    expressions: screen => screen.renderExpressions(ctx),
+    library: screen => screen.renderLibrary(ctx),
+    review: screen => screen.renderReview(ctx),
+    vocabulary: screen => screen.renderVocabulary(ctx),
+    glossary: screen => screen.renderGlossary(ctx),
+    exercises: screen => screen.renderExercises(ctx),
+    worksheets: screen => screen.renderWorksheets(ctx, id),
+    settings: screen => screen.renderSettings(ctx, id),
+    account: screen => screen.renderSettings(ctx, id, true)
   };
   const paused = ["themes", "teacher", "package"].includes(route) || (route === "worksheets" && id && id !== "characters");
   if (paused) main.innerHTML = `<section class="play-paused panel"><span class="play-tag">EM PAUSA</span><h1 tabindex="-1">Um intervalo para preparar o próximo passo.</h1><p>As trilhas temáticas, o material para professores e as atividades impressas estão temporariamente fechados. Seu progresso anterior está preservado.</p><div class="play-actions">${routeLink("journey", "Seguir a trilha", "btn btn-primary")}${routeLink("practice", "Ir para os jogos", "btn btn-ghost")}${routeLink("worksheets", "Imprimir repetições", "btn btn-ghost")}</div></section>`;
-  else if (views[route]) cleanup = views[route]();
+  else if (views[route]) {
+    // O início desenha na hora; as outras telas esperam o próprio módulo. Uma navegação
+    // mais nova durante o download descarta esta. Sem o módulo (rede ou versão nova
+    // publicada), a tela pede para recarregar.
+    const screen = SCREEN_OF[route] ? await SCREENS[SCREEN_OF[route]]().catch(() => null) : undefined;
+    if (ticket !== renderTicket) return;
+    if (screen === null) main.innerHTML = emptyState("Não foi possível abrir esta tela.", "Confira a conexão e recarregue a página. Seu progresso continua salvo.", '<button class="btn btn-primary" type="button" data-reload>Recarregar a página</button>');
+    else cleanup = views[route](screen);
+  }
   else main.innerHTML = emptyState("Este caminho ainda não existe.", "Volte para seu espaço de aprendizado.", routeLink("home", "Meu aprendizado", "btn btn-primary"));
   // Animate only the route entrance. Answering or moving through a lesson keeps the workspace still.
   for (const element of main.children) {
@@ -210,7 +240,8 @@ document.addEventListener("click", event => {
   const speaker = event.target.closest("[data-speak]");
   if (speaker) { event.preventDefault(); audio.speak(speaker.dataset.speak, speaker); }
   const review = event.target.closest("[data-add-review]");
-  if (review) addToReview(ctx, review);
+  if (review) reference?.addToReview(ctx, review);
+  if (event.target.closest("[data-reload]")) location.reload();
   const link = event.target.closest('a[href^="#/"]');
   if (link && link.getAttribute("href") === location.hash && !event.ctrlKey && !event.metaKey) { event.preventDefault(); render(); }
 });
@@ -218,4 +249,4 @@ document.querySelector(".skip-link").addEventListener("click", event => { event.
 window.addEventListener("hashchange", render);
 applyTheme(store.snapshot.preferences.theme);
 syncMotion();
-render();
+render().finally(preloadScreens);
