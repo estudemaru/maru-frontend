@@ -77,7 +77,8 @@ test('reading lessons need no voice, and a voice failure can switch to reading',
   await page.getByRole('button', { name: 'Começar o jogo' }).click();
   const readings = romajiOf(kanji);
   const first = await page.locator('.lesson-game-prompt').textContent();
-  await page.locator('.karuta-card', { has: page.locator('span', { hasText: readings.get(first) }) }).first().click();
+  // Texto exato: "Nihon" também está contido em "Nihongo", e as cartas vêm embaralhadas.
+  await page.locator('.karuta-card', { has: page.getByText(readings.get(first), { exact: true }) }).first().click();
   await expect(page.locator('.lesson-game .feedback')).toContainText('Pegou');
   expect(requested).toEqual([]);
 
