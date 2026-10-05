@@ -173,7 +173,9 @@
   html[data-theme] .stage-seals { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   html[data-theme] .stage-seal { padding: 10px 4px; }
   html[data-theme] .stage-seal .hanko { width: 38px; height: 38px; margin-bottom: 6px; font-size: 21px; }
-  html[data-theme] .stage-seal h3 { font-size: 11px; line-height: 1.3; }
+  /* Quatro selos por linha: abaixo de ~355 px a letra desce até 10 px (o piso dos selos) para
+     "partículas" e "primeiros" caberem inteiras. */
+  html[data-theme] .stage-seal h3 { font-size: clamp(10px, 3.1vw, 11px); line-height: 1.3; overflow-wrap: break-word; }
   html[data-theme] .stage-seal p { font-size: 10px; }
 }
 
@@ -197,7 +199,9 @@
   html[data-theme] .word-card { position: relative; }
   html[data-theme] .word-card > .example-art { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; margin: 0; padding: 3px; }
   html[data-theme] .word-card:has(.card-more[open]) > .example-art { display: none; }
-  html[data-theme] :is(.word-card h2, .library-card h2) { overflow-wrap: break-word; word-break: keep-all; }
+  /* Japonês quebra entre expressões (ありがとう / ございます), não deixando uma letra sozinha na linha;
+     sem suporte a auto-phrase, fica o keep-all. */
+  html[data-theme] :is(.word-card h2, .library-card h2) { overflow-wrap: break-word; word-break: keep-all; word-break: auto-phrase; }
   html[data-theme] .word-card-top > h2 { flex: 1 1 auto; min-width: 0; }
 
   /* Expressões: duas por linha, com os filtros numa faixa que rola para o lado. */
@@ -206,9 +210,9 @@
   /* A expressão usa a largura toda do cartão; o botão de ouvir desce para a linha do romaji. */
   html[data-theme] .expression-card .example { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "jp jp" "romaji audio" "pt pt"; align-items: center; column-gap: 6px; }
   html[data-theme] .expression-card .example-line { display: contents; }
-  html[data-theme] .expression-card .example-line > .jp { grid-area: jp; font-size: clamp(12px, 3.7vw, 17px); line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+  html[data-theme] .expression-card .example-line > .jp { grid-area: jp; font-size: clamp(12px, 3.7vw, 17px); line-height: 1.6; word-break: keep-all; word-break: auto-phrase; overflow-wrap: break-word; }
   html[data-theme] .expression-card .example-line > .audio-button { grid-area: audio; width: 34px; height: 34px; margin: 0; }
-  html[data-theme] .expression-card .romaji { grid-area: romaji; margin: 0; font-size: 11px; }
+  html[data-theme] .expression-card .romaji { grid-area: romaji; margin: 0; font-size: 11px; overflow-wrap: anywhere; }
   html[data-theme] .expression-card .translation { grid-area: pt; margin-top: 4px; font-size: 13px; line-height: 1.4; }
   html[data-theme] .expression-card:has(.card-more[open]) .example-line > .jp { font-size: 20px; }
   html[data-theme] #expression-filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 2px 16px 4px; scrollbar-width: none; }
