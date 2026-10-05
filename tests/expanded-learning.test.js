@@ -88,14 +88,22 @@ test("all study pronunciations have context-appropriate text for the voice API",
   assert.equal(getPronunciation("texto livre não autorizado"),undefined);
 });
 
+// Largura e altura do cabeçalho WebP: VP8X (com transparência), VP8L (sem perdas) ou VP8.
+const webpSize = image => {
+  const chunk = image.toString("latin1",12,16);
+  if (chunk==="VP8X") return [1+image.readUIntLE(24,3),1+image.readUIntLE(27,3)];
+  if (chunk==="VP8L") { const bits = image.readUInt32LE(21); return [1+(bits&0x3fff),1+((bits>>>14)&0x3fff)]; }
+  return [image.readUInt16LE(26)&0x3fff,image.readUInt16LE(28)&0x3fff];
+};
 test("printable picture and dialogue activities have complete local content", () => {
   assert.equal(PICTURE_WORDS.length,14);
   assert.deepEqual([...PICTURE_BANK_ORDER].sort((a,b)=>a-b),Array.from({length:14},(_,i)=>i));
   for(const item of PICTURE_WORDS){
     assert.ok(VOCABULARY.some(word=>word.id===item.wordId),item.wordId);
-    const image = readFileSync(new URL(`../frontend/assets/img/irasutoya-${item.id}.png`,import.meta.url));
-    assert.equal(image.subarray(1,4).toString(),"PNG");
-    assert.ok(image.readUInt32BE(16)>=250 && image.readUInt32BE(20)>=250,"Imagem legível na impressão");
+    const image = readFileSync(new URL(`../frontend/assets/img/irasutoya-${item.id}.webp`,import.meta.url));
+    assert.equal(image.toString("latin1",0,4)+image.toString("latin1",8,12),"RIFFWEBP");
+    const [width,height] = webpSize(image);
+    assert.ok(width>=250 && height>=250,"Imagem legível na impressão");
   }
   assert.ok(PRINT_DIALOGUES.length>=3);
   for(const dialogue of PRINT_DIALOGUES){

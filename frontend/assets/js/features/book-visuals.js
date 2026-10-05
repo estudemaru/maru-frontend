@@ -16,7 +16,7 @@ export function bookPicture(example) {
   const match = pictures.find(([word]) => text === word || text.startsWith(word + '。') || new RegExp(`(?:^|[、。\\s])${word}(?:[はがをにでともの]|$)`).test(text));
   return match ? { id: match[1], label: match[2] } : null;
 }
-export const bookPictureHTML = picture => picture ? `<img class="paper-learning-image" src="/assets/img/irasutoya-${esc(picture.id)}.png" alt="${esc(picture.label)}" width="120" height="120">` : '';
+export const bookPictureHTML = picture => picture ? `<img class="paper-learning-image" src="/assets/img/irasutoya-${esc(picture.id)}.webp" alt="${esc(picture.label)}" width="120" height="120">` : '';
 
 export function exampleKind(example) {
   const text = bookKanaText(example.reading || example.jp).trim();

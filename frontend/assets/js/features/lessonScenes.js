@@ -2,7 +2,7 @@ import { esc, exampleHTML } from '../core/ui.js';
 
 // As cenas acompanham a leitura. No quiz, uma pose neutra não dá pistas da resposta.
 export const readingScene = examples => examples.some(example => /コーヒー|ケーキ/.test(example.jp)) ? 'cafe' : 'study';
-export const lessonArt = (scene = 'study', className = 'lesson-scene-art') => `<img class="${className}" src="/assets/img/irasutoya-lesson-${scene}.png" alt="" width="160" height="160" decoding="async">`;
+export const lessonArt = (scene = 'study', className = 'lesson-scene-art') => `<img class="${className}" src="/assets/img/irasutoya-lesson-${scene}.webp" alt="" width="160" height="160" decoding="async">`;
 export const lessonArtCredit = '<small class="lesson-art-credit">Ilustrações: Mifune Takashi / <a href="https://www.irasutoya.com/" target="_blank" rel="noopener noreferrer">Irasutoya</a></small>';
 
 const wordArt = new Map([
@@ -16,5 +16,5 @@ const wordArt = new Map([
 export const exampleIllustration = example => example.image || wordArt.get(example.jp.trim());
 export const illustratedExampleHTML = (example, romaji) => {
   const image = exampleIllustration(example);
-  return image ? `<div class="lesson-example-scene"><img class="lesson-word-art" src="/assets/img/irasutoya-${esc(image)}.png" alt="" width="80" height="80" loading="lazy">${exampleHTML({ ...example, image: null }, romaji)}</div>` : exampleHTML(example, romaji);
+  return image ? `<div class="lesson-example-scene"><img class="lesson-word-art" src="/assets/img/irasutoya-${esc(image)}.webp" alt="" width="80" height="80" loading="lazy">${exampleHTML({ ...example, image: null }, romaji)}</div>` : exampleHTML(example, romaji);
 };

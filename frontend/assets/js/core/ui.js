@@ -12,7 +12,7 @@ export const progressBar = (value, label = "Progresso") => `<div class="progress
 export const pageHeading = (eyebrow, title, subtitle, action = "") => `<div class="page-heading"><div><p class="eyebrow">${eyebrow}</p><h1 tabindex="-1">${title}</h1><p class="page-description">${subtitle}</p></div>${action}</div>`;
 export const audioButton = (text, label = "Ouvir pronúncia") => `<button type="button" class="icon-button audio-button" data-speak="${esc(text)}" aria-label="${esc(label)}" title="${esc(label)}">${icon("volume")}</button>`;
 export const IRASUTOYA_CREDIT = "Ilustração: Mifune Takashi / Irasutoya · www.irasutoya.com";
-export const irasutoyaImg = (slug, alt) => `<img class="example-art" src="/assets/img/irasutoya-${slug}.png" alt="${esc(alt)}" width="96" height="96" loading="lazy"><small class="art-credit">${IRASUTOYA_CREDIT}</small>`;
+export const irasutoyaImg = (slug, alt) => `<img class="example-art" src="/assets/img/irasutoya-${slug}.webp" alt="${esc(alt)}" width="96" height="96" loading="lazy"><small class="art-credit">${IRASUTOYA_CREDIT}</small>`;
 export const exampleHTML = (example, romaji = true) => `<div class="example">${example.image ? irasutoyaImg(example.image, example.pt) : ""}<div class="example-line"><span class="jp" lang="ja">${jpHTML(example.jp, example.reading)}</span>${audioButton(example.jp)}</div>${romaji ? `<p class="romaji">${esc(example.romaji)}</p>` : ""}<p class="translation">${esc(example.pt)}</p>${example.note ? `<p class="example-note">${esc(beginnerText(example.note))}</p>` : ""}</div>`;
 // Texto das lições: cada linha vira um parágrafo e linhas que começam com "• " viram lista.
 // O conteúdo é autoral (shared/lessons), como o resto do texto das lições.

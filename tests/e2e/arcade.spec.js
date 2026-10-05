@@ -27,7 +27,7 @@ test('infinite pictures accept the selected script, reveal feedback and persist'
   await page.getByRole('button',{name:'Vamos jogar'}).click();
   for(let i=0;i<17;i++) {
     const image = await page.locator('#question-image').getAttribute('src');
-    const item = buildPool({game:'pictures',script:'kanji'}).find(item=>image.includes(`-${item.image}.png`));
+    const item = buildPool({game:'pictures',script:'kanji'}).find(item=>image.includes(`-${item.image}.webp`));
     await expect(page.locator('#arcade-check')).toBeEnabled();
     await page.locator('#arcade-answer').fill(item.answers[0]);
     await page.locator('#arcade-check').click();

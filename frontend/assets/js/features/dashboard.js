@@ -27,7 +27,7 @@ export function renderDashboard(ctx) {
     </section>
     <section class="play-games" aria-labelledby="home-practice-title">
       <div class="play-section-title"><h2 id="home-practice-title">Para praticar.</h2>${routeLink('practice', 'Ver todos ' + icon('arrow'), 'text-link home-all-games', 'aria-label="Ver todos os jogos"')}</div>
-      <div class="play-grid">${games.map(game => `<a class="play-card home-game ${game.color}" href="#/arcade/${game.id}"><div class="play-card-art"><img src="/assets/img/irasutoya-${game.image}.png" width="96" height="96" alt=""><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.id === 'renda' ? 'Kana com um toque' : 'Palavras por imagens'}</span><h3>${esc(game.title)}</h3></div></a>`).join('')}</div>
+      <div class="play-grid">${games.map(game => `<a class="play-card home-game ${game.color}" href="#/arcade/${game.id}"><div class="play-card-art"><img src="/assets/img/irasutoya-${game.image}.webp" width="96" height="96" alt=""><span class="play-arrow" aria-hidden="true">↗</span></div><div class="play-card-copy"><span class="play-subtitle">${game.id === 'renda' ? 'Kana com um toque' : 'Palavras por imagens'}</span><h3>${esc(game.title)}</h3></div></a>`).join('')}</div>
     </section>
     ${dailyBanner(ctx.progress)}
   </div>`;
