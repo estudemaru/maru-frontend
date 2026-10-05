@@ -9,7 +9,7 @@ const testWave=Buffer.alloc(44+48000);
 testWave.write("RIFF",0);testWave.writeUInt32LE(testWave.length-8,4);testWave.write("WAVEfmt ",8);testWave.writeUInt32LE(16,16);testWave.writeUInt16LE(1,20);testWave.writeUInt16LE(1,22);testWave.writeUInt32LE(24000,24);testWave.writeUInt32LE(48000,28);testWave.writeUInt16LE(2,32);testWave.writeUInt16LE(16,34);testWave.write("data",36);testWave.writeUInt32LE(48000,40);
 for(let i=0;i<24000;i++)testWave.writeInt16LE(Math.round(1500*Math.sin(2*Math.PI*440*i/24000)),44+i*2);
 test.beforeEach(async({page})=>{
-  await page.route("**/api/audio",route=>route.fulfill({json:{url:"https://audio1.tts.quest/v1/data/abc123/audio.mp3s",expiresAt:Date.now()+600000,attribution:"VOICEVOX:ずんだもん"}}));
+  await page.route("**/api/audio",route=>route.fulfill({json:{url:"https://audio1.tts.quest/v1/data/abc123/audio.mp3s",expiresAt:Date.now()+600000,attribution:"VOICEVOX:No.7"}}));
   await page.route("https://audio1.tts.quest/**",route=>route.fulfill({contentType:"audio/wav",body:testWave}));
 });
 
