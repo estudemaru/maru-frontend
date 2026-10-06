@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MODULES, UNITS, LESSONS, THEMES, getLesson } from '../shared/curriculum.js';
+import { MODULES, UNITS, LESSONS, THEMES, getLesson, hasCheckpoint } from '../shared/curriculum.js';
 import { CHECKPOINTS, checkpointQuestions, gradeCheckpoint } from '../shared/checkpoints.js';
 import { unitStates, nextStep, stepAfter, isLessonOpen, moduleSeals } from '../shared/learningPath.js';
 import { normalizeSnapshot, mergeSnapshots, recordCheckpoint } from '../shared/progress.js';
@@ -46,8 +46,9 @@ test('checkpoints only ask what their own unit (or an earlier one) taught', () =
       }
     }
   }
-  // Fase 1: unidades com aulas têm checkpoint, menos a 0 (orientação).
-  assert.deepEqual(UNITS.filter(unit => unit.lessons.length && unit.id !== 'start').map(unit => unit.id), Object.keys(CHECKPOINTS));
+  // A trilha decide quem tem checkpoint sem carregar as perguntas: as duas listas precisam bater.
+  assert.deepEqual(UNITS.filter(hasCheckpoint).map(unit => unit.id), Object.keys(CHECKPOINTS));
+  assert.equal(hasCheckpoint(UNITS[0]), false);
 });
 
 test('passing needs 80% and no critical concept fully missed', () => {

@@ -1,5 +1,5 @@
 import { GAMES } from '/shared/arcade.js';
-import { dailyBanner } from './daily.js';
+import { dailyBanner } from './dailyBanner.js';
 import { nextStep, stepRoute } from '/shared/learningPath.js';
 import { esc, icon, routeLink } from '../core/ui.js';
 

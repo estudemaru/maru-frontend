@@ -6,7 +6,7 @@ import { renderKaruta } from './karuta.js';
 import { renderRenda } from './renda.js';
 import { renderKazu } from './kazu.js';
 import { KAZU_CATEGORIES, kazuItem } from '/shared/kazu.js';
-import { dailyBanner } from './daily.js';
+import { dailyBanner } from './dailyBanner.js';
 import { kanaModeButton } from '../core/kanaInput.js';
 import { LEVELS } from '/shared/shiritori.js';
 
