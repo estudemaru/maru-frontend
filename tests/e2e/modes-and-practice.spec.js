@@ -107,8 +107,10 @@ test("listening hides transcription until the answer and records the actual resp
   await page.getByRole("radio",{name:item.answer,exact:false}).check();
   await page.getByRole("button",{name:"Verificar resposta",exact:true}).click();
   await expect(page.locator(".feedback")).toHaveClass(/success/);
-  // Furigana is always shown now; the reading still appears as a substring alongside the kanji.
-  await expect(page.locator(".feedback")).toContainText(item.reading);
+  // A transcrição vem com furigana: sem os <rt>, sobra a frase como foi escrita.
+  // (Comparar com a leitura só funcionava quando o item sorteado não tinha kanji.)
+  const transcript=await page.locator(".feedback").evaluate(el=>{const clone=el.cloneNode(true);clone.querySelectorAll("rt").forEach(rt=>rt.remove());return clone.textContent;});
+  expect(transcript).toContain(item.prompt);
   expect((await snapshot(page)).reviews[item.id].correct).toBe(1);
 });
 
