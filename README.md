@@ -6,7 +6,8 @@ O Maru organiza o estudo em uma trilha clara e acolhedora: a pessoa aprende o al
 
 ## O que a interface oferece
 
-- 51 lições curtas em 8 etapas, do primeiro contato a conversas cotidianas, com o hiragana e o katakana ensinados uma família por vez, com dicas de memória;
+- 47 lições curtas em 15 unidades, do primeiro contato a conversas cotidianas, com o hiragana e o katakana ensinados uma família por vez, com dicas de memória. Cada unidade termina num checkpoint, que abre a seguinte; mais 10 lições em extras sempre abertos;
+- números, horas, dias da semana, meses e datas, contadores e isto/isso/aquilo (com o jeito educado), nas unidades da trilha e no jogo “Quanto, quando, qual”;
 - trilha em forma de mapa de linhas de trem: cada lição abre com o objetivo e uma aula em vídeo, segue em partes curtas, fecha com um resumo, perguntas e um jogo;
 - hiragana, katakana, kanji, vocabulário, partículas e construção de frases;
 - jogos curtos de escrita e escuta com 15, 30 ou 60 segundos por tentativa, modo sem tempo e indicação do que revisar;
@@ -16,7 +17,7 @@ O Maru organiza o estudo em uma trilha clara e acolhedora: a pessoa aprende o al
 - folhas A4 por família, começando pelas vogais, ou por seleção livre de caracteres; modelos de traços e opções colorida e preto e branco de alto contraste;
 - atividades A4 de associação entre imagens e palavras, diálogos para completar e perguntas de compreensão, separadas ou em um pacote, com gabarito opcional;
 - Livro 1 colorido para imprimir, com sumário paginado, 36 lições em kana, atividades e gabaritos; uma introdução a dez kanji básicos aparece somente na última parte;
-- pacotes públicos para professores compartilharem uma etapa ou trilha temática com a turma, sem conta de aluno ou acompanhamento individual;
+- pacotes públicos para professores compartilharem uma unidade ou trilha temática com a turma, sem conta de aluno ou acompanhamento individual;
 - diagnóstico inicial e uma trilha que indica o próximo passo;
 - estilos visuais Dojo e Arcade, metas, constância e conquistas;
 - estudo anônimo no navegador ou sincronização entre aparelhos com uma conta por e-mail em Minha conta; cadastro, confirmação e recuperação de senha sem Google.

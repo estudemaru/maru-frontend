@@ -21,13 +21,15 @@ credenciais e persistência vivem no repositório `maru-backend`.
 | Camada | Responsabilidade |
 | --- | --- |
 | `shared/lessons/` | Texto das lições, exemplos, objetivos e perguntas. |
-| `shared/curriculum.js` | Ordem das oito etapas (lista de IDs por etapa), resultado de cada etapa e referências. |
+| `shared/curriculum.js` | As 15 unidades e os extras (lista de IDs por unidade), os temas de origem de cada lição e referências. |
+| `shared/checkpoints.js` | Perguntas de cada checkpoint, conceitos críticos e a correção (80%). |
+| `shared/kazu.js` | Jogo “Quanto, quando, qual”: leituras de números, horas, datas, contadores e これ/それ/あれ, alternativas e chaves de revisão. |
 | `shared/videos.js` | Aulas do YouTube ligadas às lições, canais e URLs de miniatura e player. |
 | `shared/renda.js` | Regras do jogo "Só mais um": conjunto de caracteres, alternativas e chaves de revisão. |
 | `shared/catalog.js` | Combinações, kanji iniciais, partículas, expressões e frases. |
 | `shared/vocabulary.js`, `glossary.js`, `exercises.js` | Vocabulário inicial, conceitos e perguntas por tipo. |
 | `shared/pronunciation.js` | Texto e leitura correta das pronúncias aceitas pela API. |
-| `shared/placement.js`, `learningPath.js` | Diagnóstico por etapa, ponto de entrada e selos de conclusão. |
+| `shared/placement.js`, `learningPath.js` | Diagnóstico por unidade, unidades abertas, próxima parada e selos de conclusão. |
 | `shared/discovery.js` | Cápsulas culturais e trilhas temáticas por referências ao acervo. |
 | `maru-backend/supabase/functions/maru-api/` | API de produção, sessões Supabase Auth e progresso no Postgres. |
 | `shared/gamification.js` | Níveis, missões e conquistas derivados do progresso. |
@@ -82,7 +84,8 @@ a busca. Nenhuma rota de conteúdo foi removida.
 ## Telas
 
 - Dashboard: próximo passo, meta diária e acesso às práticas.
-- Journey: mapa de linhas de trem; próxima parada, as oito etapas e uma estação por lição.
+- Journey: mapa de linhas de trem; próxima parada, as 15 unidades com cadeado, uma estação por lição, o checkpoint e os extras.
+- Checkpoint: as perguntas da unidade, uma por vez, e o resultado com o que revisar.
 - Lesson: abertura com objetivo e vídeo, partes curtas, resumo, perguntas explicadas, jogo e próxima parada.
 - Kana: tabela, fileiras e configuração das rodadas.
 - Practice: rodada reutilizável, respostas e repetição dos erros.
@@ -329,12 +332,13 @@ TTS Quest. PDFs são gerados no teste e conferidos por número de páginas.
 
 O diagnóstico é acessado pela home e configurações, sem item extra no menu.
 Seu resultado não passa por completeLesson ou recordReview: apenas placement é
-salvo. learningPath.js seleciona a próxima lição a partir da etapa aceita. Etapas
-anteriores continuam livres e aparecem como revisão opcional.
+salvo. learningPath.js abre as unidades até a aceita e seleciona a próxima parada a
+partir dela. As unidades anteriores contam como vencidas e aparecem como revisão
+opcional.
 
 Trilhas temáticas ficam em
 Descobrir, assim como os imprimíveis. Cápsulas aparecem na última explicação da
-lição correspondente. Selos derivam de todas as lições reais de uma etapa; não são
+lição correspondente. Selos derivam de todas as lições reais de uma unidade; não são
 uma segunda fonte de verdade para o progresso.
 
 O material para professores também fica em Descobrir e pode ser acessado pela
@@ -392,9 +396,9 @@ memória para cada caractere) e o katakana de 5 para 8. Os IDs antigos foram
 mantidos, então o progresso de quem já estudava continua valendo; `h-rows` virou a
 revisão de K a H e `h-rest` fecha a tabela com わ, を e ん.
 
-- `features/journey.js`: mapa de linhas de trem. Cada etapa tem uma cor
-  (`--line-*` em `trail.css`), o mapa no topo leva a cada etapa e a próxima lição
-  mostra "Você está aqui". `trailBanner` leva a próxima parada para a home.
+- `features/journey.js`: mapa de linhas de trem. Cada unidade tem uma cor
+  (`--line-*` em `trail.css`), o mapa no topo leva a cada unidade e a próxima parada
+  (uma lição ou o checkpoint) mostra "Você está aqui".
 - `features/lesson.js`: abertura (objetivo, plano da lição e vídeo), uma parte por
   seção, resumo na última parte, perguntas, jogo e conclusão com a próxima parada.
   Exemplos de um kana com dica viram cartões que tocam o som. A conclusão das
@@ -435,3 +439,56 @@ No computador nada muda.
   letra em Meu ritmo.
 - Grades: Palavras, Biblioteca, Partículas, Expressões e o glossário em duas
   colunas; kanji em três.
+
+
+## Unidades e checkpoints (05/10/2026)
+
+Fase 1 de `docs/TRILHA-N5.md`: a trilha passou de 9 etapas abertas para 15 unidades
+em ordem, mais três extras, sem conteúdo novo em japonês.
+
+- **Unidade e tema.** `MODULES` (as unidades e os extras) decide a posição na
+  trilha. `THEMES` guarda as etapas antigas e decide o que depende do tipo de
+  conteúdo: o jogo de cada lição (`lessonGame.js`), o Livro 1 (`book-content.js`),
+  o modo de leitura antes do kana e o treino "Só mais um". Cada lição tem os dois:
+  `moduleId` e `theme`.
+- **Bloqueio sem estado novo.** `unitStates` calcula tudo a partir das lições, dos
+  checkpoints e do diagnóstico. Uma unidade abre quando a anterior foi vencida
+  (checkpoint aprovado; na unidade 0, as aulas lidas), quando o diagnóstico aceito
+  começa nela ou depois, ou quando a pessoa já concluiu alguma aula dela. Unidades
+  ainda sem aulas abrem e contam como vencidas.
+- **Checkpoints.** `shared/checkpoints.js` escolhe à mão perguntas das lições da
+  unidade. Uma lição que ainda mistura ideias de várias unidades só cede as
+  perguntas da ideia desta unidade. Unidades com poucas perguntas completam a prova
+  com itens do jogo "Quanto, quando, qual". Para passar: 80%, sem nenhum conceito
+  crítico com todas as perguntas erradas. Os erros aparecem no resultado, com o
+  link da aula; ainda não entram na revisão do FSRS.
+- **Progresso.** `checkpoints` guarda, por unidade, `passedAt`, `best`, `attempts`
+  e `updatedAt`. Progresso antigo vira `{}`, e chaves desconhecidas são mantidas. A
+  mescla guarda a primeira aprovação e a melhor nota. O diagnóstico salvo com as
+  etapas antigas é traduzido para a unidade equivalente (`sentences` → `meet`,
+  `everyday` → `numbers`). Como `progress.js` também roda no backend, a Edge
+  Function precisa ser publicada antes do frontend: a versão antiga descartaria o
+  campo novo.
+
+## Quanto, quando e qual (05/10/2026)
+
+As seis lições de `shared/lessons/numbers.js` ensinam números até 10.000, horas e
+minutos, dias da semana, meses e dias do mês, contadores (つ, 人, 本, 枚, 匹) e a
+série こ/そ/あ/ど, inclusive こちら/そちら/あちら/どちら. Elas nunca foram uma etapa
+publicada: entram direto nas unidades 4, 6, 7 e 13. O tema `numbers` fica fora do
+Livro 1 e das leituras que ele usa para trocar kanji por kana (`book-content.js`),
+porque horas e datas pedem kanji.
+
+Cada lição termina no jogo de leitura e leva, pelo botão de prática, ao jogo do Arcade
+“Quanto, quando, qual” (`features/kazu.js`) já na categoria dela. O jogo usa as peças
+visuais do “Só mais um”. As leituras de `shared/kazu.js` são escritas à mão:
+`traps` guarda erros comuns (さんほん, よんじ, はちにち) e `alt`, variantes aceitas
+(じっぷん, はちふん), que nunca aparecem como alternativa errada. Do português, os
+contadores mostram o mesmo número com outro contador; つ só entra quando a pergunta
+é sobre pessoas ou bichos, porque também serve para objetos. A revisão fica em
+`arcade:kazu:<categoria>:<read|meaning>:<id>`.
+
+Os itens do jogo e os exemplos dessas lições entram no catálogo de voz com a leitura
+ensinada (よじ, ついたち), não com a escrita, para a síntese não escolher outra
+leitura. `tests/kazu.test.js` confere leituras irregulares, alternativas únicas e
+a pronúncia de cada item.

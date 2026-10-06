@@ -2,18 +2,32 @@
 
 A trilha assume zero conhecimento de japonês. O aluno recebe explicação em
 português antes dos exercícios; exemplos trazem japonês, leitura de apoio e
-tradução. A progressão é recomendada, sem bloqueios artificiais.
+tradução.
 
-| Etapa | Lições | Resultado esperado |
+A trilha tem 15 unidades em ordem, do zero ao N5 (o plano completo está em
+`TRILHA-N5.md`). Cada unidade termina num checkpoint, e a seguinte só abre depois
+dele. Arcade, revisão, consulta, folhas e os extras continuam livres. Esta é a
+fase 1: as lições atuais nos novos lugares, sem conteúdo novo. Uma lição que ainda
+ensina várias ideias fica inteira, na unidade da primeira delas.
+
+| Unidade | Lições | Resultado esperado |
 | --- | --- | --- |
-| Primeiros passos | 6 | Reconhecer as escritas, perceber sons e cumprimentar. |
-| Hiragana | 14 | Uma família por lição (あ, か, さ, た, な, は, revisão, ま, や/ら, わをん), depois ゛゜, combinações, palavras e uma cena. |
-| Katakana | 8 | Vogais e K; S/T; N/H; M a ン; formas parecidas; ー e sons adaptados; palavras e cena. |
-| Primeiros kanji | 4 | Significado e leituras, números, natureza e peças. |
-| Construir frases | 5 | Apresentar-se, perguntar, negar e expressar ações. |
-| Partículas | 4 | Identificar tópico, sujeito, objeto, lugar e relações. |
-| Dia a dia | 5 | Pedir itens, encontrar lugares e pedir ajuda na conversa. |
-| Além dos livros | 5 | Entender registro, gírias e expressões de comunidades. |
+| 0 Começando do zero | 3 | Saber como o japonês é escrito e como estudar (sem checkpoint). |
+| 1 Hiragana | 10 | Uma família por lição (あ, か, さ, た, な, は, revisão, ま, や/ら, わをん). |
+| 2 Hiragana avançado | 4 | ゛゜, combinações, palavras e uma cena. |
+| 3 Apresentar-se | 5 | Cumprimentar, dizer quem é, perguntar com か, の e も. |
+| 4 Coisas ao meu redor | 1 | これ/それ/あれ e この/その/あの. |
+| 5 Katakana | 8 | Vogais e K; S/T; N/H; M a ン; formas parecidas; ー e sons adaptados; palavras e cena. |
+| 6 Números | 3 | Números com kanji, até 10.000, e preços. |
+| 7 Tempo | 3 | Horas, dias da semana, meses e datas. |
+| 8 Lugares | 2 | ここ/そこ/あそこ/どこ e あります/います. |
+| 9 Verbos e rotina | 6 | を, に, へ, で, ます e ません, pedidos e pedidos de ajuda. |
+| 10 Descrição | 1 | Adjetivos い e な. |
+| 11 Gostos, 12 Passado, 14 Forma て | 0 | Em preparo; a trilha passa direto por elas. |
+| 13 Quantidades | 1 | つ, 人, 本, 枚 e 匹. |
+
+Extras, sempre abertos e sem checkpoint: Gramática para curiosos (2), Kanji como
+sistema (3) e Além dos livros (5).
 
 ## Voz das lições
 
@@ -66,7 +80,10 @@ fluência, boa caligrafia ou capacidade de manter conversações espontâneas.
 2. Inclua objetivo, duração, seções, exemplos, perguntas explicadas, `hook` e `recap`.
 3. Defina o índice da resposta correta em cada pergunta.
 4. Para prática complementar, informe uma rota existente e parâmetros.
-5. Coloque o ID na lista da etapa em curriculum.js, na posição recomendada.
+5. Coloque o ID na lista da unidade em curriculum.js (`MODULES`), na posição certa,
+   e no tema dela (`THEMES`): o tema decide o jogo da lição e o Livro 1.
+   Perguntas sobre a ideia da unidade podem entrar no checkpoint dela, em
+   shared/checkpoints.js.
 6. Se houver aula em vídeo, ligue o ID dela em shared/videos.js.
 7. Execute as verificações e teste leitura e prática.
 
