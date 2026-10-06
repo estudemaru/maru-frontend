@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { LESSONS, getLesson } from '../../shared/curriculum.js';
 import { rendaPool } from '../../shared/renda.js';
 import { videosFor } from '../../shared/videos.js';
+import { unlockTrail, startHiragana } from './unlock.js';
 
 test.beforeEach(async ({ context, page }) => {
   await context.setExtraHTTPHeaders({ 'x-maru-user': 'e2e-' + randomUUID() });
@@ -11,31 +12,40 @@ test.beforeEach(async ({ context, page }) => {
 });
 const fits = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
-test('the journey lists stages on a phone, and the desktop line map opens a stage', async ({ page }) => {
+test('the journey lists units on a phone, locks the later ones, and the desktop line map opens a unit', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/journey');
   await expect(page.locator('main h1')).toHaveText('Do zero, com direção.');
   await expect(page.locator('.trail-next h2')).toHaveText(LESSONS[0].title);
   await expect(page.locator('.trail-stop.is-next')).toContainText('Você está aqui');
-  // No celular o mapa repetiria as etapas logo abaixo: elas abrem pela lista.
+  // No celular o mapa repetiria as unidades logo abaixo: elas abrem pela lista.
   await expect(page.locator('.trail-map')).toBeHidden();
   expect(await fits(page)).toBe(true);
-  await page.locator('#etapa-katakana > summary').click();
-  await expect(page.locator('#etapa-katakana')).toHaveAttribute('open', '');
-  await expect(page.locator('#etapa-start')).not.toHaveAttribute('open', '');
-  await expect(page.locator('#etapa-katakana .trail-stop')).toHaveCount(8);
+  await page.locator('#unidade-world > summary').click();
+  await expect(page.locator('#unidade-world')).toHaveAttribute('open', '');
+  await expect(page.locator('#unidade-start')).not.toHaveAttribute('open', '');
+  // Katakana é a unidade 5: aulas e checkpoint aparecem com cadeado, sem link, e com o motivo.
+  await expect(page.locator('#unidade-world .trail-stop.is-locked')).toHaveCount(9);
+  await expect(page.locator('#unidade-world a')).toHaveCount(0);
+  await expect(page.locator('#unidade-world .trail-locked-note')).toContainText('checkpoint da Unidade 4');
+  await page.goto('/#/lesson/k-basics');
+  await expect(page.locator('.trail-locked')).toContainText('Agora você está na Unidade 0');
+  await expect(page.locator('.trail-locked .btn-primary')).toHaveAttribute('href', '#/lesson/' + LESSONS[0].id);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/#/journey');
-  await expect(page.locator('.trail-map-stop')).toHaveCount(9);
-  await page.locator('.trail-map-stop[href="#/journey/kanji"]').click();
-  await expect(page.locator('#etapa-kanji')).toHaveAttribute('open', '');
+  await expect(page.locator('.trail-map-stop')).toHaveCount(15);
+  await expect(page.locator('.trail-map-stop.is-locked')).toHaveCount(14);
+  await expect(page.locator('#unidade-casual a.lesson-row')).toHaveCount(5);
+  await page.locator('.trail-map-stop[href="#/journey/time"]').click();
+  await expect(page.locator('#unidade-time')).toHaveAttribute('open', '');
   await page.goto('/#/home');
   await expect(page.locator('.home-start')).toHaveAttribute('href', '#/lesson/' + LESSONS[0].id);
   expect(errors).toEqual([]);
 });
 
 test('a kana lesson opens with its goal and video, teaches with tiles and ends with a recap', async ({ page }) => {
+  await unlockTrail(page);
   await page.setViewportSize({ width: 390, height: 844 });
   const lesson = getLesson('h-vowels');
   await page.goto('/#/lesson/h-vowels');
@@ -64,6 +74,7 @@ test('a kana lesson opens with its goal and video, teaches with tiles and ends w
 });
 
 test('kana cards switch by touch, keyboard and swipe without losing their sound or memory hint', async ({ page }) => {
+  await unlockTrail(page);
   await page.setViewportSize({ width: 320, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#/settings');
@@ -97,6 +108,7 @@ test('kana cards switch by touch, keyboard and swipe without losing their sound 
 });
 
 test('lesson stages and answer feedback follow mistakes, a retry and completion on a phone', async ({ page }) => {
+  await unlockTrail(page);
   await page.setViewportSize({ width: 390, height: 844 });
   const lesson = getLesson('h-vowels');
   await page.goto('/#/lesson/h-vowels');
@@ -131,6 +143,7 @@ for (const theme of ['dojo', 'arcade']) {
   test(`mobile lessons keep reading and quiz actions reachable in ${theme}`, async ({ page }) => {
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     const lesson = getLesson('h-vowels');
+    await startHiragana(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/#/journey');
     if (theme === 'arcade') await page.locator('#theme-toggle').click();
@@ -149,7 +162,7 @@ for (const theme of ['dojo', 'arcade']) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto('/#/journey');
       await reachable(page.locator('.trail-stop.is-next .lesson-row'));
-      await page.locator('#etapa-hiragana > summary').click();
+      await page.locator('#unidade-start > summary').click();
       await expect(page.locator('.trail-station[open]')).toHaveCount(1);
       await page.goto('/#/lesson/h-vowels');
       await expect(page.locator('.lesson-video')).not.toHaveAttribute('open', '');
@@ -157,7 +170,7 @@ for (const theme of ['dojo', 'arcade']) {
       await page.locator('[data-lesson="next"]').click();
       await expect(page.locator('.topbar')).toBeHidden();
       await expect(page.locator('.mobile-nav')).toBeHidden();
-      await reachable(page.getByRole('link', { name: 'Voltar à trilha: Aprenda hiragana', exact: true }));
+      await reachable(page.getByRole('link', { name: 'Voltar à trilha: Hiragana', exact: true }));
       await expect.poll(() => page.locator('.lesson-scene-art').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
       if (await page.locator('#toast').isVisible()) {
         const toast = await page.locator('#toast').boundingBox();
@@ -197,6 +210,7 @@ for (const theme of ['dojo', 'arcade']) {
 }
 
 test('illustrated lessons use Irasutoya scenes and matching vocabulary, and restore navigation on exit', async ({ page }) => {
+  await unlockTrail(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/lesson/h-words');
   await page.locator('[data-lesson="next"]').click();
@@ -207,7 +221,7 @@ test('illustrated lessons use Irasutoya scenes and matching vocabulary, and rest
   await expect(art.nth(2)).toHaveAttribute('src', '/assets/img/irasutoya-fish.webp');
   await expect.poll(() => page.locator('.lesson-reader img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
   await expect(page.locator('.lesson-art-credit')).toContainText('Mifune Takashi / Irasutoya');
-  await page.getByRole('link', { name: 'Voltar à trilha: Aprenda hiragana', exact: true }).click();
+  await page.getByRole('link', { name: 'Voltar à trilha: Hiragana avançado', exact: true }).click();
   await expect(page.locator('.trail-page')).toBeVisible();
   await expect(page.locator('.topbar')).toBeVisible();
   await expect(page.locator('.mobile-nav')).toBeVisible();
@@ -259,6 +273,7 @@ test('Só mais um plays by touch on a phone, gives the memory hint on a miss and
 });
 
 test('finishing a lesson offers the next stop and a drill with only the letters seen so far', async ({ page }) => {
+  await unlockTrail(page);
   const lesson = getLesson('h-sa');
   await page.goto('/#/lesson/h-sa');
   for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();

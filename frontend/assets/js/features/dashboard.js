@@ -1,6 +1,6 @@
 import { GAMES } from '/shared/arcade.js';
 import { dailyBanner } from './daily.js';
-import { nextLesson } from '/shared/learningPath.js';
+import { nextStep, stepRoute } from '/shared/learningPath.js';
 import { esc, icon, routeLink } from '../core/ui.js';
 
 // Folhas do bambu da capa: [x, y, rotação, escala] no desenho de 520 × 500.
@@ -12,7 +12,7 @@ const HERO_SCENE = `<div class="hero-window"><div class="hero-view"><span class=
 const HERO_BADGE = `<span class="hero-badge"><svg viewBox="0 0 100 100"><defs><path id="hero-badge-ring" d="M50,50 m-40,0 a40,40 0 1,1 80,0 a40,40 0 1,1 -80,0"/></defs><text><textPath href="#hero-badge-ring" textLength="244" lengthAdjust="spacing">JAPONÊS NO SEU RITMO ✦ まいにち ✦</textPath></text></svg><b lang="ja">丸</b></span>`;
 
 export function renderDashboard(ctx) {
-  const next = nextLesson(ctx.progress);
+  const next = nextStep(ctx.progress);
   const started = Object.values(ctx.progress.lessons).some(lesson => lesson.completedAt);
   const startLabel = next ? started ? 'Continuar minha trilha' : 'Começar minha trilha' : 'Rever minha trilha';
   const games = GAMES.filter(game => ['renda', 'pictures'].includes(game.id));
@@ -21,7 +21,7 @@ export function renderDashboard(ctx) {
       <div class="play-hero-copy">
         <h1 tabindex="-1"><span class="hero-line">Um traço.</span> <em class="hero-line">Um novo começo.</em></h1>
         <p>Um pouquinho de japonês. No seu ritmo.</p>
-        <div class="play-actions">${routeLink(next ? 'lesson/' + next.id : 'journey', startLabel + icon('arrow'), 'btn btn-primary home-start')}</div>
+        <div class="play-actions">${routeLink(stepRoute(next), startLabel + icon('arrow'), 'btn btn-primary home-start')}</div>
       </div>
       <div class="play-hero-art" aria-hidden="true"><div class="book-scene">${HERO_BADGE}${HERO_SCENE}</div><span class="hero-petals">${'<i></i>'.repeat(8)}</span></div>
     </section>

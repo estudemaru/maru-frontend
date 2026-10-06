@@ -444,3 +444,29 @@ html[data-theme] .worksheet-family[aria-pressed="true"] { background: var(--seal
   .trail-stop.is-next .trail-node, .renda-choice.is-wrong { animation: none !important; }
 }
 @media print { .video-panel, .trail-map { display: none !important; } }
+
+/* Unidades fechadas, unidades em preparo, extras e checkpoints (docs/TRILHA-N5.md). */
+.trail-map-stop.is-locked, .trail-map-stop.is-soon { color: var(--muted); }
+.trail-map-stop.is-locked .trail-map-dot, .trail-map-stop.is-soon .trail-map-dot { border-style: dashed; color: var(--muted); }
+.trail-map-stop.is-locked .trail-map-dot .icon { width: 18px; height: 18px; }
+.trail-station.is-locked .module-symbol .icon { width: 20px; height: 20px; }
+.trail-station .pill .icon { width: 10px; height: 10px; }
+html[data-theme] .trail-stop.is-locked .lesson-row { color: var(--muted); cursor: default; }
+html[data-theme] .trail-stop.is-locked .lesson-row:hover { background: transparent; }
+.trail-stop.is-locked .trail-node { border-style: dashed; color: var(--muted); }
+.trail-checkpoint .trail-stop-copy > strong { letter-spacing: .02em; }
+.trail-locked-note, .trail-soon { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 14px; padding: 12px 14px; border: 1.5px dashed var(--line); border-radius: 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.trail-locked-note .icon { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 2px; }
+.trail-extras { margin-top: 40px; }
+.trail-extras > h2 { font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 26px); line-height: 1.4; }
+.trail-extras > p { margin: 6px 0 18px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.trail-locked, .checkpoint-intro, .checkpoint-result { max-width: 720px; padding: clamp(22px, 4vw, 36px); }
+.trail-locked h1, .checkpoint-intro h1, .checkpoint-result h1 { font-family: var(--font-display); font-size: clamp(26px, 4vw, 36px); line-height: 1.35; margin: 8px 0 14px; }
+.trail-locked > p:not(.eyebrow), .checkpoint-intro > p:not(.eyebrow), .checkpoint-result > p:not(.eyebrow) { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 12px 0; }
+.trail-locked-mark { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 14px; border: 2px dashed var(--line); border-radius: 50%; color: var(--muted); }
+.trail-locked-mark .icon { width: 24px; height: 24px; }
+html[data-theme] .checkpoint-result > p.checkpoint-score { color: var(--ink); font-size: clamp(22px, 3vw, 28px); }
+.checkpoint-note { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--surface-soft); color: var(--ink); font-size: 14px; line-height: 1.7; }
+.checkpoint-note .icon { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 3px; }
+.checkpoint-note.is-critical { border: 1.5px solid var(--accent); }
+.checkpoint-note .text-link { font-size: 12px; }

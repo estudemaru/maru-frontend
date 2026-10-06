@@ -1,6 +1,6 @@
 import { PRACTICE_TOOLS, RESOURCES, RESOURCE_GROUPS } from "../core/navigation.js";
 import { pageHeading, icon, routeLink, esc } from "../core/ui.js";
-import { nextLesson } from "/shared/learningPath.js";
+import { nextStep, stepRoute } from "/shared/learningPath.js";
 import { dueReviews } from "/shared/progress.js";
 
 const symbol = item => ["あ", "日"].includes(item.icon) ? `<span class="jp" lang="ja">${item.icon}</span>` : icon(item.icon);
@@ -9,10 +9,10 @@ const normalize = value => value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""
 
 export function renderPracticeHub(ctx) {
   const due = dueReviews(ctx.progress).length;
-  const next = nextLesson(ctx.progress);
+  const next = nextStep(ctx.progress);
   ctx.main.innerHTML = pageHeading("UM POUCO, TODOS OS DIAS", "Escolha seu jogo de hoje.", "Escolha como quer praticar agora. Cada atividade explica o caminho, e você pode tentar de novo.") +
     (due ? `<aside class="hub-recommendation panel"><span class="hub-card-symbol lavender" aria-hidden="true">${icon("repeat")}</span><div><p class="eyebrow">ANTES DE ALGO NOVO</p><h2>${due === 1 ? "Uma revisão esperando por você." : due + " revisões esperando por você."}</h2><p>Reencontre o que já estudou enquanto ainda está fresco na memória.</p></div>${routeLink("review", "Revisar agora " + icon("arrow"), "btn btn-primary")}</aside>` : "") +
-    `<div class="hub-grid practice-hub-grid">${PRACTICE_TOOLS.map(item => card(item, "h2")).join("")}</div><aside class="hub-note"><span class="hanko small-hanko" aria-hidden="true">あ</span><div><h2>Ainda não sabe por onde começar?</h2><p>A trilha apresenta cada ideia antes de pedir que você pratique.</p>${routeLink(next ? "lesson/" + next.id : "journey", next ? "Seguir minha trilha " + icon("arrow") : "Rever minha trilha " + icon("arrow"), "text-link")}</div></aside><div class="hub-paper-link">${icon("pen")}<p>Prefere treinar no papel? ${routeLink("worksheets", "Abrir atividades para imprimir", "text-link")}</p></div>`;
+    `<div class="hub-grid practice-hub-grid">${PRACTICE_TOOLS.map(item => card(item, "h2")).join("")}</div><aside class="hub-note"><span class="hanko small-hanko" aria-hidden="true">あ</span><div><h2>Ainda não sabe por onde começar?</h2><p>A trilha apresenta cada ideia antes de pedir que você pratique.</p>${routeLink(stepRoute(next), next ? "Seguir minha trilha " + icon("arrow") : "Rever minha trilha " + icon("arrow"), "text-link")}</div></aside><div class="hub-paper-link">${icon("pen")}<p>Prefere treinar no papel? ${routeLink("worksheets", "Abrir atividades para imprimir", "text-link")}</p></div>`;
 }
 
 export function renderExplore(ctx) {

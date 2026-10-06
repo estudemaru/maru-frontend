@@ -1,11 +1,13 @@
 import { CULTURE_CAPSULES } from "/shared/discovery.js";
 import { conceptsIn } from "/shared/glossary.js";
-import { getLesson, getModule, getTheme, LESSONS, moduleLabel } from "/shared/curriculum.js";
+import { getLesson, getModule, getTheme, moduleLabel } from "/shared/curriculum.js";
+import { isLessonOpen, stepAfter, stepRoute } from "/shared/learningPath.js";
 import { completeLesson } from "/shared/progress.js";
 import { personalBest } from "/shared/arcade.js";
 import { lessonGameKey, lessonGameKind, LESSON_GAME_KINDS } from "/shared/lessonGame.js";
 import { videosFor } from "/shared/videos.js";
 import { mountLessonGame } from "./lessonGame.js";
+import { lockedPanel } from "./checkpoint.js";
 import { readingScene, lessonArt, lessonArtCredit, illustratedExampleHTML } from "./lessonScenes.js";
 import { videoPanelHTML, bindVideos } from "../core/videos.js";
 import { esc, icon, routeLink, progressBar, exampleHTML, emptyState, beginnerText, richText } from "../core/ui.js";
@@ -35,6 +37,7 @@ function trainingScope(lesson) {
 export function renderLesson(ctx, id) {
   const source = getLesson(id);
   if (!source) { ctx.main.innerHTML = emptyState("Lição não encontrada", "Escolha uma lição na sua trilha.", routeLink("journey", "Ver a trilha")); return; }
+  if (!isLessonOpen(ctx.progress, id)) { ctx.main.innerHTML = `<div class="lesson-locked">${lockedPanel(ctx.progress, getModule(source.moduleId))}</div>`; return; }
   const lesson = { ...source, goal: beginnerText(source.goal), hook: beginnerText(source.hook), sections: source.sections.map(section => ({ ...section, title: beginnerText(section.title), body: section.body.split("\n").map(beginnerText).join("\n"), tip: section.tip && beginnerText(section.tip) })), quiz: source.quiz.map(question => ({ ...question, prompt: beginnerText(question.prompt), choices: question.choices.map(beginnerText), explanation: beginnerText(question.explanation) })) };
   const module = getModule(lesson.moduleId);
   const videos = videosFor(id);
@@ -86,9 +89,10 @@ export function renderLesson(ctx, id) {
     shell(`<div class="lesson-question-head"><div class="lesson-question-scene">${lessonArt(feedback ? feedback.correct ? "idea" : "think" : "study")}<span class="lesson-question-mark ${cue ? "jp" : ""}${cue && [...cue].length > 2 ? " is-phrase" : ""}"${cue ? ' lang="ja"' : ' aria-hidden="true"'}>${cue ? esc(cue) : icon("target")}</span></div><div><span class="step-label">SUA VEZ · ${questionIndex + 1} DE ${queue.length}</span><h2 data-focus tabindex="-1">${esc(question.prompt)}</h2><p>Escolha uma resposta. Errar faz parte do aprendizado.</p></div></div><form id="lesson-answer"><fieldset class="answer-options" ${feedback ? "disabled" : ""}><legend class="sr-only">Escolha uma resposta</legend>${question.choices.map((choice, index) => `<label class="answer-option ${feedback && index === question.answer ? "is-correct" : feedback && index === feedback.selected && !feedback.correct ? "is-wrong" : ""}"><input type="radio" name="answer" value="${index}" required ${feedback?.selected === index ? "checked" : ""}><span class="option-letter">${String.fromCharCode(65 + index)}</span><span>${esc(choice)}</span>${feedback && index === question.answer ? icon("check") : ""}</label>`).join("")}</fieldset>${feedback ? `<div class="feedback ${feedback.correct ? "success" : "retry"}" role="status"><span class="lesson-feedback-mark" aria-hidden="true">${icon(feedback.correct ? "check" : "repeat")}</span><div><strong>${feedback.correct ? "Isso mesmo!" : "Vamos entender juntos."}</strong><p>${question.explanation}</p></div></div><div class="lesson-controls"><span class="small muted">${feedback.correct ? "Mais um passo dado." : "Você vai poder tentar esta pergunta de novo."}</span><button type="button" class="btn btn-primary" data-lesson="question-next" data-focus>Continuar ${icon("arrow")}</button></div>` : '<div class="lesson-controls align-end"><button class="btn btn-primary" type="submit">Verificar resposta</button></div>'}</form>`);
   }
   function done() {
-    const next = LESSONS[LESSONS.findIndex(item => item.id === lesson.id) + 1];
+    const next = stepAfter(ctx.progress, lesson.id);
+    const nextModule = next && (next.kind === "lesson" ? getModule(next.lesson.moduleId) : next.unit);
     const scope = trainingScope(source);
-    const nextStop = next ? `<a class="next-stop" href="#/lesson/${next.id}"><span class="next-stop-copy"><span class="eyebrow">PRÓXIMA PARADA${next.moduleId !== lesson.moduleId ? " · NOVA UNIDADE" : ""}</span><strong>${next.title}</strong><small>${esc(beginnerText(next.hook))}</small></span><span class="next-stop-go">${icon("arrow")}</span></a>` : `<a class="next-stop" href="#/journey"><span class="next-stop-copy"><span class="eyebrow">FIM DA TRILHA</span><strong>Você chegou ao fim das 8 etapas!</strong><small>Volte à trilha para revisar o que quiser.</small></span><span class="next-stop-go">${icon("arrow")}</span></a>`;
+    const nextStop = next ? `<a class="next-stop" href="#/${stepRoute(next)}"><span class="next-stop-copy"><span class="eyebrow">PRÓXIMA PARADA${nextModule.id !== lesson.moduleId ? " · " + moduleLabel(nextModule).toUpperCase() : ""}</span><strong>${next.kind === "lesson" ? next.lesson.title : "Checkpoint: " + esc(nextModule.title)}</strong><small>${next.kind === "lesson" ? esc(beginnerText(next.lesson.hook)) : "Mostre o que aprendeu e abra a próxima unidade."}</small></span><span class="next-stop-go">${icon("arrow")}</span></a>` : `<a class="next-stop" href="#/journey"><span class="next-stop-copy"><span class="eyebrow">${module.extra ? "FIM DO EXTRA" : "FIM DA TRILHA, POR ENQUANTO"}</span><strong>${module.extra ? "Você leu todas as lições deste extra." : "Você chegou ao fim das unidades prontas!"}</strong><small>Volte à trilha para revisar o que quiser.</small></span><span class="next-stop-go">${icon("arrow")}</span></a>`;
     shell(`<div class="completion"><div class="lesson-celebration">${lessonArt("celebrate")}<span class="completion-mark">${icon("check")}</span></div><p class="eyebrow">UM PASSO A MAIS</p><h2 data-focus tabindex="-1">Você aprendeu algo novo.</h2><p>${lesson.goal}</p><span class="pill sage">${awarded ? "+30 XP · Lição concluída" : "Lição revisitada · Conhecimento reforçado"}</span>${gameResult ? `<p class="lesson-game-result">${icon("target")} Jogo da lição: <strong>${gameResult.correct} de ${gameResult.total}</strong>${gameResult.correct === gameResult.total ? " · mesa limpa!" : ""}</p>` : ""}${nextStop}<div class="completion-actions">${lesson.practice ? `<button class="btn btn-ghost" data-lesson="practice">${lesson.practice.label} ${icon("arrow")}</button>` : ""}${scope ? `<button class="btn btn-ghost" data-lesson="renda">${icon("repeat")} Treinar no Só mais um</button>` : ""}${routeLink("journey/" + lesson.moduleId, "Voltar à trilha", "btn btn-ghost")}</div></div>`);
   }
   function draw() {

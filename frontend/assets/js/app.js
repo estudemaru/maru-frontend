@@ -39,6 +39,7 @@ const SCREENS = {
   daily: () => import("./features/daily.js"),
   journey: () => import("./features/journey.js"),
   lesson: () => import("./features/lesson.js"),
+  checkpoint: () => import("./features/checkpoint.js"),
   placement: () => import("./features/placement.js"),
   hubs: () => import("./features/hubs.js"),
   videos: () => import("./features/video-lessons.js"),
@@ -51,7 +52,7 @@ const SCREENS = {
 };
 const SCREEN_OF = {
   practice: "arcade", arcade: "arcade", progress: "arcade", challenge: "arcade", sentences: "arcade",
-  daily: "daily", journey: "journey", lesson: "lesson", placement: "placement", videos: "videos", explore: "hubs",
+  daily: "daily", journey: "journey", lesson: "lesson", checkpoint: "checkpoint", placement: "placement", videos: "videos", explore: "hubs",
   kana: "kana", writing: "writing", kanji: "reference", particles: "reference", expressions: "reference",
   library: "reference", review: "reference", vocabulary: "study", glossary: "study", exercises: "study",
   worksheets: "worksheets", settings: "settings", account: "settings"
@@ -181,6 +182,7 @@ async function render() {
     daily: screen => screen.renderDaily(ctx),
     journey: screen => screen.renderJourney(ctx, id),
     lesson: screen => screen.renderLesson(ctx, id),
+    checkpoint: screen => screen.renderCheckpoint(ctx, id),
     placement: screen => screen.renderPlacement(ctx),
     progress: screen => screen.renderArcadeProgress(ctx),
     challenge: screen => screen.renderArcade(ctx, ["repeat", "pictures", "difference", "sentences", "translate"].includes(id) ? id : "repeat"),

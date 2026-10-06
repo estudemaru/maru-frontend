@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { KAZU_ITEMS } from '../../shared/kazu.js';
 import { getLesson } from '../../shared/curriculum.js';
+import { unlockTrail } from './unlock.js';
 
 const snapshot = page => page.evaluate(() => JSON.parse(localStorage.getItem('maru-learning-v2')));
 const fits = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
@@ -41,10 +42,13 @@ test('the numbers game asks for readings, explains mistakes and records reviews'
   expect(errors).toEqual([]);
 });
 
-test('the new trail stage leads from a lesson to the game in the same category', async ({ page }) => {
+test('the numbers lessons sit in their units and lead to the game in the same category', async ({ page }) => {
+  await unlockTrail(page);
   await page.goto('/#/journey');
-  await expect(page.locator('.trail-map-stop')).toHaveCount(9);
-  await expect(page.locator('#etapa-numbers .trail-stop')).toHaveCount(6);
+  await expect(page.locator('.trail-map-stop')).toHaveCount(15);
+  // Sem etapa própria: as três lições de tempo ficam na unidade 7, antes do checkpoint.
+  await expect(page.locator('#unidade-time .trail-stop:not(.trail-checkpoint)')).toHaveCount(3);
+  await expect(page.locator('#unidade-time .trail-checkpoint a')).toHaveAttribute('href', '#/checkpoint/time');
   const lesson = getLesson('num-week');
   await page.goto('/#/lesson/num-week');
   for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();

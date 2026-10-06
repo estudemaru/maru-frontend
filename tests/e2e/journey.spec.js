@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { LESSONS } from '../../shared/curriculum.js';
+import { unlockTrail } from './unlock.js';
 
 test.beforeEach(async ({ context }) => { await context.setExtraHTTPHeaders({ 'x-maru-user': 'e2e-' + randomUUID() }); });
 
@@ -69,6 +70,7 @@ test('the journey is back and a lesson ends with a listening game that preloads 
 });
 
 test('reading lessons need no voice, and a voice failure can switch to reading', async ({ page }) => {
+  await unlockTrail(page);
   const requested = await mockVoice(page, () => ({ status: 429, json: { error: 'A API de voz pediu um intervalo.', retryAfter: 30 } }));
   const kanji = LESSONS.find(lesson => lesson.moduleId === 'kanji');
   await page.goto('/#/lesson/' + kanji.id);

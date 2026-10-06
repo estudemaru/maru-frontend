@@ -24,6 +24,7 @@ const paths = {
   play: '<path d="m8 4 12 8-12 8Z"/>',
   undo: '<path d="m9 4-6 6 6 6m-6-6h11a6 6 0 0 1 0 12"/>',
   eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
-  leaf: '<path d="M20 3C9 1 2 7 5 15s17 5 15-12ZM5 20l10-10"/>'
+  leaf: '<path d="M20 3C9 1 2 7 5 15s17 5 15-12ZM5 20l10-10"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'
 };
 export const icon = (name, className = "") => '<svg class="icon ' + className + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (paths[name] || paths.book) + "</svg>";

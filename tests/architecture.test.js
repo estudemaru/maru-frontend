@@ -7,7 +7,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PLACEMENT_QUESTIONS, placementResult } from "../shared/placement.js";
 import { normalizeSnapshot, mergeSnapshots, recordActivity, currentStreak, availableRestDay } from "../shared/progress.js";
-import { moduleSeals, nextLesson } from "../shared/learningPath.js";
+import { moduleSeals, nextStep } from "../shared/learningPath.js";
 import { MODULES, getLesson } from "../shared/curriculum.js";
 import { CULTURE_CAPSULES, THEMATIC_PATHS, thematicContent } from "../shared/discovery.js";
 
@@ -41,13 +41,13 @@ test("diagnosis, manual entry and resetting suggestions preserve actual achievem
   assert.deepEqual(p.placement.answers, {"h-a":0,"h-ne":null});
   // A etapa antiga "kanji" vem de antes das unidades e vira a unidade 3.
   assert.equal(p.placement.acceptedModule, "meet");
-  assert.equal(nextLesson(p).moduleId, "meet");
+  assert.equal(nextStep(p).lesson.moduleId, "meet");
   assert.equal(moduleSeals(p).filter(m => m.earned).length, 0);
   assert.equal(p.xp.total, 80);
   assert.equal(Object.keys(p.lessons).length, 1);
   const newer = normalizeSnapshot({ placement: { updatedAt:200, acceptedModule:"start" } });
   const merged = mergeSnapshots(p, newer);
-  assert.equal(nextLesson(merged).id, "sounds");
+  assert.equal(nextStep(merged).lesson.id, "sounds");
   assert.equal(merged.xp.total, 80);
   for (const lesson of MODULES[0].lessons) merged.lessons[lesson.id] = {completedAt:1};
   assert.equal(moduleSeals(merged)[0].earned,true);
