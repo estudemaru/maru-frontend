@@ -1,5 +1,4 @@
 import { hasKanaFoundation } from "../core/beginner.js";
-import { placementResult } from "/shared/placement.js";
 import { nextStep, stepRoute, unitStates, unlockHint } from "/shared/learningPath.js";
 import { MODULES, LESSONS, UNITS, getModule, moduleLabel } from "/shared/curriculum.js";
 import { lessonGameKey } from "/shared/lessonGame.js";
@@ -61,11 +60,10 @@ export function renderJourney(ctx, moduleId) {
   const station = unit => {
     const index = UNITS.findIndex(item => item.id === unit.id);
     const suggested = !unit.extra && ctx.progress.placement.acceptedModule === unit.id;
-    const suggestionLabel = placementResult(ctx.progress.placement.answers).moduleId === unit.id ? "Sugerido para você" : "Escolhido por você";
     const prior = !unit.extra && placed > index;
     const open = moduleId ? moduleId === unit.id : here?.id === unit.id;
     const done = unit.extra ? unit.done === unit.lessons.length : finished(unit);
-    const pills = [suggested ? `<span class="pill small-pill">${suggestionLabel}</span>` : "", !unit.open ? `<span class="pill small-pill">${icon("lock")} Fechada</span>` : "", unit.soon ? `<span class="pill small-pill">Em breve</span>` : ""].join("");
+    const pills = [suggested ? `<span class="pill small-pill">Seu ponto de partida</span>` : "", !unit.open ? `<span class="pill small-pill">${icon("lock")} Fechada</span>` : "", unit.soon ? `<span class="pill small-pill">Em breve</span>` : ""].join("");
     const body = unit.soon
       ? `<p class="trail-soon">As aulas desta unidade estão sendo escritas. Enquanto isso, a trilha segue para a próxima.</p>`
       : `${unit.open ? "" : `<p class="trail-locked-note">${icon("lock")}<span>${esc(unlockHint(ctx.progress, unit.id))}</span></p>`}<ol class="trail-line">${unit.lessons.map((lesson, i) => lessonStop(unit, lesson, i)).join("")}${unit.checkpoint ? checkpointStop(unit) : ""}</ol>`;
@@ -77,15 +75,3 @@ export function renderJourney(ctx, moduleId) {
   if (moduleId) requestAnimationFrame(() => document.getElementById("unidade-" + moduleId)?.scrollIntoView({ block: "start", behavior: "instant" }));
 }
 
-// Cartão da home: a próxima parada da trilha, a um toque.
-export function trailBanner(progress) {
-  const step = nextStep(progress);
-  if (!step) return "";
-  const module = stepUnit(step);
-  const completed = LESSONS.filter(lesson => !isExtra(lesson) && progress.lessons[lesson.id]?.completedAt).length;
-  const total = LESSONS.filter(lesson => !isExtra(lesson)).length;
-  const mark = hasKanaFoundation(progress) || !/\p{Script=Han}/u.test(module.symbol) ? module.symbol : module.number;
-  const title = step.kind === "lesson" ? step.lesson.title : "Checkpoint: " + esc(module.title);
-  const detail = step.kind === "lesson" ? esc(beginnerText(step.lesson.hook)) : "Mostre o que aprendeu e abra a próxima unidade.";
-  return `<a class="trail-banner line-${module.id}" href="#/${stepRoute(step)}"><span class="trail-next-mark jp ${module.color}" lang="ja" aria-hidden="true">${mark}</span><span class="trail-banner-copy"><span class="eyebrow">SUA TRILHA<span class="only-wide">${completed ? " · PRÓXIMA PARADA" : " · APRENDA DO ZERO"}</span></span><strong>${title}</strong><small>${detail}</small></span><span class="trail-banner-count"><strong>${completed}</strong>/${total}<small>lições</small></span><span class="next-stop-go">${icon("arrow")}</span></a>`;
-}
