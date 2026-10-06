@@ -9,7 +9,8 @@ const seeded = (seed = 1) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 
 test('every lesson ends with a playable game built from its own examples', () => {
   for (const lesson of LESSONS) {
     const game = lessonGame(lesson, { random: seeded(lesson.id.length) });
-    assert.ok(game.rounds.length >= 3 && game.rounds.length <= LESSON_ROUNDS, lesson.id);
+    // sentence-identity tem três exemplos e um deles é ブラジル, palavra-imagem antes do katakana: sobram dois.
+    assert.ok(game.rounds.length >= (lesson.id === 'sentence-identity' ? 2 : 3) && game.rounds.length <= LESSON_ROUNDS, lesson.id);
     assert.equal(new Set(game.rounds.map(round => round.target.id)).size, game.rounds.length, 'sem alvo repetido');
     for (const { target, cards } of game.rounds) {
       assert.ok(target.id.startsWith(lesson.id + ':'), 'o alvo vem da própria lição');
@@ -35,4 +36,17 @@ test('kana rows become one card per sound and を never shares a table with お'
   for (let seed = 1; seed < 40; seed++) {
     for (const { cards } of lessonGame(rest, { random: seeded(seed) }).rounds) assert.ok(!(cards.some(card => card.card === 'を') && cards.some(card => card.card === 'お')));
   }
+});
+
+test('before the katakana unit, katakana words never become a game card', () => {
+  const katakana = /[ァ-ヺ]/u;
+  for (const id of ['greetings', 'sentence-identity', 'particle-connect', 'num-pointing']) {
+    for (let seed = 1; seed <= 6; seed++) {
+      const game = lessonGame(LESSONS.find(lesson => lesson.id === id), { random: seeded(seed) });
+      assert.ok(game.rounds.every(round => round.cards.every(card => !katakana.test(card.jp))), id);
+    }
+  }
+  // Na unidade 0 o katakana aparece de propósito, como exemplo das três escritas.
+  const welcome = lessonGame(LESSONS.find(lesson => lesson.id === 'welcome'), { random: seeded(2) });
+  assert.equal(welcome.rounds.length, LESSON_ROUNDS);
 });

@@ -1,7 +1,8 @@
 import { mountLessonTutor } from "./lessonTutor.js";
 import { CULTURE_CAPSULES } from "/shared/discovery.js";
 import { conceptsIn } from "/shared/glossary.js";
-import { getLesson, getModule, getTheme, moduleLabel } from "/shared/curriculum.js";
+import { getLesson, getModule, getTheme, moduleLabel, katakanaAsPicture } from "/shared/curriculum.js";
+import { toHiragana } from "/shared/shiritori.js";
 import { isLessonOpen, stepAfter, stepRoute } from "/shared/learningPath.js";
 import { completeLesson } from "/shared/progress.js";
 import { personalBest } from "/shared/arcade.js";
@@ -23,6 +24,15 @@ function kanaTile(example, romaji) {
 const examplesHTML = (examples, romaji) => !examples.length ? "" : examples.every(isKanaTile)
   ? `<section class="kana-deck" aria-label="Cartas de kana"><div class="lesson-examples-head"><span>${icon("volume")} Explore os sons</span><small class="kana-deck-position" aria-live="polite" aria-atomic="true">1 de ${examples.length}</small></div><div class="kana-deck-picker" role="group" aria-label="Escolher uma carta">${examples.map((example, index) => `<button type="button" data-kana-card="${index}" aria-label="Ver carta ${index + 1}: ${esc(example.jp)}" aria-pressed="${index === 0}" aria-controls="lesson-kana-cards"><span class="jp" lang="ja">${esc(example.jp)}</span></button>`).join("")}</div><div class="kana-tiles" id="lesson-kana-cards">${examples.map(example => kanaTile(example, romaji)).join("")}</div><p class="kana-deck-hint">Toque para ouvir · deslize para ver a próxima carta</p></section>`
   : `<section class="lesson-examples" aria-label="Exemplos em japonês"><div class="lesson-examples-head"><span>${icon("chat")} Veja em japonês</span><small>Toque em ${icon("volume")} para ouvir</small></div><div class="examples-grid${examples.length > 1 && examples.every(example => example.jp.length <= 6 && !example.note) ? " is-compact" : ""}">${examples.map(example => illustratedExampleHTML(example, romaji)).join("")}</div></section>`;
+
+// Nas unidades 3 e 4, uma palavra em katakana é palavra-imagem: a nota dá a leitura em
+// hiragana e avisa quando o katakana chega (docs/TRILHA-N5.md).
+function pictureWords(example) {
+  const words = [...new Set(example.jp.match(/[\u30A1-\u30FA][\u30A1-\u30FA\u30FC]*/gu) || [])];
+  if (!words.length) return example;
+  const reading = `Katakana: ${words.map(word => `${word} se lê ${toHiragana(word)}`).join(", ")}. Você aprende a ler na unidade 5.`;
+  return { ...example, note: [example.note, reading].filter(Boolean).join(" ") };
+}
 
 // Letras que o tema da lição já apresentou até ela, para o treino "Só mais um".
 function trainingScope(lesson) {
@@ -78,7 +88,7 @@ export function renderLesson(ctx, id) {
     const last = index === SECTIONS - 1;
     const capsule = last ? CULTURE_CAPSULES.find(item => item.lessonId === id) : null;
     const concepts = conceptsIn(part.body + " " + part.title);
-    const examples = examplesHTML(part.examples, ctx.progress.preferences.romaji);
+    const examples = examplesHTML(katakanaAsPicture(source) ? part.examples.map(pictureWords) : part.examples, ctx.progress.preferences.romaji);
     const body = `<div class="lesson-body">${richText(part.body)}</div>`;
     const teaching = part.examples.length && part.examples.every(isKanaTile) ? examples + body : body + examples;
     const help = concepts.length ? `<details class="concept-help"><summary>Em outras palavras · termos desta explicação</summary><dl>${concepts.map(item => `<dt>${item.term}</dt><dd>${esc(beginnerText(item.definition))}<small>${esc(beginnerText(item.example))}</small></dd>`).join("")}</dl></details>` : "";
