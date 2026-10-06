@@ -1,4 +1,4 @@
-import { MODULES } from '/shared/curriculum.js';
+import { MODULES, moduleLabel } from '/shared/curriculum.js';
 import { CHANNELS, VIDEOS, videosFor, videoThumbnail } from '/shared/videos.js';
 import { pageHeading, icon, routeLink, esc, wideScreen } from '../core/ui.js';
 import { videoPanelHTML, bindVideos } from '../core/videos.js';
@@ -22,7 +22,7 @@ export function renderVideoLessons(ctx) {
     <div class="video-modules">${MODULES.map(module => {
       const lessons = module.lessons.filter(lesson => videosFor(lesson.id).length);
       if (!lessons.length) return '';
-      return `<details class="video-module panel" ${module.id === 'hiragana' && wideScreen() ? 'open' : ''}><summary><span class="module-symbol ${module.color} jp" lang="ja">${module.number}</span><span><span class="eyebrow">ETAPA ${module.number}</span><strong>${module.title}</strong></span><small>${lessons.reduce((sum, lesson) => sum + videosFor(lesson.id).length, 0)} aulas</small>${icon('down')}</summary>${lessons.map(lesson => `<div class="video-lesson-group"><div class="video-lesson-group-head"><h3>${lesson.title}</h3>${routeLink('lesson/' + lesson.id, 'Fazer a lição ' + icon('arrow'), 'text-link')}</div><ul class="video-list">${videosFor(lesson.id).map(card).join('')}</ul></div>`).join('')}</details>`;
+      return `<details class="video-module panel" ${module.id === 'hiragana' && wideScreen() ? 'open' : ''}><summary><span class="module-symbol ${module.color} jp" lang="ja">${module.number || '+'}</span><span><span class="eyebrow">${moduleLabel(module).toUpperCase()}</span><strong>${module.title}</strong></span><small>${lessons.reduce((sum, lesson) => sum + videosFor(lesson.id).length, 0)} aulas</small>${icon('down')}</summary>${lessons.map(lesson => `<div class="video-lesson-group"><div class="video-lesson-group-head"><h3>${lesson.title}</h3>${routeLink('lesson/' + lesson.id, 'Fazer a lição ' + icon('arrow'), 'text-link')}</div><ul class="video-list">${videosFor(lesson.id).map(card).join('')}</ul></div>`).join('')}</details>`;
     }).join('')}</div>
     <aside class="tip-box only-wide">${icon('pen')}<p>As aulas são de professores e canais independentes, sem ligação com o Maru. Os vídeos são públicos; outros produtos dos canais podem ser pagos. O player só carrega quando você toca no play. ${routeLink('worksheets', 'Preparar folhas para estudar', 'text-link')}</p></aside>`;
   bindVideos(ctx.main, controller.signal, () => ctx.audio.stop());

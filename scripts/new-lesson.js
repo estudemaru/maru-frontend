@@ -6,7 +6,7 @@ const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf("--" + name); return i < 0 ? "" : args[i + 1] || ""; };
 const id = option("id"), moduleId = option("module"), title = option("title");
 if (!/^[a-z][a-z0-9-]{2,59}$/.test(id) || !getModule(moduleId) || !title || title.startsWith("--") || LESSONS.some(item => item.id === id)) {
-  console.error('Uso: npm run content:new -- --id identificador-novo --module everyday --title "Título da lição"\nEscolha um ID novo e uma das oito etapas existentes.');
+  console.error('Uso: npm run content:new -- --id identificador-novo --module routine --title "Título da lição"\nEscolha um ID novo e uma das unidades existentes (ou um extra).');
   process.exitCode = 1;
 } else {
   const draft = {

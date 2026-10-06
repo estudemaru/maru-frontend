@@ -22,8 +22,8 @@ test('every lesson ends with a playable game built from its own examples', () =>
   }
 });
 
-test('sound and conversation stages listen; kanji, sentences and particles read', () => {
-  const kinds = Object.fromEntries(LESSONS.map(lesson => [lesson.moduleId, lessonGame(lesson).kind]));
+test('sound and conversation themes listen; kanji, sentences and particles read', () => {
+  const kinds = Object.fromEntries(LESSONS.map(lesson => [lesson.theme, lessonGame(lesson).kind]));
   assert.deepEqual(kinds, { start: 'listen', hiragana: 'listen', katakana: 'listen', kanji: 'read', sentences: 'read', particles: 'read', everyday: 'listen', numbers: 'read', casual: 'listen' });
 });
 

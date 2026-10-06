@@ -1,6 +1,6 @@
 import { CULTURE_CAPSULES } from "/shared/discovery.js";
 import { conceptsIn } from "/shared/glossary.js";
-import { getLesson, getModule, LESSONS } from "/shared/curriculum.js";
+import { getLesson, getModule, getTheme, LESSONS, moduleLabel } from "/shared/curriculum.js";
 import { completeLesson } from "/shared/progress.js";
 import { personalBest } from "/shared/arcade.js";
 import { lessonGameKey, lessonGameKind, LESSON_GAME_KINDS } from "/shared/lessonGame.js";
@@ -21,15 +21,15 @@ const examplesHTML = (examples, romaji) => !examples.length ? "" : examples.ever
   ? `<section class="kana-deck" aria-label="Cartas de kana"><div class="lesson-examples-head"><span>${icon("volume")} Explore os sons</span><small class="kana-deck-position" aria-live="polite" aria-atomic="true">1 de ${examples.length}</small></div><div class="kana-deck-picker" role="group" aria-label="Escolher uma carta">${examples.map((example, index) => `<button type="button" data-kana-card="${index}" aria-label="Ver carta ${index + 1}: ${esc(example.jp)}" aria-pressed="${index === 0}" aria-controls="lesson-kana-cards"><span class="jp" lang="ja">${esc(example.jp)}</span></button>`).join("")}</div><div class="kana-tiles" id="lesson-kana-cards">${examples.map(example => kanaTile(example, romaji)).join("")}</div><p class="kana-deck-hint">Toque para ouvir · deslize para ver a próxima carta</p></section>`
   : `<section class="lesson-examples" aria-label="Exemplos em japonês"><div class="lesson-examples-head"><span>${icon("chat")} Veja em japonês</span><small>Toque em ${icon("volume")} para ouvir</small></div><div class="examples-grid${examples.length > 1 && examples.every(example => example.jp.length <= 6 && !example.note) ? " is-compact" : ""}">${examples.map(example => illustratedExampleHTML(example, romaji)).join("")}</div></section>`;
 
-// Letras que a trilha já apresentou até esta lição, para o treino "Só mais um".
+// Letras que o tema da lição já apresentou até ela, para o treino "Só mais um".
 function trainingScope(lesson) {
-  const module = getModule(lesson.moduleId);
-  if (module.id === "kanji") return { script: "kanji" };
-  if (!["hiragana", "katakana"].includes(module.id)) return null;
-  const seen = module.lessons.slice(0, module.lessons.findIndex(item => item.id === lesson.id) + 1);
+  if (lesson.theme === "kanji") return { script: "kanji" };
+  if (!["hiragana", "katakana"].includes(lesson.theme)) return null;
+  const theme = getTheme(lesson.theme);
+  const seen = theme.lessons.slice(0, theme.lessons.findIndex(item => item.id === lesson.id) + 1);
   const rows = [...new Set(seen.flatMap(item => item.practice?.rows || []))];
   const groups = [...new Set(seen.flatMap(item => item.practice?.group ? [item.practice.group] : []))];
-  return rows.length ? { script: module.id, rows, groups } : { script: module.id };
+  return rows.length ? { script: lesson.theme, rows, groups } : { script: lesson.theme };
 }
 
 export function renderLesson(ctx, id) {
@@ -50,7 +50,7 @@ export function renderLesson(ctx, id) {
   let gameResult = null, unmountGame = null;
   const controller = new AbortController();
   const focus = () => ctx.main.querySelector("[data-focus]")?.focus({ preventScroll: true });
-  const position = `ETAPA ${module.number} · LIÇÃO ${String(lesson.index + 1).padStart(2, "0")} DE ${String(module.lessons.length).padStart(2, "0")}`;
+  const position = `${moduleLabel(module).toUpperCase()} · LIÇÃO ${String(lesson.index + 1).padStart(2, "0")} DE ${String(module.lessons.length).padStart(2, "0")}`;
   const shell = content => {
     const progress = step >= DONE ? 100 : (step + (step === QUIZ ? questionIndex / queue.length : 0)) / DONE * 100;
     const phase = step === 0 ? "intro" : step <= SECTIONS ? "reading" : step === QUIZ ? "quiz" : step === GAME ? "game" : "done";
@@ -88,7 +88,7 @@ export function renderLesson(ctx, id) {
   function done() {
     const next = LESSONS[LESSONS.findIndex(item => item.id === lesson.id) + 1];
     const scope = trainingScope(source);
-    const nextStop = next ? `<a class="next-stop" href="#/lesson/${next.id}"><span class="next-stop-copy"><span class="eyebrow">PRÓXIMA PARADA${next.moduleId !== lesson.moduleId ? " · NOVA ETAPA" : ""}</span><strong>${next.title}</strong><small>${esc(beginnerText(next.hook))}</small></span><span class="next-stop-go">${icon("arrow")}</span></a>` : `<a class="next-stop" href="#/journey"><span class="next-stop-copy"><span class="eyebrow">FIM DA TRILHA</span><strong>Você chegou ao fim das 8 etapas!</strong><small>Volte à trilha para revisar o que quiser.</small></span><span class="next-stop-go">${icon("arrow")}</span></a>`;
+    const nextStop = next ? `<a class="next-stop" href="#/lesson/${next.id}"><span class="next-stop-copy"><span class="eyebrow">PRÓXIMA PARADA${next.moduleId !== lesson.moduleId ? " · NOVA UNIDADE" : ""}</span><strong>${next.title}</strong><small>${esc(beginnerText(next.hook))}</small></span><span class="next-stop-go">${icon("arrow")}</span></a>` : `<a class="next-stop" href="#/journey"><span class="next-stop-copy"><span class="eyebrow">FIM DA TRILHA</span><strong>Você chegou ao fim das 8 etapas!</strong><small>Volte à trilha para revisar o que quiser.</small></span><span class="next-stop-go">${icon("arrow")}</span></a>`;
     shell(`<div class="completion"><div class="lesson-celebration">${lessonArt("celebrate")}<span class="completion-mark">${icon("check")}</span></div><p class="eyebrow">UM PASSO A MAIS</p><h2 data-focus tabindex="-1">Você aprendeu algo novo.</h2><p>${lesson.goal}</p><span class="pill sage">${awarded ? "+30 XP · Lição concluída" : "Lição revisitada · Conhecimento reforçado"}</span>${gameResult ? `<p class="lesson-game-result">${icon("target")} Jogo da lição: <strong>${gameResult.correct} de ${gameResult.total}</strong>${gameResult.correct === gameResult.total ? " · mesa limpa!" : ""}</p>` : ""}${nextStop}<div class="completion-actions">${lesson.practice ? `<button class="btn btn-ghost" data-lesson="practice">${lesson.practice.label} ${icon("arrow")}</button>` : ""}${scope ? `<button class="btn btn-ghost" data-lesson="renda">${icon("repeat")} Treinar no Só mais um</button>` : ""}${routeLink("journey/" + lesson.moduleId, "Voltar à trilha", "btn btn-ghost")}</div></div>`);
   }
   function draw() {

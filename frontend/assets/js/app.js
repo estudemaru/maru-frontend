@@ -158,7 +158,7 @@ async function render() {
   let route = "home", id = "";
   try { [route = "home", id = ""] = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/"); } catch { route = "missing"; }
   if (!route) route = "home";
-  setReaderMode(!hasKanaFoundation(ctx.progress) && route!=='kanji' && route!=='worksheets' && !(route==='lesson' && getLesson(id)?.moduleId==='kanji'));
+  setReaderMode(!hasKanaFoundation(ctx.progress) && route!=='kanji' && route!=='worksheets' && !(route==='lesson' && getLesson(id)?.theme==='kanji'));
   const params = routeParams || {}; routeParams = null;
   const locationInfo = navigationFor(route);
   document.querySelectorAll("[data-nav]").forEach(link => {

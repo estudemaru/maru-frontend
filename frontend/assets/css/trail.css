@@ -13,6 +13,17 @@
 .line-start { --line: var(--line-start); } .line-hiragana { --line: var(--line-hiragana); } .line-katakana { --line: var(--line-katakana); }
 .line-kanji { --line: var(--line-kanji); } .line-sentences { --line: var(--line-sentences); } .line-particles { --line: var(--line-particles); }
 .line-everyday { --line: var(--line-everyday); } .line-numbers { --line: var(--line-numbers); } .line-casual { --line: var(--line-casual); }
+/* As unidades e os extras reaproveitam a paleta das etapas antigas (cores provisórias). */
+:root {
+  --line-hiragana-plus: var(--line-hiragana); --line-meet: var(--line-sentences); --line-around: var(--line-particles);
+  --line-world: var(--line-katakana); --line-time: var(--line-kanji); --line-places: var(--line-everyday); --line-routine: var(--line-start);
+  --line-describe: var(--line-sentences); --line-likes: var(--line-casual); --line-past: var(--line-katakana); --line-counting: var(--line-numbers);
+  --line-te-form: var(--line-particles); --line-curious: var(--line-sentences);
+}
+.line-hiragana-plus { --line: var(--line-hiragana-plus); } .line-meet { --line: var(--line-meet); } .line-around { --line: var(--line-around); }
+.line-world { --line: var(--line-world); } .line-time { --line: var(--line-time); } .line-places { --line: var(--line-places); } .line-routine { --line: var(--line-routine); }
+.line-describe { --line: var(--line-describe); } .line-likes { --line: var(--line-likes); } .line-past { --line: var(--line-past); } .line-counting { --line: var(--line-counting); }
+.line-te-form { --line: var(--line-te-form); } .line-curious { --line: var(--line-curious); }
 
 /* ── Trilha ─────────────────────────────────────────────── */
 .trail-page { display: grid; gap: 22px; }

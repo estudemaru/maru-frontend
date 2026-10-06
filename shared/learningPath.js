@@ -6,7 +6,8 @@ export function nextLesson(snapshot) {
   return LESSONS.slice(start).find(item => !snapshot.lessons[item.id]?.completedAt);
 }
 
-export const moduleSeals = snapshot => MODULES.map(module => ({
+// Unidades ainda sem aulas não têm selo.
+export const moduleSeals = snapshot => MODULES.filter(module => module.lessons.length).map(module => ({
   ...module,
   done: module.lessons.filter(lesson => snapshot.lessons[lesson.id]?.completedAt).length,
   earned: module.lessons.every(lesson => snapshot.lessons[lesson.id]?.completedAt)

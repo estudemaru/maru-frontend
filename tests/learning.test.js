@@ -9,7 +9,8 @@ import { checkGuidedSentence } from "../shared/sentenceCheck.js";
 import { kanaToRomaji, isTypedAnswerCorrect } from "../shared/romaji.js";
 
 test("the curriculum has complete, addressable lessons and answer explanations", () => {
-  assert.equal(MODULES.length, 9);
+  assert.equal(MODULES.length, 18);
+  assert.equal(MODULES.filter(module => !module.extra).length, 15);
   assert.equal(LESSONS.length, 57);
   assert.equal(new Set(LESSONS.map(item => item.id)).size, LESSONS.length);
   assert.equal(getLesson("welcome").moduleId, "start");

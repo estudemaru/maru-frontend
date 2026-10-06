@@ -1,11 +1,12 @@
-import { MODULES } from "/shared/curriculum.js";
+import { MODULES, THEMES, moduleLabel } from "/shared/curriculum.js";
 import { THEMATIC_PATHS } from "/shared/discovery.js";
 import { esc, icon, pageHeading, routeLink } from "../core/ui.js";
 
 const packageFor = key => {
   if(key.startsWith("module-")){
-    const module = MODULES.find(item=>item.id===key.slice(7));
-    return module && { title:module.title, description:module.subtitle, lessons:module.lessons, route:`journey/${module.id}`, type:"Etapa da trilha" };
+    // Links antigos apontam para as etapas de antes das unidades: elas continuam como temas.
+    const module = MODULES.find(item=>item.id===key.slice(7)) || THEMES.find(item=>item.id===key.slice(7));
+    return module?.lessons.length && { title:module.title, description:module.subtitle, lessons:module.lessons, route:`journey/${MODULES.includes(module) ? module.id : ""}`, type:"Unidade da trilha" };
   }
   if(key.startsWith("theme-")){
     const theme = THEMATIC_PATHS.find(item=>item.id===key.slice(6));
@@ -14,7 +15,7 @@ const packageFor = key => {
   return null;
 };
 const choices = [
-  ...MODULES.map(item=>({key:`module-${item.id}`,label:`Etapa ${item.number} · ${item.title}`})),
+  ...MODULES.filter(item=>item.lessons.length).map(item=>({key:`module-${item.id}`,label:`${moduleLabel(item)} · ${item.title}`})),
   ...THEMATIC_PATHS.map(item=>({key:`theme-${item.id}`,label:`Tema · ${item.title}`}))
 ];
 const packageContent = item => `<span class="pill">${item.type}</span><h2>${esc(item.title)}</h2><p>${esc(item.description)}</p><ol class="teacher-lesson-list">${item.lessons.map(lesson=>`<li>${esc(lesson.title)}</li>`).join("")}</ol><div class="teacher-package-actions">${routeLink(item.route,"Abrir o conteúdo "+icon("arrow"),"btn btn-primary")}${routeLink("worksheets/book","Imprimir o Livro 1 "+icon("pen"),"btn btn-ghost")}</div><p class="small muted">O Livro 1 reúne todas as 8 etapas; o link da trilha acima leva diretamente ao recorte escolhido. Ninguém precisa criar conta para abrir o pacote.</p>`;

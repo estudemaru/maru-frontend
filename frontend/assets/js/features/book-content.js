@@ -1,6 +1,6 @@
 import { BOOK_NOTES } from './book-notes.js';
 import { interleaveKanaLesson } from './book-kana.js';
-import { MODULES } from '../../../../shared/curriculum.js';
+import { THEMES } from '../../../../shared/curriculum.js';
 import { BEGINNER_KANJI, SENTENCES, PARTICLES, EXPRESSIONS } from '../../../../shared/catalog.js';
 import { VOCABULARY } from '../../../../shared/vocabulary.js';
 import { PARTICLE_EXERCISES } from '../../../../shared/exercises.js';
@@ -16,7 +16,7 @@ export const BOOK_KANA_ORDER = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', '
 const ONLINE_ONLY = new Set(['h-ka', 'h-sa', 'h-ta', 'h-na', 'h-ha', 'h-ma', 'h-yara', 'h-dakuten', 'k-sata', 'k-naha', 'k-mawa']);
 const flat = text => String(text || '').replace(/\n• /g, ' · ').replace(/\n/g, ' ');
 // Kanji e "Quanto, quando e qual" (horas e datas pedem kanji) ficam só no curso online.
-export const BOOK_MODULES = MODULES.filter(module => !['kanji', 'numbers'].includes(module.id)).map((module, index) => ({
+export const BOOK_MODULES = THEMES.filter(module => !['kanji', 'numbers'].includes(module.id)).map((module, index) => ({
   ...module, number: String(index + 1).padStart(2, '0'),
   lessons: module.lessons.filter(source => !ONLINE_ONLY.has(source.id)).map(source => {
     const lesson = { ...source, sections: source.sections.map((section, index) => ({ ...section, body: BOOK_NOTES[source.id]?.[index] || flat(section.body) })) };
@@ -45,7 +45,7 @@ VOCABULARY.forEach(item => pairs.push([item.jp, item.reading], [item.sentence, i
 SENTENCES.forEach(item => item.tokens.forEach(token => pairs.push([token[0], token[3]])));
 [...PARTICLES, ...EXPRESSIONS].forEach(item => pairs.push([item.jp, item.reading]));
 // A etapa de números fica fora do livro e das leituras dele (ついたち não pode virar a leitura de 一日 no texto impresso).
-MODULES.filter(module => module.id !== 'numbers').forEach(module => module.lessons.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => pairs.push([item.jp, item.reading])))));
+THEMES.filter(module => module.id !== 'numbers').forEach(module => module.lessons.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => pairs.push([item.jp, item.reading])))));
 PARTICLE_EXERCISES.forEach(item => pairs.push([item.prompt, item.reading], [item.speech, item.reading?.replace('＿', item.answer)]));
 PRINT_DIALOGUES.forEach(dialogue => dialogue.turns.forEach(turn => pairs.push([turn.text, turn.reading], [turn.answer, turn.answerReading])));
 const runs = new Map();

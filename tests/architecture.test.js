@@ -88,12 +88,12 @@ test("the authoring command creates a draft without publishing or overwriting it
   const directory = await mkdtemp(path.join(tmpdir(),"maru-editorial-"));
   t.after(()=>rm(directory,{recursive:true,force:true}));
   const script = fileURLToPath(new URL("../scripts/new-lesson.js",import.meta.url));
-  const args = [script,"--id","travel-new","--module","everyday","--title","Uma nova ideia"];
+  const args = [script,"--id","travel-new","--module","routine","--title","Uma nova ideia"];
   execFileSync(process.execPath,args,{cwd:directory});
   const output = await readFile(path.join(directory,"docs/drafts/travel-new.js"),"utf8");
   assert.match(output,/"status": "draft"/);
   assert.match(output,/"title": "Uma nova ideia"/);
   assert.throws(()=>execFileSync(process.execPath,args,{cwd:directory,stdio:"pipe"}));
   assert.equal(await readFile(path.join(directory,"docs/drafts/travel-new.js"),"utf8"),output);
-  assert.throws(()=>execFileSync(process.execPath,[script,"--id","../escape","--module","everyday","--title","X"],{cwd:directory,stdio:"pipe"}));
+  assert.throws(()=>execFileSync(process.execPath,[script,"--id","../escape","--module","routine","--title","X"],{cwd:directory,stdio:"pipe"}));
 });
