@@ -7,7 +7,7 @@ test('legacy challenge links open the new arcade and timers stop after navigatio
   await page.getByRole('button',{name:'Vamos jogar'}).click();
   await page.getByRole('link',{name:'Todos os jogos',exact:false}).click();
   await page.clock.fastForward(120000);
-  await expect(page.locator('.play-card')).toHaveCount(7);
+  await expect(page.locator('.play-card')).toHaveCount(8);
   await expect(page.locator('.play-results')).toHaveCount(0);
 });
 test('novice references show kanji with furigana rather than hiding it',async({page})=>{

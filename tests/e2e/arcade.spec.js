@@ -18,7 +18,7 @@ test('home stays compact and usable from 320px to desktop', async ({ page }) => 
   }
   await page.getByRole('link', { name: 'Ver todos os jogos' }).click();
   await expect(page).toHaveURL(/#\/practice$/);
-  await expect(page.locator('.play-card')).toHaveCount(7);
+  await expect(page.locator('.play-card')).toHaveCount(8);
   expect(errors).toEqual([]);
 });
 test('infinite pictures accept the selected script, reveal feedback and persist', async ({ page }) => {
@@ -39,9 +39,10 @@ test('infinite pictures accept the selected script, reveal feedback and persist'
   await page.reload();
   await page.goto('/#/progress');
   await expect(page.locator('.play-heading')).toContainText('17 respostas');
-  // O "Só mais um" abre a lista; Olhou, escreveu é o terceiro cartão.
-  await page.locator('.play-progress-card').nth(2).locator('summary').click();
-  await expect(page.locator('.play-progress-card').nth(2)).toContainText('100%');
+  // O cartão é achado pelo nome: a ordem dos jogos muda quando um jogo novo entra.
+  const pictures = page.locator('.play-progress-card', { hasText: 'Olhou, escreveu' });
+  await pictures.locator('summary').click();
+  await expect(pictures).toContainText('100%');
 });
 test('transcription, recognition and Japanese to Portuguese translation accept their models', async ({ page }) => {
   for(const config of [

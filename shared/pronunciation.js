@@ -4,6 +4,7 @@ import { LESSONS } from "./curriculum.js";
 import { DATA } from "./content.js";
 import { PARTICLE_EXERCISES, SITUATION_EXERCISES } from "./exercises.js";
 import { audioKey } from "./audioText.js";
+import { KAZU_ITEMS } from "./kazu.js";
 
 export function pronunciationCatalog() {
   const entries = new Map();
@@ -17,6 +18,9 @@ export function pronunciationCatalog() {
   VOCABULARY.forEach(item => add(item.jp, item.reading));
   SENTENCES.forEach(item => item.tokens.forEach(token => add(token[0], token[3] || token[0])));
   VOCABULARY.forEach(item => add(item.sentence));
+  // Números, horas e datas do jogo "Quanto, quando, qual" entram antes das lições, para a
+  // voz ler a leitura ensinada (よじ, ついたち) também onde uma lição já usa a mesma palavra.
+  KAZU_ITEMS.forEach(item => add(item.speak, item.reading));
   LESSONS.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => add(item.jp))));
   PARTICLES.forEach(item => add(item.jp));
   EXPRESSIONS.forEach(item => add(item.jp));

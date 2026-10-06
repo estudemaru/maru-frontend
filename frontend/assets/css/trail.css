@@ -219,6 +219,12 @@ html[data-theme] .renda-choice { position: relative; display: grid; place-items:
 .renda-choice-main { font-size: 26px; font-weight: 650; line-height: 1.15; overflow-wrap: anywhere; }
 .renda-choice-main[lang="ja"] { font-family: var(--font-game-jp, var(--font-jp-serif)); font-size: 44px; font-weight: 400; }
 .renda-choice small { font-size: 12px; color: var(--muted); }
+/* "Quanto, quando, qual" usa as peças do "Só mais um", mas as leituras são longas
+   (さんぜんはっぴゃくえん) e as perguntas podem ter várias letras (午後9時半). */
+.kazu-session .renda-prompt.is-glyph span { font-size: clamp(48px, 13vw, 96px); text-align: center; }
+.kazu-session .renda-prompt.is-text span { font-size: clamp(24px, 6vw, 40px); text-align: center; }
+.kazu-session .renda-choice-main[lang="ja"] { font-size: clamp(17px, 4.6vw, 26px); line-height: 1.3; text-align: center; }
+.kazu-session .renda-choice-main[lang="pt"] { font-size: clamp(14px, 3.8vw, 18px); line-height: 1.3; text-align: center; }
 html[data-theme] .renda-choice:hover:not(:disabled) { border-color: var(--accent-hover); }
 html[data-theme] .renda-choice:focus-visible { outline: 2.5px solid var(--frame-strong, var(--ink)); outline-offset: 3px; }
 html[data-theme] .renda-choice:disabled { cursor: default; }

@@ -4,6 +4,8 @@ import { esc, icon, routeLink } from '../core/ui.js';
 import { renderShiritori, shiritoriBestKey } from './shiritori.js';
 import { renderKaruta } from './karuta.js';
 import { renderRenda } from './renda.js';
+import { renderKazu } from './kazu.js';
+import { KAZU_CATEGORIES, kazuItem } from '/shared/kazu.js';
 import { dailyBanner } from './daily.js';
 import { kanaModeButton } from '../core/kanaInput.js';
 import { LEVELS } from '/shared/shiritori.js';
@@ -22,6 +24,7 @@ const options = (items, current) => items.map(([value, label]) => `<option value
 const detailList = items => items.length ? `<ul>${items.map(item => `<li><span>${esc(item.label)}</span><strong>${item.accuracy}% <small>· ${item.attempts} tentativas</small></strong></li>`).join('')}</ul>` : '<p class="muted">Ainda estamos conhecendo seu ritmo. Responda cada item pelo menos 3 vezes.</p>';
 export function renderArcade(ctx, id = 'sentences', params = {}) {
   const game = GAMES.find(game => game.id === id) || GAMES.find(game => game.id === 'sentences');
+  if (game.id === 'kazu') return renderKazu(ctx, game, params);
   if (game.kind === 'tap') return renderRenda(ctx, game, params);
   if (game.kind === 'chain') return renderShiritori(ctx, game);
   if (game.kind === 'listen') return renderKaruta(ctx, game);
@@ -127,11 +130,12 @@ export function renderArcadeProgress(ctx) {
     const labels = new Map();
     for (const [key] of rows) {
       const [, , script, , ...id] = key.split(':');
+      if (game.id === 'kazu') { const item = kazuItem(id.join(':')); if (item) labels.set(key, `${item.jp} · ${item.reading}`); continue; }
       const pool = buildPool({ game: game.id, script });
       const item = pool.find(item => item.id === id.join(':'));
       if (item) labels.set(key, item.label);
     }
-    const qualified = rows.filter(([, item]) => item.attempts >= 3).map(([key, item]) => ({ label: `${labels.get(key) || 'Item praticado'} · ${SCRIPTS.find(([script]) => script === key.split(':')[2])?.[1] || ''}`, attempts: item.attempts, accuracy: Math.round(100 * item.correct / item.attempts) }));
+    const qualified = rows.filter(([, item]) => item.attempts >= 3).map(([key, item]) => ({ label: `${labels.get(key) || 'Item praticado'} · ${(game.id === 'kazu' ? KAZU_CATEGORIES : SCRIPTS).find(([script]) => script === key.split(':')[2])?.[1] || ''}`, attempts: item.attempts, accuracy: Math.round(100 * item.correct / item.attempts) }));
     return `<section class="panel play-progress-card"><div><img src="/assets/img/irasutoya-${game.image}.webp" width="64" height="64" alt=""><h2>${game.title}</h2><span>${attempts ? Math.round(correct / attempts * 100) + '% de acertos · ' + attempts + ' respostas' : 'Seu primeiro treino está esperando'}</span></div>${attempts ? `<details><summary>Pontos fortes e o que revisar</summary><h3>Pontos fortes</h3>${detailList(qualified.filter(item => item.accuracy >= 80).sort((a,b) => b.accuracy-a.accuracy).slice(0,4))}<h3>Próximos passos</h3>${detailList(qualified.filter(item => item.accuracy < 80).sort((a,b) => a.accuracy-b.accuracy).slice(0,4))}</details>` : ''}${routeLink('arcade/' + game.id, 'Praticar →', 'text-link')}</section>`;
   }).join('');
   ctx.main.innerHTML = `<div class="play-page"><header class="play-heading"><p class="eyebrow">SEU JAPONÊS, EM MOVIMENTO</p><h1 tabindex="-1">Pequenas tentativas. Progresso real.</h1><p>${total ? `${total} respostas e ${Math.round(correct / total * 100)}% de acertos. Continue construindo seu ritmo.` : 'Jogue para descobrir o que já está ficando fácil e o que merece mais atenção.'}</p></header><div class="play-progress-grid">${sections}</div><p class="field-hint only-wide">Pontos fortes: pelo menos 80% de acertos, com 3 ou mais tentativas por item. Os resultados descrevem seus treinos; não são uma certificação de domínio.</p></div>`;
