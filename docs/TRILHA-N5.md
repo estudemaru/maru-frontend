@@ -474,7 +474,12 @@ Regras que entram no `EDITORIAL-CHECKLIST.md`:
    - Unidades em `curriculum.js`, com as lições atuais nos novos lugares (IDs mantidos).
    - Checkpoints provisórios, com perguntas das lições escolhidas à mão: uma lição
      que ainda mistura ideias só cede as perguntas da ideia da unidade. A 0 não tem
-     checkpoint; 11, 12 e 14 ainda não têm aulas e não seguram a trilha.
+     checkpoint; 11, 12 e 14 ainda não têm aulas e não seguram a trilha. Onde as
+     perguntas não chegavam a seis, entram itens do jogo de números ou o significado
+     dos exemplos de uma lição que só trata da ideia da unidade.
+   - Palavras-imagem nas unidades 3 e 4, de forma automática: a nota do exemplo dá a
+     leitura em hiragana, e o jogo da lição deixa o katakana de fora. Os jogos também
+     só usam cartas de lições da mesma unidade ou de unidades anteriores.
    - Liberação pelo diagnóstico e regra para quem já tem progresso.
    - Trilha com cadeados; testes e documentos atualizados.
    - As lições a dividir ficam inteiras por enquanto, na unidade da primeira ideia delas.

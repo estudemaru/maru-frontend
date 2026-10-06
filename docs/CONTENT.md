@@ -203,7 +203,7 @@ nem arquivos de áudio no projeto.
 O diagnóstico contém 15 perguntas em shared/placement.js. O reconhecimento de
 hiragana e katakana funciona como pré-requisito para sugestões posteriores;
 kanji, vocabulário, partículas e leitura refinam a indicação. O resultado sugere
-uma etapa, não certifica proficiência. A resposta “Ainda não sei” é válida e não
+uma unidade e abre as anteriores; não certifica proficiência. A resposta “Ainda não sei” é válida e não
 altera revisão, XP, constância ou lições concluídas. A sugestão é reversível.
 
 shared/discovery.js reúne oito cápsulas culturais e três trilhas temáticas.

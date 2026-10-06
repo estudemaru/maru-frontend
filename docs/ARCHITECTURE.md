@@ -94,7 +94,7 @@ a busca. Nenhuma rota de conteúdo foi removida.
 - Reference: kanji, partículas, expressões, biblioteca e revisão.
 - Study: palavras por tema, exercícios, escuta e glossário.
 - Worksheets/Book 1: folhas avulsas e volume colorido adaptado do currículo existente; `book-content.js` define a progressão impressa em kana e a seleção de dez kanji básicos exclusiva da seção final, sem alterar o curso online.
-- Teacher/Package: seleção de etapa ou tema codificada no link público; não há tabela de turmas, contas de aluno nem acesso ao progresso individual.
+- Teacher/Package: seleção de unidade ou tema codificada no link público; não há tabela de turmas, contas de aluno nem acesso ao progresso individual.
 - Worksheets: folhas A4 de caracteres, palavras e frases com gabaritos opcionais; seleção livre de caracteres e páginas extras de repetição vazias.
 - Settings: modo visual, áudio, romaji, meta diária, indicadores e conquistas.
 
@@ -380,7 +380,7 @@ cadastro, login, recuperação e troca de senha no Supabase Auth; o adaptador No
 local não oferece esses endpoints. O funcionamento público depende das URLs
 permitidas e do SMTP descritos na documentação de publicação do backend.
 
-`#/videos` lista as aulas de `shared/videos.js` por etapa e lição. As lições e a
+`#/videos` lista as aulas de `shared/videos.js` por unidade e lição. As lições e a
 página usam `core/videos.js`: até o clique há só a miniatura (i.ytimg.com); o
 player `youtube-nocookie.com` entra no lugar dela quando a pessoa toca no play.
 Cada aula tem link para abrir no YouTube e crédito do canal. `trail.css` contém os
@@ -433,7 +433,7 @@ No computador nada muda.
   segue a mesma ideia com o termo como resumo. O cartão aberto ocupa a linha
   inteira da grade e continua à vista (`app.js`, ouvinte de `toggle`).
 - Cortes só por CSS: a paisagem da capa, os rótulos em maiúsculas sobre os
-  títulos, o mapa da trilha (as etapas logo abaixo já levam a cada uma), o plano
+  títulos, o mapa da trilha (as unidades logo abaixo já levam a cada uma), o plano
   da lição (o botão "Começar a lição" sobe para antes do vídeo), a descrição dos
   cartões de jogo, dos materiais e dos exercícios, e as descrições de tema e de
   letra em Meu ritmo.
@@ -461,7 +461,14 @@ em ordem, mais três extras, sem conteúdo novo em japonês.
   perguntas da ideia desta unidade. Unidades com poucas perguntas completam a prova
   com itens do jogo "Quanto, quando, qual". Para passar: 80%, sem nenhum conceito
   crítico com todas as perguntas erradas. Os erros aparecem no resultado, com o
-  link da aula; ainda não entram na revisão do FSRS.
+  link da aula; ainda não entram na revisão do FSRS. Onde as perguntas não chegavam
+  a seis, entra também o significado dos exemplos de uma lição que só trata da ideia
+  da unidade, com as outras traduções da lição como alternativas.
+- **Só o que a trilha já mostrou.** Nas unidades 3 e 4, antes do katakana, uma
+  palavra em katakana vira palavra-imagem: a nota do exemplo dá a leitura em
+  hiragana (`katakanaAsPicture` em `curriculum.js`), e o jogo da lição não usa
+  cartas com katakana. O jogo completa a mesa só com lições do mesmo tema nesta
+  unidade ou em anteriores.
 - **Progresso.** `checkpoints` guarda, por unidade, `passedAt`, `best`, `attempts`
   e `updatedAt`. Progresso antigo vira `{}`, e chaves desconhecidas são mantidas. A
   mescla guarda a primeira aprovação e a melhor nota. O diagnóstico salvo com as
