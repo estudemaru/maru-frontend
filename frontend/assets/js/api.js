@@ -69,7 +69,10 @@ export function checkPhrase(payload){
   });
 }
 
-export const getAiStatus = () => request("/api/ai/status");
+// A IA não liga nem desliga durante a visita: uma consulta basta para todas as telas.
+// Uma falha não fica guardada, para a próxima tela tentar de novo.
+let aiStatus = null;
+export const getAiStatus = () => aiStatus ||= request("/api/ai/status").catch(error => { aiStatus = null; throw error; });
 const aiPost = (path, payload, signal) => request("/api/ai/" + path, {
   method: "POST", body: JSON.stringify(payload), keepalive: false,
   signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(35000)]) : AbortSignal.timeout(35000)

@@ -29,3 +29,20 @@ test('lesson tutor sends lesson ID and renders answer as text',async({page})=>{
  await page.goto('/#/lesson/welcome');await page.getByText('Tirar uma dúvida com o Maru · IA').click();await page.locator('#tutor-question').fill('Como estudar?');await page.getByRole('button',{name:'Perguntar',exact:true}).click();
  await expect(page.locator('[data-lesson-tutor] [role=status]')).toContainText('<img src=x>');await expect(page.locator('[data-lesson-tutor] img')).toHaveCount(0);
 });
+test('lesson tutor stays out of sight without AI, asks the status once and uses the full width on a phone',async({page})=>{
+ let status=0, enabled=false;
+ await page.route('**/api/ai/status',route=>{status++;return route.fulfill({json:{enabled}});});
+ await page.route('**/api/ai/tutor',route=>route.fulfill({json:{answer:'Uma resposta com várias palavras, para ver se a caixa ocupa a largura da tela.',source:'ai'}}));
+ await page.setViewportSize({width:320,height:640});
+ await page.goto('/#/lesson/sentence-identity');
+ for(let i=0;i<2;i++)await page.locator('[data-lesson="next"]').click();
+ await expect(page.locator('[data-lesson-tutor]')).toBeHidden();
+ expect(status).toBe(1);
+ enabled=true;await page.reload();
+ for(let i=0;i<2;i++)await page.locator('[data-lesson="next"]').click();
+ await page.getByText('Tirar uma dúvida com o Maru · IA').click();await page.locator('#tutor-question').fill('Por que wa?');await page.getByRole('button',{name:'Perguntar',exact:true}).click();
+ const answer=page.locator('[data-lesson-tutor] [role=status]');
+ await expect(answer).toContainText('largura');
+ expect((await answer.boundingBox()).width).toBeGreaterThan(240);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

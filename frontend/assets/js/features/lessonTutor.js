@@ -4,8 +4,11 @@ import { esc } from "../core/ui.js";
 export function mountLessonTutor(ctx, host, lessonId, signal) {
   if (!host) return;
   let enabled = false, pending = false, question = "", answer = "", error = "";
+  // Sem IA, a caixa nem aparece.
+  host.hidden = true;
   const draw = () => {
     if (signal.aborted || !host.isConnected) return;
+    host.hidden = !enabled;
     host.innerHTML = enabled ? `<details class="concept-help"><summary>Tirar uma dúvida com o Maru · IA</summary>
       <p class="small muted">Pergunte sobre esta lição. Requer login. Sua pergunta será enviada à OpenAI; a IA pode errar.</p>
       <form data-tutor-form><label class="input-label" for="tutor-question">Sua dúvida</label>

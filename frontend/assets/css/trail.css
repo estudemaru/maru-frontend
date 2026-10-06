@@ -470,3 +470,15 @@ html[data-theme] .checkpoint-result > p.checkpoint-score { color: var(--ink); fo
 .checkpoint-note .icon { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 3px; }
 .checkpoint-note.is-critical { border: 1.5px solid var(--accent); }
 .checkpoint-note .text-link { font-size: 12px; }
+
+/* Tutor com IA na lição e correção com IA nas frases (features/lessonTutor.js, sentences.js).
+   No celular, a lição em andamento é uma grade: o tutor ocupa a linha inteira. */
+html[data-theme] .lesson-reader [data-lesson-tutor] { margin-top: 16px; padding: 0; background: none; border: 0; box-shadow: none; }
+html[data-theme] [data-lesson-active] > [data-lesson-tutor] { grid-column: 1 / -1; }
+[data-lesson-tutor] .concept-help { margin: 0; }
+[data-lesson-tutor] summary + p { margin: 8px 0 14px; line-height: 1.6; }
+[data-lesson-tutor] textarea { min-height: 96px; margin: 8px 0 12px; resize: vertical; }
+[data-lesson-tutor] [role="status"]:not(:empty) { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.8; }
+.sentence-ai { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.sentence-ai input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.sentence-ai-note { margin: 0 0 18px; }
