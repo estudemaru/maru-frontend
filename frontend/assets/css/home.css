@@ -1,6 +1,5 @@
 /* Só a Home: uma ação principal e duas sugestões de prática. */
 .home-page { max-width: 940px; }
-html[data-theme] body:has(.home-page)::before { opacity: .005; }
 html[data-theme] .app-body:has(.home-page) .app-footer { padding-block: 18px; }
 html[data-theme] .app-body:has(.home-page) .voice-credit { display: none; }
 html[data-theme] .home-page .play-hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; padding: 8px 0 36px; }
