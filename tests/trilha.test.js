@@ -34,7 +34,7 @@ test('checkpoints only ask what their own unit (or an earlier one) taught', () =
       if (item.type === 'quiz') assert.ok(lesson.quiz[item.index], `${unitId}: ${item.lessonId}#${item.index}`);
     }
     const questions = checkpointQuestions(unitId, seeded(7));
-    assert.ok(questions.length >= 3, unitId);
+    assert.ok(questions.length >= 6, `${unitId}: com menos de 6 perguntas, um erro já reprova`);
     assert.equal(new Set(questions.map(question => question.key)).size, questions.length, `${unitId}: pergunta repetida`);
     for (const concept of Object.keys(checkpoint.concepts)) assert.ok(questions.some(question => question.concept === concept), `${unitId}: ${concept} sem pergunta`);
     // Um conceito crítico tem ao menos duas perguntas: um deslize só não reprova.

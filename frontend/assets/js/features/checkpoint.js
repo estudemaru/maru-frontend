@@ -19,12 +19,14 @@ export function renderCheckpoint(ctx, unitId) {
   const controller = new AbortController();
   const text = value => esc(beginnerText(value));
   const back = routeLink("journey/" + unitId, icon("back") + esc(module.title), "back-link");
+  const concepts = Object.values(checkpoint.concepts);
+  const topics = concepts.length > 1 ? concepts.slice(0, -1).join(", ") + " e " + concepts.at(-1) : concepts[0];
   let questions = [], answers = [], index = 0, feedback = null, result = null, firstPass = false;
 
   function intro() {
     const saved = ctx.progress.checkpoints[unitId];
     const status = saved?.passedAt ? `<span class="pill sage">${icon("check")} Aprovado · melhor nota ${saved.best}%</span>` : saved?.attempts ? `<span class="pill">Melhor nota até agora: ${saved.best}%</span>` : "";
-    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-intro"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${esc(module.title)}</h1>${status}<p>Perguntas curtas sobre ${esc(Object.values(checkpoint.concepts).join(", "))}. Com ${PASS_RATIO * 100}% de acerto, a próxima unidade abre.</p><ul class="plain-list"><li>Cada resposta vem com a explicação, na hora.</li><li>Errar não apaga nada, e dá para tentar de novo quando quiser.</li><li>Se você já sabe, pode fazer antes de terminar as aulas.</li></ul><div class="completion-actions"><button class="btn btn-primary" data-checkpoint="start">Começar o checkpoint ${icon("arrow")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}</div></section></div>`;
+    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-intro"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${esc(module.title)}</h1>${status}<p>Perguntas curtas sobre ${esc(topics)}. Com ${PASS_RATIO * 100}% de acerto, a próxima unidade abre.</p><ul class="plain-list"><li>Cada resposta vem com a explicação, na hora.</li><li>Errar não apaga nada, e dá para tentar de novo quando quiser.</li><li>Se você já sabe, pode fazer antes de terminar as aulas.</li></ul><div class="completion-actions"><button class="btn btn-primary" data-checkpoint="start">Começar o checkpoint ${icon("arrow")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}</div></section></div>`;
   }
 
   function question() {
