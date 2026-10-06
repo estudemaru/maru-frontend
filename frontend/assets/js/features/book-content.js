@@ -15,7 +15,8 @@ export const BOOK_KANA_ORDER = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', '
 // printed book already interleaves every family, so it keeps its original lessons.
 const ONLINE_ONLY = new Set(['h-ka', 'h-sa', 'h-ta', 'h-na', 'h-ha', 'h-ma', 'h-yara', 'h-dakuten', 'k-sata', 'k-naha', 'k-mawa']);
 const flat = text => String(text || '').replace(/\n• /g, ' · ').replace(/\n/g, ' ');
-export const BOOK_MODULES = MODULES.filter(module => module.id !== 'kanji').map((module, index) => ({
+// Kanji e "Quanto, quando e qual" (horas e datas pedem kanji) ficam só no curso online.
+export const BOOK_MODULES = MODULES.filter(module => !['kanji', 'numbers'].includes(module.id)).map((module, index) => ({
   ...module, number: String(index + 1).padStart(2, '0'),
   lessons: module.lessons.filter(source => !ONLINE_ONLY.has(source.id)).map(source => {
     const lesson = { ...source, sections: source.sections.map((section, index) => ({ ...section, body: BOOK_NOTES[source.id]?.[index] || flat(section.body) })) };
@@ -43,7 +44,8 @@ BEGINNER_KANJI.forEach(item => pairs.push([item.char, item.reading], [item.word,
 VOCABULARY.forEach(item => pairs.push([item.jp, item.reading], [item.sentence, item.sentenceReading]));
 SENTENCES.forEach(item => item.tokens.forEach(token => pairs.push([token[0], token[3]])));
 [...PARTICLES, ...EXPRESSIONS].forEach(item => pairs.push([item.jp, item.reading]));
-MODULES.forEach(module => module.lessons.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => pairs.push([item.jp, item.reading])))));
+// A etapa de números fica fora do livro e das leituras dele (ついたち não pode virar a leitura de 一日 no texto impresso).
+MODULES.filter(module => module.id !== 'numbers').forEach(module => module.lessons.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => pairs.push([item.jp, item.reading])))));
 PARTICLE_EXERCISES.forEach(item => pairs.push([item.prompt, item.reading], [item.speech, item.reading?.replace('＿', item.answer)]));
 PRINT_DIALOGUES.forEach(dialogue => dialogue.turns.forEach(turn => pairs.push([turn.text, turn.reading], [turn.answer, turn.answerReading])));
 const runs = new Map();

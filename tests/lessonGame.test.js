@@ -24,7 +24,7 @@ test('every lesson ends with a playable game built from its own examples', () =>
 
 test('sound and conversation stages listen; kanji, sentences and particles read', () => {
   const kinds = Object.fromEntries(LESSONS.map(lesson => [lesson.moduleId, lessonGame(lesson).kind]));
-  assert.deepEqual(kinds, { start: 'listen', hiragana: 'listen', katakana: 'listen', kanji: 'read', sentences: 'read', particles: 'read', everyday: 'listen', casual: 'listen' });
+  assert.deepEqual(kinds, { start: 'listen', hiragana: 'listen', katakana: 'listen', kanji: 'read', sentences: 'read', particles: 'read', everyday: 'listen', numbers: 'read', casual: 'listen' });
 });
 
 test('kana rows become one card per sound and を never shares a table with お', () => {

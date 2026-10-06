@@ -4,15 +4,15 @@
 /* Cor de cada etapa, como as linhas de um mapa de trem (路線図). */
 :root {
   --line-start: #b5342a; --line-hiragana: #2f6b4f; --line-katakana: #6a4c93; --line-kanji: #9a7020;
-  --line-sentences: #1f5f8b; --line-particles: #b8572a; --line-everyday: #2b7a72; --line-casual: #8d3a68;
+  --line-sentences: #1f5f8b; --line-particles: #b8572a; --line-everyday: #2b7a72; --line-numbers: #66731c; --line-casual: #8d3a68;
 }
 :root[data-theme="arcade"] {
   --line-start: #ef6d4f; --line-hiragana: #74c29a; --line-katakana: #b49be0; --line-kanji: #e4b65e;
-  --line-sentences: #79b4e0; --line-particles: #f0955f; --line-everyday: #6cc9bc; --line-casual: #e08bb9;
+  --line-sentences: #79b4e0; --line-particles: #f0955f; --line-everyday: #6cc9bc; --line-numbers: #c5d16e; --line-casual: #e08bb9;
 }
 .line-start { --line: var(--line-start); } .line-hiragana { --line: var(--line-hiragana); } .line-katakana { --line: var(--line-katakana); }
 .line-kanji { --line: var(--line-kanji); } .line-sentences { --line: var(--line-sentences); } .line-particles { --line: var(--line-particles); }
-.line-everyday { --line: var(--line-everyday); } .line-casual { --line: var(--line-casual); }
+.line-everyday { --line: var(--line-everyday); } .line-numbers { --line: var(--line-numbers); } .line-casual { --line: var(--line-casual); }
 
 /* ── Trilha ─────────────────────────────────────────────── */
 .trail-page { display: grid; gap: 22px; }

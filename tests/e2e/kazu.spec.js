@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { KAZU_ITEMS } from '../../shared/kazu.js';
+import { getLesson } from '../../shared/curriculum.js';
 
 const snapshot = page => page.evaluate(() => JSON.parse(localStorage.getItem('maru-learning-v2')));
 const fits = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
@@ -38,6 +39,25 @@ test('the numbers game asks for readings, explains mistakes and records reviews'
   await page.locator('#kazu-finish').click();
   await expect(page.locator('.renda-review')).toContainText(wrong.reading);
   expect(errors).toEqual([]);
+});
+
+test('the new trail stage leads from a lesson to the game in the same category', async ({ page }) => {
+  await page.goto('/#/journey');
+  await expect(page.locator('.trail-map-stop')).toHaveCount(9);
+  await expect(page.locator('#etapa-numbers .trail-stop')).toHaveCount(6);
+  const lesson = getLesson('num-week');
+  await page.goto('/#/lesson/num-week');
+  for (let i = 0; i <= lesson.sections.length; i++) await page.locator('[data-lesson="next"]').click();
+  for (const question of lesson.quiz) {
+    await page.locator(`input[name="answer"][value="${question.answer}"]`).check();
+    await page.getByRole('button', { name: 'Verificar resposta', exact: true }).click();
+    await page.locator('[data-lesson="question-next"]').click();
+  }
+  await page.getByRole('button', { name: 'Pular o jogo' }).click();
+  await page.locator('[data-lesson="practice"]').click();
+  await expect(page).toHaveURL(/#\/arcade\/kazu$/);
+  await expect(page.locator('#kazu-category')).toHaveValue('week');
+  await expect(page.locator('.renda-from')).toContainText('Dias da semana');
 });
 
 test('long readings and Portuguese prompts fit a small phone', async ({ page }) => {

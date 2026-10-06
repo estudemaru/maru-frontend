@@ -21,7 +21,14 @@ export function pronunciationCatalog() {
   // Números, horas e datas do jogo "Quanto, quando, qual" entram antes das lições, para a
   // voz ler a leitura ensinada (よじ, ついたち) também onde uma lição já usa a mesma palavra.
   KAZU_ITEMS.forEach(item => add(item.speak, item.reading));
-  LESSONS.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => add(item.jp))));
+  // Na etapa de números, a voz lê a leitura ensinada (ようか, しちじ), também peça por peça
+  // nas sequências que o jogo da lição separa em cartas ("四時　七時　九時").
+  LESSONS.forEach(lesson => lesson.sections.forEach(section => section.examples.forEach(item => {
+    if (lesson.moduleId !== "numbers") return add(item.jp);
+    const parts = item.jp.split(/　| → /), readings = (item.reading || item.jp).split(/　| → /);
+    add(item.jp, item.reading || item.jp);
+    if (parts.length > 1 && parts.length === readings.length) parts.forEach((part, index) => add(part, readings[index]));
+  })));
   PARTICLES.forEach(item => add(item.jp));
   EXPRESSIONS.forEach(item => add(item.jp));
   SENTENCES.forEach(item => add(item.tokens.map(token => token[0]).join("") + "。"));
