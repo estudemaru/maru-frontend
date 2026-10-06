@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MODULES, UNITS, LESSONS, THEMES, getLesson, hasCheckpoint } from '../shared/curriculum.js';
 import { CHECKPOINTS, checkpointQuestions, gradeCheckpoint } from '../shared/checkpoints.js';
-import { unitStates, nextStep, stepAfter, isLessonOpen, moduleSeals } from '../shared/learningPath.js';
+import { unitStates, nextStep, stepAfter, isLessonOpen, moduleSeals, katakanaCleared } from '../shared/learningPath.js';
 import { normalizeSnapshot, mergeSnapshots, recordCheckpoint } from '../shared/progress.js';
 
 const seeded = (seed = 1) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
@@ -151,4 +151,17 @@ test('checkpoints survive bad data, merges and older apps', () => {
   const stale = normalizeSnapshot({ placement: { acceptedModule: '', updatedAt: 50 } });
   assert.equal(mergeSnapshots(stale, current).placement.acceptedModule, 'numbers');
   assert.equal(mergeSnapshots(current, stale).placement.acceptedModule, 'numbers');
+});
+
+test('passing the katakana unit counts as knowing kana, and later checkpoints keep kanji as written', () => {
+  const fresh = normalizeSnapshot();
+  assert.equal(katakanaCleared(fresh), false);
+  assert.equal(katakanaCleared(normalizeSnapshot({ placement: { acceptedModule: 'numbers', updatedAt: 1 } })), true, 'o diagnóstico passou do katakana');
+  const tested = normalizeSnapshot({ placement: { acceptedModule: 'world', updatedAt: 1 } });
+  assert.equal(katakanaCleared(tested), false);
+  pass(tested, 'world');
+  assert.equal(katakanaCleared(tested), true, 'o checkpoint do katakana foi aprovado');
+  // Antes do katakana, o modo de leitura ainda pode trocar kanji por kana; depois, não.
+  assert.ok(checkpointQuestions('around', seeded(1)).every(question => !question.plain));
+  for (const unit of ['numbers', 'time', 'counting', 'describe']) assert.ok(checkpointQuestions(unit, seeded(1)).every(question => question.plain), unit);
 });

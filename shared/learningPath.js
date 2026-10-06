@@ -22,6 +22,10 @@ export function unitStates(snapshot) {
   });
 }
 
+// A unidade do katakana (5) vencida, por checkpoint ou pelo diagnóstico, conta como
+// kana aprendido, mesmo sem as lições de kana concluídas.
+export const katakanaCleared = snapshot => unitStates(snapshot).find(unit => unit.id === "world").cleared;
+
 export function isLessonOpen(snapshot, lessonId) {
   const module = getModule(getLesson(lessonId)?.moduleId);
   return !module || module.extra || unitStates(snapshot).find(unit => unit.id === module.id).open;

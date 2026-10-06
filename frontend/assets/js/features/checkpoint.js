@@ -17,7 +17,6 @@ export function renderCheckpoint(ctx, unitId) {
   if (!module || !checkpoint) { ctx.main.innerHTML = emptyState("Checkpoint não encontrado", "Escolha uma unidade na sua trilha.", routeLink("journey", "Ver a trilha", "btn btn-primary")); return; }
   if (!unitStates(ctx.progress).find(unit => unit.id === unitId).open) { ctx.main.innerHTML = `<div class="checkpoint-page">${lockedPanel(ctx.progress, module)}</div>`; return; }
   const controller = new AbortController();
-  const text = value => esc(beginnerText(value));
   const back = routeLink("journey/" + unitId, icon("back") + esc(module.title), "back-link");
   const concepts = Object.values(checkpoint.concepts);
   const topics = concepts.length > 1 ? concepts.slice(0, -1).join(", ") + " e " + concepts.at(-1) : concepts[0];
@@ -29,13 +28,16 @@ export function renderCheckpoint(ctx, unitId) {
     return `<div class="checkpoint-page">${back}<section class="panel checkpoint-intro"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${esc(module.title)}</h1>${status}<p>Perguntas curtas sobre ${esc(topics)}. Com ${PASS_RATIO * 100}% de acerto, a próxima unidade abre.</p><ul class="plain-list"><li>Cada resposta vem com a explicação, na hora.</li><li>Errar não apaga nada, e dá para tentar de novo quando quiser.</li><li>Se você já sabe, pode fazer antes de terminar as aulas.</li></ul><div class="completion-actions"><button class="btn btn-primary" data-checkpoint="start">Começar o checkpoint ${icon("arrow")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}</div></section></div>`;
   }
 
+  // O modo de leitura (kanji como kana) só vale para as provas de antes do katakana.
+  const text = (value, item) => esc(item.plain ? value : beginnerText(value));
+
   function question() {
     const item = questions[index];
-    const option = (choice, i) => `<label class="answer-option ${feedback && i === item.answer ? "is-correct" : feedback && i === feedback.selected && !feedback.correct ? "is-wrong" : ""}"><input type="radio" name="answer" value="${i}" required ${feedback?.selected === i ? "checked" : ""}><span class="option-letter">${String.fromCharCode(65 + i)}</span><span>${text(choice)}</span>${feedback && i === item.answer ? icon("check") : ""}</label>`;
+    const option = (choice, i) => `<label class="answer-option ${feedback && i === item.answer ? "is-correct" : feedback && i === feedback.selected && !feedback.correct ? "is-wrong" : ""}"><input type="radio" name="answer" value="${i}" required ${feedback?.selected === i ? "checked" : ""}><span class="option-letter">${String.fromCharCode(65 + i)}</span><span>${text(choice, item)}</span>${feedback && i === item.answer ? icon("check") : ""}</label>`;
     const after = feedback
-      ? `<div class="feedback ${feedback.correct ? "success" : "retry"}" role="status"><strong>${feedback.correct ? "Isso mesmo!" : "Não foi desta vez."}</strong><p>${text(item.explanation)}</p></div><div class="lesson-controls align-end"><button type="button" class="btn btn-primary" data-checkpoint="next">${index + 1 === questions.length ? "Ver o resultado" : "Continuar"} ${icon("arrow")}</button></div>`
+      ? `<div class="feedback ${feedback.correct ? "success" : "retry"}" role="status"><strong>${feedback.correct ? "Isso mesmo!" : "Não foi desta vez."}</strong><p>${text(item.explanation, item)}</p></div><div class="lesson-controls align-end"><button type="button" class="btn btn-primary" data-checkpoint="next">${index + 1 === questions.length ? "Ver o resultado" : "Continuar"} ${icon("arrow")}</button></div>`
       : '<div class="lesson-controls align-end"><button class="btn btn-primary" type="submit">Verificar resposta</button></div>';
-    return `<div class="practice-session checkpoint-page">${back}<div class="session-heading"><h1 tabindex="-1">Checkpoint · ${esc(module.title)}</h1><span>${index + 1} / ${questions.length}</span></div>${progressBar(index / questions.length * 100, "Progresso do checkpoint")}<section class="panel quiz-stage"><h2 class="placement-question" data-focus tabindex="-1">${text(item.prompt)}</h2><form id="checkpoint-answer"><fieldset class="answer-options" ${feedback ? "disabled" : ""}><legend class="sr-only">Escolha uma resposta</legend>${item.choices.map(option).join("")}</fieldset>${after}</form></section></div>`;
+    return `<div class="practice-session checkpoint-page">${back}<div class="session-heading"><h1 tabindex="-1">Checkpoint · ${esc(module.title)}</h1><span>${index + 1} / ${questions.length}</span></div>${progressBar(index / questions.length * 100, "Progresso do checkpoint")}<section class="panel quiz-stage"><h2 class="placement-question" data-focus tabindex="-1">${text(item.prompt, item)}</h2><form id="checkpoint-answer"><fieldset class="answer-options" ${feedback ? "disabled" : ""}><legend class="sr-only">Escolha uma resposta</legend>${item.choices.map(option).join("")}</fieldset>${after}</form></section></div>`;
   }
 
   function outcome() {
@@ -53,7 +55,7 @@ export function renderCheckpoint(ctx, unitId) {
     const actions = result.passed
       ? `${routeLink(stepRoute(step), "Seguir para a próxima parada" + icon("arrow"), "btn btn-primary")}<button class="btn btn-ghost" data-checkpoint="start">Fazer de novo</button>`
       : `<button class="btn btn-primary" data-checkpoint="start">Tentar de novo ${icon("repeat")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}`;
-    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-result ${result.passed ? "is-passed" : ""}"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${heading}</h1><p class="checkpoint-score"><strong>${result.correct} de ${result.total}</strong> · ${result.percent}%</p><p>${summary}</p>${firstPass ? `<span class="pill sage">+50 XP · Checkpoint aprovado</span>` : ""}${notes}${missed.length ? `<details class="concept-help"><summary>Rever as perguntas que você errou</summary>${missed.map(item => `<article class="placement-review"><h3>${text(item.prompt)}</h3><p><strong>${text(item.choices[item.answer])}</strong> · ${text(item.explanation)}</p></article>`).join("")}</details>` : ""}<div class="completion-actions">${actions}</div></section></div>`;
+    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-result ${result.passed ? "is-passed" : ""}"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${heading}</h1><p class="checkpoint-score"><strong>${result.correct} de ${result.total}</strong> · ${result.percent}%</p><p>${summary}</p>${firstPass ? `<span class="pill sage">+50 XP · Checkpoint aprovado</span>` : ""}${notes}${missed.length ? `<details class="concept-help"><summary>Rever as perguntas que você errou</summary>${missed.map(item => `<article class="placement-review"><h3>${text(item.prompt, item)}</h3><p><strong>${text(item.choices[item.answer], item)}</strong> · ${text(item.explanation, item)}</p></article>`).join("")}</details>` : ""}<div class="completion-actions">${actions}</div></section></div>`;
   }
 
   const draw = () => { ctx.main.innerHTML = result ? outcome() : questions.length ? question() : intro(); };
