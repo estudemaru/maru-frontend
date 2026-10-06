@@ -11,7 +11,7 @@ import { moduleSeals, nextLesson } from "../shared/learningPath.js";
 import { MODULES, getLesson } from "../shared/curriculum.js";
 import { CULTURE_CAPSULES, THEMATIC_PATHS, thematicContent } from "../shared/discovery.js";
 
-test("placement gates later stages on kana and recommends only a stage", () => {
+test("placement gates later units on kana and recommends only a unit", () => {
   const answers = Object.fromEntries(PLACEMENT_QUESTIONS.map(q => [q.id, null]));
   assert.equal(PLACEMENT_QUESTIONS.length, 15);
   assert.equal(placementResult(answers).moduleId, "start");
@@ -21,16 +21,17 @@ test("placement gates later stages on kana and recommends only a stage", () => {
   answers["h-a"] = 0;
   assert.equal(placementResult(answers).moduleId, "hiragana");
   pass(["hiragana"]);
-  assert.equal(placementResult(answers).moduleId, "katakana");
-  pass(["katakana"]);
-  assert.equal(placementResult(answers).moduleId, "kanji");
-  answers["p-object"] = null; answers["r-where"] = null; answers["r-negative"] = null;
-  pass(["kanji", "vocabulary"]);
-  assert.equal(placementResult(answers).moduleId, "sentences");
+  assert.equal(placementResult(answers).moduleId, "meet");
+  pass(["katakana", "kanji"]);
+  assert.equal(placementResult(answers).moduleId, "meet");
+  answers["p-object"] = null; answers["p-place"] = null; answers["r-where"] = null; answers["r-negative"] = null;
+  pass(["vocabulary"]);
+  assert.equal(placementResult(answers).moduleId, "meet");
   pass(["reading"]);
-  assert.equal(placementResult(answers).moduleId, "particles");
+  assert.equal(placementResult(answers).moduleId, "meet");
   pass(["particles"]);
-  assert.equal(placementResult(answers).moduleId, "everyday");
+  // Nem números nem horas entram no diagnóstico: a sugestão para na unidade 6.
+  assert.equal(placementResult(answers).moduleId, "numbers");
   assert.equal(placementResult(answers).complete, true);
   assert.equal(placementResult({}).complete, false);
 });
@@ -38,7 +39,9 @@ test("placement gates later stages on kana and recommends only a stage", () => {
 test("diagnosis, manual entry and resetting suggestions preserve actual achievements", () => {
   const p = normalizeSnapshot({ xp: { total: 80 }, lessons: { welcome: { completedAt: 10 } }, placement: { version: 1, answers: {"h-a":0, fake:1, "h-ne":99}, acceptedModule:"kanji", updatedAt:100 } });
   assert.deepEqual(p.placement.answers, {"h-a":0,"h-ne":null});
-  assert.equal(nextLesson(p).moduleId, "kanji");
+  // A etapa antiga "kanji" vem de antes das unidades e vira a unidade 3.
+  assert.equal(p.placement.acceptedModule, "meet");
+  assert.equal(nextLesson(p).moduleId, "meet");
   assert.equal(moduleSeals(p).filter(m => m.earned).length, 0);
   assert.equal(p.xp.total, 80);
   assert.equal(Object.keys(p.lessons).length, 1);
