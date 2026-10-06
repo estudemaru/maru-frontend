@@ -1,3 +1,4 @@
+import { mountLessonTutor } from "./lessonTutor.js";
 import { CULTURE_CAPSULES } from "/shared/discovery.js";
 import { conceptsIn } from "/shared/glossary.js";
 import { getLesson, getModule, getTheme, moduleLabel } from "/shared/curriculum.js";
@@ -60,7 +61,8 @@ export function renderLesson(ctx, id) {
     const currentStage = step < QUIZ ? 0 : step === QUIZ ? 1 : 2;
     const stages = [{ title: "Aprender", icon: "book" }, { title: "Praticar", icon: "pen" }, { title: "Jogar", icon: "target" }];
     const stageBar = `<ol class="lesson-stages" aria-label="Etapas da lição">${stages.map((item, index) => `<li class="${step >= DONE || index < currentStage ? "is-done" : index === currentStage ? "is-current" : ""}"${step < DONE && index === currentStage ? ' aria-current="step"' : ""}>${icon(step >= DONE || index < currentStage ? "check" : item.icon)}<span>${item.title}</span></li>`).join("")}</ol>`;
-    ctx.main.innerHTML = `<div class="lesson-reader" data-lesson-phase="${phase}"${["reading", "quiz", "game"].includes(phase) ? ' data-lesson-active' : ''} style="--lesson-accent:var(--line-${lesson.moduleId})">${routeLink("journey/" + lesson.moduleId, icon("back") + `<span class="lesson-back-copy">${lesson.moduleTitle}</span>`, "back-link", `aria-label="Voltar à trilha: ${esc(lesson.moduleTitle)}"`)}<div class="lesson-reader-head"><div><p class="eyebrow">${position}</p><h1 tabindex="-1">${lesson.title}</h1></div><span class="pill">${icon("clock")} ${lesson.minutes} min</span></div>${progressBar(progress, "Progresso da lição")}${stageBar}<div class="lesson-content panel">${content}</div>${lessonArtCredit}</div>`;
+    ctx.main.innerHTML = `<div class="lesson-reader" data-lesson-phase="${phase}"${["reading", "quiz", "game"].includes(phase) ? ' data-lesson-active' : ''} style="--lesson-accent:var(--line-${lesson.moduleId})">${routeLink("journey/" + lesson.moduleId, icon("back") + `<span class="lesson-back-copy">${lesson.moduleTitle}</span>`, "back-link", `aria-label="Voltar à trilha: ${esc(lesson.moduleTitle)}"`)}<div class="lesson-reader-head"><div><p class="eyebrow">${position}</p><h1 tabindex="-1">${lesson.title}</h1></div><span class="pill">${icon("clock")} ${lesson.minutes} min</span></div>${progressBar(progress, "Progresso da lição")}${stageBar}<div class="lesson-content panel">${content}</div>${step <= SECTIONS || step >= DONE ? `<aside class="panel" data-lesson-tutor></aside>` : ""}${lessonArtCredit}</div>`;
+    mountLessonTutor(ctx, ctx.main.querySelector("[data-lesson-tutor]"), lesson.id, controller.signal);
   };
   const recapHTML = () => source.recap.length ? `<aside class="lesson-recap"><p class="eyebrow">RESUMINDO</p><ul>${source.recap.map(item => `<li>${esc(beginnerText(item))}</li>`).join("")}</ul></aside>` : "";
   function intro() {

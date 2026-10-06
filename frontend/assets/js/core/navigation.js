@@ -33,6 +33,7 @@ const ALL_RESOURCES = [
 ];
 export const RESOURCES = ALL_RESOURCES.filter(item => !["themes", "teacher"].includes(item.route)).map(item => item.route === "worksheets" ? { ...item, title: "Folhas de repetição", description: "Modelos e quadrados para repetir caracteres à mão." } : item);
 const pages = [
+  { route: "sentence-coach", title: "Montar e corrigir frases", section: "practice" },
   { route: "arcade", title: "Jogar", section: "practice" },
   { route: "daily", title: "Desafio do dia", section: "practice" },
   ...NAVIGATION.map(item => ({ ...item, section: item.route })),

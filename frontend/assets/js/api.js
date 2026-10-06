@@ -68,3 +68,11 @@ export function checkPhrase(payload){
     body: JSON.stringify(payload)
   });
 }
+
+export const getAiStatus = () => request("/api/ai/status");
+const aiPost = (path, payload, signal) => request("/api/ai/" + path, {
+  method: "POST", body: JSON.stringify(payload), keepalive: false,
+  signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(35000)]) : AbortSignal.timeout(35000)
+});
+export const checkPhraseWithAi = (payload, signal) => aiPost("phrase", payload, signal);
+export const askLessonTutor = (payload, signal) => aiPost("tutor", payload, signal);

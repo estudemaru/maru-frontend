@@ -44,3 +44,12 @@ usada apenas quando a API estiver indisponível. O arquivo registra a fonte e a 
 As explicações, traduções em português e exercícios do Maru são autorais.
 Os traços de escrita continuam vindo de KanjiVG; os créditos estão na interface,
 nas folhas de impressão e em `frontend/assets/data/LICENSE.md`.
+
+## Tutor e correção com IA
+
+Os controles aparecem quando `/api/ai/status` indica disponibilidade. A correção
+com IA é opcional no exercício de frases; sem IA, permanece a comparação local
+com o modelo. O tutor aparece na leitura e conclusão das lições, fora do quiz.
+Ambos exigem login e informam que o texto será enviado à OpenAI. As respostas
+são exibidas como texto escapado, sem interpretar HTML do modelo.
+A configuração da chave e da quota está em `maru-backend/docs/INTEGRATIONS.md`.

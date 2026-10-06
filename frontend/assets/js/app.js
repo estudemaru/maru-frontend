@@ -41,6 +41,7 @@ const SCREENS = {
   lesson: () => import("./features/lesson.js"),
   checkpoint: () => import("./features/checkpoint.js"),
   placement: () => import("./features/placement.js"),
+  sentences: () => import("./features/sentences.js"),
   hubs: () => import("./features/hubs.js"),
   videos: () => import("./features/video-lessons.js"),
   study: () => Promise.all([import("./features/study.js"), loadReference()]).then(([screen]) => screen),
@@ -51,7 +52,7 @@ const SCREENS = {
   settings: () => import("./features/settings.js")
 };
 const SCREEN_OF = {
-  practice: "arcade", arcade: "arcade", progress: "arcade", challenge: "arcade", sentences: "arcade",
+  practice: "arcade", arcade: "arcade", progress: "arcade", challenge: "arcade", sentences: "arcade", "sentence-coach": "sentences",
   daily: "daily", journey: "journey", lesson: "lesson", checkpoint: "checkpoint", placement: "placement", videos: "videos", explore: "hubs",
   kana: "kana", writing: "writing", kanji: "reference", particles: "reference", expressions: "reference",
   library: "reference", review: "reference", vocabulary: "study", glossary: "study", exercises: "study",
@@ -190,6 +191,7 @@ async function render() {
     explore: screen => screen.renderExplore(ctx),
     kana: screen => screen.renderKana(ctx, params),
     writing: screen => screen.renderWriting(ctx, id || params.char || "あ"),
+    "sentence-coach": screen => screen.renderSentences(ctx, id),
     sentences: screen => screen.renderArcade(ctx, "sentences"),
     kanji: screen => screen.renderKanji(ctx),
     particles: screen => screen.renderParticles(ctx),
