@@ -10,7 +10,7 @@ const CHANNEL_NOTES = {
   jp101: 'Desafios curtos de hiragana e katakana e um guia das partículas. Em inglês.'
 };
 
-// Todas as aulas ligadas à trilha, por etapa. Tocar numa aula a abre no player do topo.
+// Todas as aulas ligadas à trilha, por unidade. Tocar numa aula a abre no player do topo.
 export function renderVideoLessons(ctx) {
   const controller = new AbortController();
   const first = videosFor('h-vowels')[0] || VIDEOS[0];
