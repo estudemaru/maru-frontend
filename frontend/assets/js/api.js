@@ -40,7 +40,8 @@ async function request(path, options){
   if(res.status === 204) return null;
   return res.json();
 }
-export const getAccount = () => request("/api/account");
+// Allow the server to verify an expired access token and renew the session.
+export const getAccount = () => request("/api/account", { signal: AbortSignal.timeout(25000) });
 export const signOut = () => request("/api/auth/logout", { method: "POST" });
 const authPost = (path, body) => request("/api/auth/email/" + path, {
   method: "POST", body: JSON.stringify(body), signal: AbortSignal.timeout(15000)

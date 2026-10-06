@@ -36,6 +36,22 @@ export async function createStore(onStatus) {
   }
   persistLocal();
   const report = status => onStatus(status || (remoteAvailable ? "saved" : localAvailable ? "local" : "unsaved"));
+  let checking = null;
+  const checkAccount = () => {
+    if (!checking) checking = (async () => {
+      const state = await getAccount();
+      if (stopped) return false;
+      if ((state.user?.id || "") !== (user?.id || "")) {
+        remoteAvailable = false; dirty = true; changedAccount = true; stopped = true;
+        clearTimeout(timer); report("account-changed");
+        return false;
+      }
+      verified = true;
+      updateProviders(state);
+      return true;
+    })().finally(() => { checking = null; });
+    return checking;
+  };
   const flush = async () => {
     clearTimeout(timer);
     if (stopped) return;
@@ -45,14 +61,7 @@ export async function createStore(onStatus) {
       dirty = false;
       try {
         // Check identity before every batch, including reconnects and expired cookies.
-        const state = await getAccount();
-        if ((state.user?.id || "") !== (user?.id || "")) {
-          remoteAvailable = false; dirty = true; changedAccount = true;
-          report("account-changed");
-          return;
-        }
-        verified = true;
-        updateProviders(state);
+        if (!await checkAccount()) return;
         const sent = structuredClone(snapshot);
         const merged = await saveProgress(sent);
         Object.assign(snapshot, mergeSnapshots(snapshot, merged));
@@ -69,8 +78,16 @@ export async function createStore(onStatus) {
     if (dirty && remoteAvailable) return flush();
     if (!remoteAvailable) report(changedAccount ? "account-changed" : localAvailable ? "local" : "unsaved");
   };
+  const renewSession = async () => {
+    if (stopped || document.hidden || !user) return;
+    try {
+      if (!await checkAccount()) return;
+      if (dirty || !remoteAvailable) { dirty = true; await flush(); }
+    } catch { remoteAvailable = false; report(); }
+  };
   window.addEventListener("online", () => { dirty = true; void flush(); });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) void flush(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) void flush(); else void renewSession(); });
+  window.addEventListener("pageshow", () => { void renewSession(); });
   window.addEventListener("storage", event => {
     if (event.key === identityKey && (readIdentity()?.id || "") !== (user?.id || "")) {
       stopped = true; clearTimeout(timer); report("account-changed");
