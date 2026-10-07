@@ -3,8 +3,9 @@ import { test, expect } from "@playwright/test";
 const localVoice = { name: "Kyoko", lang: "ja-JP", localService: true };
 const remoteVoice = { name: "Google Japanese", lang: "ja-JP", localService: false };
 const portugueseVoice = { name: "Português", lang: "pt-BR", localService: true, default: true };
+const characterVoice = { name: "Eddy (japonês (Japão))", lang: "ja-JP", localService: true };
 
-async function installSpeech(page, { voices = [portugueseVoice, remoteVoice, localVoice], mode = "play" } = {}) {
+async function installSpeech(page, { voices = [portugueseVoice, characterVoice, remoteVoice, localVoice], mode = "play" } = {}) {
   await page.addInitScript(({ voices, mode }) => {
     window.speechCalls = []; window.speechCancels = 0; window.audioInstances = 0;
     window.testVoices = voices;
@@ -74,6 +75,8 @@ for (const [device, viewport] of [["desktop", { width: 1440, height: 1000 }], ["
     await page.evaluate(() => window.lastUtterance.onend());
     await expect(button).toHaveAttribute("aria-pressed", "false");
     expect(await page.evaluate(() => window.speechCalls.length)).toBe(2);
+    expect(await page.evaluate(() => window.speechCancels)).toBe(1);
+    expect(requests).toEqual([]);
   });
 }
 

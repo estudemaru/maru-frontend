@@ -1,11 +1,19 @@
 // Prefer a Japanese voice on the device to avoid a synthesis request per click.
 export function createBrowserSpeech({ synthesis = globalThis.speechSynthesis, Utterance = globalThis.SpeechSynthesisUtterance, startTimeout = 2500 } = {}) {
   let active = null, unavailable = false;
+  // macOS lists Eloquence voices before Kyoko. Japanese Eloquence has reported
+  // rate/distortion problems (WebKit bug 282920), so prefer another speech engine.
+  const eloquenceVoice = voice => /\.eloquence\./i.test(voice.voiceURI || "")
+    || /\b(?:Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/i.test(voice.name || "");
+  const readingVoice = voice => /\b(?:Kyoko|Otoya|Haruka|Ayumi|Ichiro)\b/i.test(`${voice.name || ""} ${voice.voiceURI || ""}`);
   function japaneseVoice() {
     if (!synthesis || !Utterance || unavailable) return null;
     try {
-      const voices = synthesis.getVoices().filter(voice => /^ja(?:[-_]|$)/i.test(voice.lang));
-      return voices.find(voice => voice.localService) || voices.find(voice => voice.default) || voices[0] || null;
+      const voices = synthesis.getVoices().filter(voice => /^ja(?:[-_]|$)/i.test(voice.lang) && !eloquenceVoice(voice));
+      return voices.find(voice => voice.localService && readingVoice(voice))
+        || voices.find(voice => voice.localService && voice.default)
+        || voices.find(voice => voice.localService)
+        || voices.find(voice => voice.default) || voices[0] || null;
     } catch { return null; }
   }
   // Query immediately so browsers that load voices asynchronously can warm up.

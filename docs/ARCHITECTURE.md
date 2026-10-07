@@ -159,8 +159,13 @@ leituras em kana e formas de romaji previstas. Divergência significa “diferen
 do modelo”, não “gramaticalmente impossível”. O mesmo código funciona localmente.
 O formato legado com item permanece, sem dar notas artificiais a frases livres.
 
-O áudio prioriza Web Speech API com uma voz japonesa disponível no aparelho,
-preferindo `localService`. `core/browserSpeech.js` carrega a lista de vozes ao
+O áudio prioriza Web Speech API com uma voz japonesa de leitura disponível no
+aparelho, preferindo `localService` e vozes como Kyoko e Otoya. As vozes Eloquence
+do macOS (Eddy, Grandma etc.) ficam fora da seleção pelo nome ou `voiceURI`:
+há um [relato de distorção e velocidade incorreta no japonês](https://bugs.webkit.org/show_bug.cgi?id=282920).
+No Chrome deste Mac, Eddy aparecia antes de Kyoko. O fim natural da fala apenas
+libera o estado do player, sem `cancel()`, nova reprodução ou efeito sonoro.
+`core/browserSpeech.js` carrega a lista de vozes ao
 abrir o aplicativo e acompanha `voiceschanged`. A fala começa no clique, sem
 aguardar a API do Maru, usando a leitura de `shared/pronunciation.js` e a velocidade
 escolhida. Uma voz ausente, com erro ou sem iniciar em 2,5 segundos leva ao caminho

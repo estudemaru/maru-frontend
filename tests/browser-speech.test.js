@@ -31,6 +31,45 @@ test("Japanese system speech starts with the local voice and chosen speed", asyn
   utterance.onend();
   assert.deepEqual(events, ["start", "end"]);
   assert.equal(utterance.onstart, null);
+  assert.equal(synthesis.canceled, 0, 'terminar naturalmente não cancela nem reinicia o motor de voz');
+});
+
+test("Japanese reading voices take priority over the Eloquence voices listed first on macOS", async () => {
+  const synthesis = new Synthesis([
+    { name: "Eddy (japonês (Japão))", lang: "ja-JP", localService: true },
+    { name: "Grandma (japonês (Japão))", lang: "ja-JP", localService: true, default: true },
+    local
+  ]);
+  const speech = controller(synthesis);
+  const played = speech.speak("こんにちは");
+  const utterance = synthesis.calls[0];
+  assert.equal(utterance.voice, local);
+  utterance.onstart(); await played; utterance.onend();
+  assert.equal(synthesis.canceled, 0);
+});
+
+test("unfamiliar Japanese reading voices remain usable but Eloquence voices fall back to remote speech", () => {
+  const character = { name: "Flo (japonês (Japão))", lang: "ja-JP", localService: true };
+  const synthesis = new Synthesis([character, remote]);
+  const speech = controller(synthesis);
+  assert.equal(speech.hasVoice(), true);
+  const playing = speech.speak("こんにちは");
+  assert.equal(synthesis.calls[0].voice, remote);
+  synthesis.calls[0].onstart();
+  synthesis.calls[0].onend();
+  synthesis.voices = [character];
+  assert.equal(speech.hasVoice(), false);
+  return playing;
+});
+
+test("Safari Eloquence identifiers are excluded even when their visible names are localized", async () => {
+  const synthesis = new Synthesis([{ name: "日本語の声", voiceURI: "com.apple.eloquence.ja-JP.Eddy", lang: "ja-JP", localService: true }, local]);
+  const speech = controller(synthesis);
+  const played = speech.speak("みず");
+  assert.equal(synthesis.calls[0].voice, local);
+  synthesis.calls[0].onstart();
+  await played;
+  synthesis.calls[0].onend();
 });
 
 test("a remote Japanese voice is usable but a Portuguese default is never used for Japanese", async () => {
