@@ -228,6 +228,13 @@ async function render() {
 document.querySelector("#menu-button").addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
 document.querySelector("#menu-close").addEventListener("click", () => { setMenu(false); document.querySelector("#menu-button").focus(); });
 document.querySelector("#sidebar-backdrop").addEventListener("click", () => { setMenu(false); document.querySelector("#menu-button").focus(); });
+// Prepare remote speech while approaching a button, without starting playback.
+const preparePronunciation = event => {
+  const speaker = event.target.closest?.("[data-speak]");
+  if (speaker) audio.preload(speaker.dataset.speak).catch(() => {});
+};
+document.addEventListener("pointerover", preparePronunciation);
+document.addEventListener("focusin", preparePronunciation);
 document.addEventListener("keydown", event => {
   if (!document.body.classList.contains("menu-open")) return;
   if (event.key === "Escape") { setMenu(false); document.querySelector("#menu-button").focus(); }

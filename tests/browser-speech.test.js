@@ -15,6 +15,43 @@ class Synthesis extends EventTarget {
 }
 const controller = (synthesis, options = {}) => createBrowserSpeech({ synthesis, Utterance, ...options });
 
+test("Firefox on macOS bypasses native speech even with Kyoko available or voices arriving later", async () => {
+  for (const userAgent of [
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.0; rv:130.0) Gecko/20100101 Firefox/130.0"
+  ]) {
+    const synthesis = new Synthesis();
+    synthesis.getVoices = () => { throw new Error("The affected native pipeline must stay unused"); };
+    const speech = controller(synthesis, { userAgent });
+    assert.equal(speech.hasVoice(), false);
+    synthesis.dispatchEvent(new Event("voiceschanged"));
+    assert.equal(speech.hasVoice(), false);
+    await assert.rejects(speech.speak("こんにちは"));
+    speech.stop();
+    assert.equal(synthesis.calls.length, 0);
+    assert.equal(synthesis.canceled, 0);
+  }
+});
+
+test("the macOS Firefox workaround preserves system speech on other browsers and platforms", async () => {
+  for (const userAgent of [
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/26.0 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "Mozilla/5.0 (Android 16; Mobile; rv:156.0) Gecko/156.0 Firefox/156.0",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 FxiOS/146.0 Mobile/15E148 Safari/605.1.15"
+  ]) {
+    const synthesis = new Synthesis();
+    const speech = controller(synthesis, { userAgent });
+    assert.equal(speech.hasVoice(), true, userAgent);
+    const played = speech.speak("こんにちは");
+    synthesis.calls[0].onstart();
+    assert.equal(await played, true);
+    synthesis.calls[0].onend();
+  }
+});
+
 test("Japanese system speech starts with the local voice and chosen speed", async () => {
   const synthesis = new Synthesis(); synthesis.paused = true;
   const speech = controller(synthesis);

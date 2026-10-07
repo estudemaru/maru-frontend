@@ -50,6 +50,61 @@ async function remoteAudio(page) {
   return requests;
 }
 
+test.describe("Firefox on macOS", () => {
+  test.use({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0" });
+
+  test("file speech ends naturally, replays from cache and stops on navigation without invoking native speech", async ({ page }) => {
+    await installSpeech(page);
+    const requests = await remoteAudio(page);
+    await page.goto("/#/settings");
+    await page.locator("#setting-audio-rate").selectOption("0.75");
+    const button = page.getByRole("button", { name: "Testar pronúncia japonesa" });
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(await page.evaluate(() => window.lastAudio.playbackRate)).toBe(.75);
+    expect(await page.evaluate(() => window.lastAudio.currentSrc)).toContain("tts.quest");
+    await expect(button).toHaveAttribute("aria-pressed", "false", { timeout: 5000 });
+    expect(await page.evaluate(() => window.lastAudio.ended)).toBe(true);
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(requests).toEqual(["こんにちは"]);
+    expect(await page.evaluate(() => window.speechCalls)).toEqual([]);
+    expect(await page.evaluate(() => window.speechCancels)).toBe(0);
+    await page.locator('a.nav-link[href="#/home"]').click();
+    await expect(page.locator(".home-page")).toBeVisible();
+    expect(await page.evaluate(() => window.lastAudio.paused)).toBe(true);
+    expect(await page.evaluate(() => window.lastAudio.hasAttribute("src"))).toBe(false);
+    expect(await page.evaluate(() => window.speechCancels)).toBe(0);
+  });
+
+  test("lessons prepare the first pronunciation before its button and warm other examples on hover", async ({ page }) => {
+    await installSpeech(page);
+    const requests = await remoteAudio(page);
+    await page.goto("/#/lesson/welcome");
+    await expect(page.locator(".lesson-intro")).toBeVisible();
+    await expect.poll(() => requests).toEqual(["こんにちは"]);
+    expect(await page.evaluate(() => window.audioInstances)).toBe(0);
+    await page.locator('[data-lesson="next"]').click();
+    const first = page.locator('[data-speak="こんにちは"]');
+    await first.click();
+    await expect(first).toHaveAttribute("aria-pressed", "true");
+    expect(requests).toEqual(["こんにちは"]);
+    await page.locator('[data-lesson="next"]').click();
+    await expect.poll(() => requests.includes("ねこ")).toBe(true);
+    const coffee = page.locator('[data-speak="コーヒー"]');
+    const playersBeforeHover = await page.evaluate(() => window.audioInstances);
+    await coffee.hover();
+    await expect.poll(() => requests.includes("コーヒー")).toBe(true);
+    await expect(coffee).not.toHaveClass(/is-playing|is-loading/);
+    expect(await page.evaluate(() => window.audioInstances)).toBe(playersBeforeHover);
+    await coffee.click();
+    await expect(coffee).toHaveAttribute("aria-pressed", "true");
+    expect(requests.filter(text => text === "コーヒー")).toHaveLength(1);
+    expect(await page.evaluate(() => window.speechCalls)).toEqual([]);
+    expect(await page.evaluate(() => window.speechCancels)).toBe(0);
+  });
+});
+
 for (const [device, viewport] of [["desktop", { width: 1440, height: 1000 }], ["mobile", { width: 390, height: 844 }]]) {
   test(`Japanese speech starts in the ${device} click without waiting for the API, respects speed and stops`, async ({ page }) => {
     await page.setViewportSize(viewport);

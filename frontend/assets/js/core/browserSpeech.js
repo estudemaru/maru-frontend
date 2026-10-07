@@ -1,13 +1,16 @@
 // Prefer a Japanese voice on the device to avoid a synthesis request per click.
-export function createBrowserSpeech({ synthesis = globalThis.speechSynthesis, Utterance = globalThis.SpeechSynthesisUtterance, startTimeout = 2500 } = {}) {
+export function createBrowserSpeech({ synthesis = globalThis.speechSynthesis, Utterance = globalThis.SpeechSynthesisUtterance, userAgent = globalThis.navigator?.userAgent || "", startTimeout = 2500 } = {}) {
   let active = null, unavailable = false;
+  // Firefox on macOS can emit a loud pop between utterances, regardless of voice.
+  // Avoid that native pipeline and use the file player (Mozilla bug 2057741).
+  const nativeAudioBroken = /Macintosh|Mac OS X/i.test(userAgent) && /Firefox\/\d/i.test(userAgent);
   // macOS lists Eloquence voices before Kyoko. Japanese Eloquence has reported
   // rate/distortion problems (WebKit bug 282920), so prefer another speech engine.
   const eloquenceVoice = voice => /\.eloquence\./i.test(voice.voiceURI || "")
     || /\b(?:Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/i.test(voice.name || "");
   const readingVoice = voice => /\b(?:Kyoko|Otoya|Haruka|Ayumi|Ichiro)\b/i.test(`${voice.name || ""} ${voice.voiceURI || ""}`);
   function japaneseVoice() {
-    if (!synthesis || !Utterance || unavailable) return null;
+    if (nativeAudioBroken || !synthesis || !Utterance || unavailable) return null;
     try {
       const voices = synthesis.getVoices().filter(voice => /^ja(?:[-_]|$)/i.test(voice.lang) && !eloquenceVoice(voice));
       return voices.find(voice => voice.localService && readingVoice(voice))
@@ -18,7 +21,7 @@ export function createBrowserSpeech({ synthesis = globalThis.speechSynthesis, Ut
   }
   // Query immediately so browsers that load voices asynchronously can warm up.
   japaneseVoice();
-  synthesis?.addEventListener?.("voiceschanged", () => { unavailable = false; japaneseVoice(); });
+  if (!nativeAudioBroken) synthesis?.addEventListener?.("voiceschanged", () => { unavailable = false; japaneseVoice(); });
 
   function release(session) {
     clearTimeout(session.timer);

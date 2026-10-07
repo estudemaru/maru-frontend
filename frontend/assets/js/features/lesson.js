@@ -76,6 +76,8 @@ export function renderLesson(ctx, id) {
   };
   const recapHTML = () => source.recap.length ? `<aside class="lesson-recap"><p class="eyebrow">RESUMINDO</p><ul>${source.recap.map(item => `<li>${esc(beginnerText(item))}</li>`).join("")}</ul></aside>` : "";
   function intro() {
+    const firstPronunciation = lesson.sections[0]?.examples[0]?.jp;
+    if (firstPronunciation) ctx.audio.preload(firstPronunciation).catch(() => {});
     const game = LESSON_GAME_KINDS[lessonGameKind(source)];
     shell(`<div class="lesson-intro"><div class="lesson-scene is-intro"><div class="lesson-scene-copy"><span class="step-label">ANTES DE COMEÇAR</span><h2 data-focus tabindex="-1">${esc(lesson.hook)}</h2></div>${lessonArt(readingScene(lesson.sections.flatMap(part => part.examples)))}</div>
       <ul class="lesson-plan"><li>${icon("book")}<span><strong>${SECTIONS} ${SECTIONS === 1 ? "parte curta" : "partes curtas"}</strong> para ler e ouvir</span></li><li>${icon("check")}<span><strong>${lesson.quiz.length} perguntas</strong> com explicação</span></li><li>${icon("target")}<span><strong>Jogo: ${game}</strong> com os exemplos da lição</span></li></ul>
@@ -85,6 +87,7 @@ export function renderLesson(ctx, id) {
   }
   function section(index) {
     const part = lesson.sections[index];
+    if (part.examples[0]) ctx.audio.preload(part.examples[0].jp).catch(() => {});
     const last = index === SECTIONS - 1;
     const capsule = last ? CULTURE_CAPSULES.find(item => item.lessonId === id) : null;
     const concepts = conceptsIn(part.body + " " + part.title);

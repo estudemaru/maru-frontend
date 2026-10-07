@@ -171,6 +171,14 @@ aguardar a API do Maru, usando a leitura de `shared/pronunciation.js` e a veloci
 escolhida. Uma voz ausente, com erro ou sem iniciar em 2,5 segundos leva ao caminho
 remoto. Cancelar ou navegar não inicia a alternativa nem deixa fala na fila.
 
+No Firefox para macOS, a voz nativa fica desativada e o Maru usa diretamente o
+player de arquivo. Há um [bug de estalos fortes entre falas no pipeline de voz
+do macOS usado pelo Firefox](https://bugzilla.mozilla.org/show_bug.cgi?id=2057741),
+que persiste com vozes diferentes. A detecção combina Firefox e macOS no
+`userAgent`; as outras combinações continuam usando a voz japonesa do aparelho.
+O primeiro exemplo é preparado na abertura da lição e de cada parte; aproximar
+o ponteiro ou focar um botão também prepara a pronúncia, sem reproduzir áudio.
+
 A alternativa usa `POST /api/audio`. O `speechService.js` do backend valida o
 texto contra o catálogo de estudo, consulta TTS Quest e devolve uma URL de
 streaming. Só URLs expiráveis ficam em memória; o servidor e o frontend não
