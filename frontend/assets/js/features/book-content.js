@@ -1,6 +1,6 @@
 import { BOOK_NOTES } from './book-notes.js';
 import { interleaveKanaLesson } from './book-kana.js';
-import { THEMES } from '../../../../shared/curriculum.js';
+import { THEMES, UNITS } from '../../../../shared/curriculum.js';
 import { BEGINNER_KANJI, SENTENCES, PARTICLES, EXPRESSIONS } from '../../../../shared/catalog.js';
 import { VOCABULARY } from '../../../../shared/vocabulary.js';
 import { PARTICLE_EXERCISES } from '../../../../shared/exercises.js';
@@ -13,7 +13,11 @@ export const BOOK_KANJI = [...'一二三人日月山川木水'].map(char => BEGI
 export const BOOK_KANA_ORDER = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', 'ha', 'ba', 'pa', 'ma', 'ya', 'ra', 'wa'];
 // The online journey later split hiragana and katakana into one lesson per row; the
 // printed book already interleaves every family, so it keeps its original lessons.
-const ONLINE_ONLY = new Set(['h-ka', 'h-sa', 'h-ta', 'h-na', 'h-ha', 'h-ma', 'h-yara', 'h-dakuten', 'k-sata', 'k-naha', 'k-mawa']);
+const ONLINE_ONLY = new Set([
+  'h-ka', 'h-sa', 'h-ta', 'h-na', 'h-ha', 'h-ma', 'h-yara', 'h-dakuten', 'k-sata', 'k-naha', 'k-mawa',
+  // A ampliação das unidades finais pertence à trilha online; o Livro 1 mantém seu escopo.
+  ...UNITS.filter(unit => ['likes', 'past', 'te-form'].includes(unit.id)).flatMap(unit => unit.lessons.map(lesson => lesson.id))
+]);
 const flat = text => String(text || '').replace(/\n• /g, ' · ').replace(/\n/g, ' ');
 // Kanji e "Quanto, quando e qual" (horas e datas pedem kanji) ficam só no curso online.
 export const BOOK_MODULES = THEMES.filter(module => !['kanji', 'numbers'].includes(module.id)).map((module, index) => ({

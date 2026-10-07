@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MODULES, UNITS, LESSONS, THEMES, getLesson, hasCheckpoint } from '../shared/curriculum.js';
 import { CHECKPOINTS, checkpointQuestions, gradeCheckpoint } from '../shared/checkpoints.js';
-import { unitStates, nextStep, stepAfter, isLessonOpen, moduleSeals, katakanaCleared } from '../shared/learningPath.js';
+import { unitStates, nextStep, stepAfter, isLessonOpen, moduleSeals, katakanaCleared, FINAL_UNITS_ADDED_AT } from '../shared/learningPath.js';
 import { normalizeSnapshot, mergeSnapshots, recordCheckpoint } from '../shared/progress.js';
 
 const seeded = (seed = 1) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 const unitIndex = id => UNITS.findIndex(unit => unit.id === id);
 const open = snapshot => unitStates(snapshot).filter(unit => unit.open).map(unit => unit.id);
 const finish = (snapshot, unitId) => getUnit(unitId).lessons.forEach(lesson => { snapshot.lessons[lesson.id] = { completedAt: 1, score: 3 }; });
-const pass = (snapshot, unitId) => { snapshot.checkpoints[unitId] = { passedAt: 1, best: 100, attempts: 1, updatedAt: 1 }; };
+const pass = (snapshot, unitId, when = FINAL_UNITS_ADDED_AT + 1) => { snapshot.checkpoints[unitId] = { passedAt: when, best: 100, attempts: 1, updatedAt: when }; };
 const getUnit = id => UNITS.find(unit => unit.id === id);
 
 test('the trail has units 0 to 14 in order, extras apart, and every lesson exactly once', () => {
@@ -21,7 +21,8 @@ test('the trail has units 0 to 14 in order, extras apart, and every lesson exact
   assert.ok(LESSONS.every(lesson => lesson.theme && THEMES.some(theme => theme.id === lesson.theme)));
   // As lições de "Quanto, quando e qual" foram distribuídas, sem etapa própria.
   assert.deepEqual(['num-pointing', 'num-count', 'num-time', 'num-week', 'num-dates', 'num-counters'].map(id => getLesson(id).moduleId), ['around', 'numbers', 'time', 'time', 'time', 'counting']);
-  assert.deepEqual(['likes', 'past', 'te-form'].map(id => getUnit(id).lessons.length), [0, 0, 0]);
+  assert.ok(UNITS.every(unit => unit.lessons.length > 0), 'toda unidade tem atividades');
+  assert.deepEqual(['likes', 'past', 'te-form'].map(id => getUnit(id).lessons.length), [3, 3, 7]);
 });
 
 test('checkpoints only ask what their own unit (or an earlier one) taught', () => {
@@ -97,16 +98,54 @@ test('a new learner opens one unit at a time', () => {
   assert.equal(nextStep(p).lesson.id, 'h-dakuten');
 });
 
-test('units without lessons yet let the trail pass through', () => {
+test('the final units advance through their lessons and checkpoints', () => {
   const p = normalizeSnapshot({ placement: { acceptedModule: 'describe', updatedAt: 1 } });
   finish(p, 'describe');
   assert.equal(nextStep(p).kind, 'checkpoint');
   pass(p, 'describe');
-  // 11 e 12 ainda não têm aulas: a próxima parada é a unidade 13.
-  assert.ok(['likes', 'past', 'counting'].every(id => open(p).includes(id)));
-  assert.equal(nextStep(p).lesson.id, 'num-counters');
-  finish(p, 'counting'); pass(p, 'counting');
+  for (const [id, next] of [['likes', 'past'], ['past', 'counting'], ['counting', 'te-form']]) {
+    assert.equal(nextStep(p).lesson.id, getUnit(id).lessons[0].id);
+    assert.equal(open(p).includes(next), false, `${next} aguarda o checkpoint`);
+    finish(p, id);
+    assert.equal(nextStep(p).unit.id, id);
+    pass(p, id);
+    assert.ok(open(p).includes(next));
+  }
+  finish(p, 'te-form');
+  assert.equal(nextStep(p).unit.id, 'te-form');
+  pass(p, 'te-form');
   assert.equal(nextStep(p), null);
+});
+
+test('filling previously empty units preserves later saved progress without inventing completion', () => {
+  for (const countingPassed of [false, true]) {
+    const p = normalizeSnapshot({ placement: { acceptedModule: 'describe', updatedAt: 1 }, lessons: { 'num-counters': { completedAt: 50, score: 3 } }, xp: { total: 120 } });
+    finish(p, 'describe'); pass(p, 'describe');
+    if (countingPassed) pass(p, 'counting');
+    const before = structuredClone(p);
+    assert.ok(['likes', 'past', 'counting'].every(id => open(p).includes(id)));
+    assert.equal(isLessonOpen(p, 'num-counters'), true);
+    assert.equal(isLessonOpen(p, 'te-group-two'), countingPassed);
+    assert.equal(nextStep(p).lesson.id, 'likes-preferences', 'as novas aulas ficam disponíveis para estudar');
+    assert.ok(['likes', 'past'].every(id => !unitStates(p).find(unit => unit.id === id).cleared));
+    assert.deepEqual(p, before, 'não altera lições, checkpoints nem XP salvos');
+  }
+  const checkpointOnly = normalizeSnapshot({ checkpoints: { counting: { passedAt: 10 } } });
+  assert.ok(['likes', 'past', 'counting', 'te-form'].every(id => open(checkpointOnly).includes(id)));
+  assert.equal(isLessonOpen(normalizeSnapshot({ lessons: { 'casual-slang': { completedAt: 10 } } }), 'past-nouns'), false, 'um extra não libera as unidades finais');
+});
+
+test('a description checkpoint from before the expansion keeps counting open without a completed counting lesson', () => {
+  const old = normalizeSnapshot({ checkpoints: { describe: { passedAt: FINAL_UNITS_ADDED_AT - 1, best: 100, attempts: 1 } } });
+  const before = structuredClone(old);
+  assert.ok(['likes', 'past', 'counting'].every(id => open(old).includes(id)));
+  assert.equal(isLessonOpen(old, 'num-counters'), true);
+  assert.equal(isLessonOpen(old, 'te-group-two'), false, 'Forma て ainda precisa do checkpoint de Quantidades');
+  assert.deepEqual(old, before);
+  const current = normalizeSnapshot({ checkpoints: { describe: { passedAt: FINAL_UNITS_ADDED_AT, best: 100, attempts: 1 } } });
+  assert.equal(isLessonOpen(current, 'likes-preferences'), true);
+  assert.equal(isLessonOpen(current, 'past-nouns'), false);
+  assert.equal(isLessonOpen(current, 'num-counters'), false, 'novos alunos seguem os novos checkpoints');
 });
 
 test('the diagnosis opens whole units, never scattered lessons', () => {

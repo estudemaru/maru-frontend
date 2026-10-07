@@ -1,8 +1,23 @@
 # Trilha do zero ao N5 · plano de reestruturação
 
-Versão 2.1, de 05/10/2026. É a especificação da nova trilha. A fase 1 (esqueleto,
-bloqueio e checkpoints) está implementada; as fases 2 a 4, não. O documento mostra como a trilha atual (9 etapas, 57 lições) se
-encaixa no novo esqueleto de 15 unidades, o que falta escrever e em que ordem.
+Versão 2.2, de 07/10/2026. É a especificação da nova trilha. A fase 1 (esqueleto,
+bloqueio e checkpoints) está implementada. As unidades antes vazias — 11 (Gostos),
+12 (Passado) e 14 (Forma て) — agora têm 13 lições novas, 41 questões de prática,
+jogos finais e três checkpoints (9, 10 e 12 perguntas). A trilha tem 70 lições,
+incluindo os extras, e nenhuma unidade vazia. A divisão das demais lições, as
+missões e a consolidação das fases 2 a 4 ainda estão pendentes.
+
+As lições antigas mantêm seus IDs e seu conteúdo para preservar progresso salvo.
+Quem já tem progresso em Quantidades, ou aprovou Descrição antes da ampliação,
+mantém acesso a Quantidades e pode estudar Gostos e Passado; os novos checkpoints
+não são marcados como aprovados automaticamente.
+O Livro 1 impresso mantém seu escopo introdutório.
+
+As atividades e os exemplos novos são próprios do Maru. A conferência gramatical
+usa [Irodori Starter](https://www.irodori.jpf.go.jp/en/starter/pdf.html),
+[as folhas de gramática Starter](https://www.irodori.jpf.go.jp/assets/data/resources/Grammar_Worksheets_X.pdf)
+e [Irodori Elementary 1](https://www.irodori.jpf.go.jp/en/elementary01/pdf.html),
+da Japan Foundation.
 
 **O que mudou na 2.1, com os ajustes finos da segunda revisão:**
 - A aula 3.4 virou duas: perguntar com か e responder com はい/いいえ; depois,
@@ -326,10 +341,10 @@ Ao terminar, você diz do que gosta e pergunta preferências.
 
 | Aula | Conteúdo | Situação |
 | --- | --- | --- |
-| 11.1 | すき e きらい, e が de preferência (なにがすきですか) | 🆕 |
-| 11.2 | とても e あまり (あまりすきじゃないです) | 🆕 |
-| 11.3 | ね e よ no fim da frase | ✂️ nova, com a parte de ね e よ de `particle-connect` ➕ |
-| 🧪 | Falar de gostos e reagir | 🆕 |
+| 11.1 | すき e きらい, e が de preferência (なにがすきですか) | ✅ `likes-preferences` |
+| 11.2 | とても e あまり (あまりすきじゃないです) | ✅ `likes-degree` |
+| 11.3 | ね e よ no fim da frase | ✅ `likes-reactions`; retoma o que foi apresentado em `particle-connect` |
+| 🧪 | Falar de gostos e reagir | ✅ 9 perguntas |
 
 ### 12 · Passado
 
@@ -337,10 +352,10 @@ Ao terminar, você conta o que aconteceu.
 
 | Aula | Conteúdo | Situação |
 | --- | --- | --- |
-| 12.1 | でした e じゃありませんでした | 🆕 |
-| 12.2 | ました e ませんでした (きのう、レストランでたべました) | ✂️ `sentence-time` fica com o passado |
-| 12.3 | Adjetivos no passado: たかかったです, しずかでした | 🆕 |
-| 🧪 | Contar o que aconteceu | 🆕 |
+| 12.1 | でした e じゃありませんでした | ✅ `past-nouns` |
+| 12.2 | ました e ませんでした | ✅ `past-actions`; aprofunda o passado visto em `sentence-time` |
+| 12.3 | Adjetivos no passado: たかかったです, しずかでした | ✅ `past-adjectives` |
+| 🧪 | Contar o que aconteceu | ✅ 10 perguntas |
 
 ### 13 · Quantidades
 
@@ -361,14 +376,14 @@ Ao terminar, você pede, encadeia ações e diz o que pode e o que não pode.
 
 | Aula | Conteúdo | Situação |
 | --- | --- | --- |
-| 14.1 | O que é a forma て; grupo 2 (たべる → たべて) | 🆕 |
-| 14.2 | Grupo 1: って, んで, いて, いで, して | 🆕 |
-| 14.3 | Irregulares: する, くる, いく → いって | 🆕 |
-| 14.4 | ～てください | 🆕 |
-| 14.5 | Sequência: たべて、いきます | 🆕 |
-| 14.6 | ～ています | 🆕 |
-| 14.7 | Pode e não pode: ～てもいいです, ～てはいけません | 🆕 |
-| 🧪 | Formar a て dos três grupos (conceito crítico), てください, sequência, ています, てもいいです e てはいけません | 🆕 |
+| 14.1 | O que é a forma て; grupo 2 (たべる → たべて) | ✅ `te-group-two` |
+| 14.2 | Grupo 1: って, んで, いて, いで, して | ✅ `te-group-one` |
+| 14.3 | Irregulares する, くる e a exceção いく → いって | ✅ `te-irregular` |
+| 14.4 | ～てください | ✅ `te-requests` |
+| 14.5 | Sequência: たべて、いきます | ✅ `te-sequence` |
+| 14.6 | ～ています | ✅ `te-ongoing` |
+| 14.7 | Pode e não pode: ～てもいいです, ～てはいけません | ✅ `te-permission` |
+| 🧪 | Formar a て dos três grupos (conceito crítico), てください, sequência, ています, てもいいです e てはいけません | ✅ 12 perguntas |
 
 A formação da forma て é o conceito crítico deste checkpoint. Quem avança sem
 dominá-la tropeça em quase tudo o que vem depois do N5.

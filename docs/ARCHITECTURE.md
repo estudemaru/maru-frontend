@@ -452,8 +452,9 @@ No computador nada muda.
 
 ## Unidades e checkpoints (05/10/2026)
 
-Fase 1 de `docs/TRILHA-N5.md`: a trilha passou de 9 etapas abertas para 15 unidades
-em ordem, mais três extras, sem conteúdo novo em japonês.
+A trilha de `docs/TRILHA-N5.md` tem 15 unidades em ordem e três extras. As unidades
+Gostos, Passado e Forma て receberam 13 lições próprias: são 70 lições no total,
+sem unidades vazias, com exercícios, jogos finais e checkpoints nas unidades 1 a 14.
 
 - **Unidade e tema.** `MODULES` (as unidades e os extras) decide a posição na
   trilha. `THEMES` guarda as etapas antigas e decide o que depende do tipo de
@@ -463,8 +464,12 @@ em ordem, mais três extras, sem conteúdo novo em japonês.
 - **Bloqueio sem estado novo.** `unitStates` calcula tudo a partir das lições, dos
   checkpoints e do diagnóstico. Uma unidade abre quando a anterior foi vencida
   (checkpoint aprovado; na unidade 0, as aulas lidas), quando o diagnóstico aceito
-  começa nela ou depois, ou quando a pessoa já concluiu alguma aula dela. Unidades
-  ainda sem aulas abrem e contam como vencidas.
+  começa nela ou depois, ou quando a pessoa já concluiu alguma aula dela. As unidades
+  antes vazias (11, 12 e 14) também abrem quando há progresso salvo numa unidade
+  posterior, preservando o acesso anterior sem inventar aulas ou checkpoints concluídos.
+  Aprovações de Descrição anteriores à ampliação também mantêm Quantidades aberta,
+  mesmo sem uma aula dela concluída. O marco fixo é `FINAL_UNITS_ADDED_AT`.
+  O Livro 1 mantém seu conteúdo introdutório, sem as 13 lições finais novas.
 - **Checkpoints.** `shared/checkpoints.js` escolhe à mão perguntas das lições da
   unidade. Uma lição que ainda mistura ideias de várias unidades só cede as
   perguntas da ideia desta unidade. Unidades com poucas perguntas completam a prova

@@ -1,4 +1,4 @@
-import { getLesson, getModule, moduleLabel } from "/shared/curriculum.js";
+import { getLesson, getModule, moduleLabel, UNITS } from "/shared/curriculum.js";
 import { CHECKPOINTS, PASS_RATIO, checkpointQuestions, gradeCheckpoint } from "/shared/checkpoints.js";
 import { unitStates, nextStep, stepRoute, unlockHint } from "/shared/learningPath.js";
 import { recordCheckpoint } from "/shared/progress.js";
@@ -17,6 +17,7 @@ export function renderCheckpoint(ctx, unitId) {
   if (!module || !checkpoint) { ctx.main.innerHTML = emptyState("Checkpoint não encontrado", "Escolha uma unidade na sua trilha.", routeLink("journey", "Ver a trilha", "btn btn-primary")); return; }
   if (!unitStates(ctx.progress).find(unit => unit.id === unitId).open) { ctx.main.innerHTML = `<div class="checkpoint-page">${lockedPanel(ctx.progress, module)}</div>`; return; }
   const controller = new AbortController();
+  const finalUnit = unitId === UNITS.at(-1).id;
   const back = routeLink("journey/" + unitId, icon("back") + esc(module.title), "back-link");
   const concepts = Object.values(checkpoint.concepts);
   const topics = concepts.length > 1 ? concepts.slice(0, -1).join(", ") + " e " + concepts.at(-1) : concepts[0];
@@ -25,7 +26,7 @@ export function renderCheckpoint(ctx, unitId) {
   function intro() {
     const saved = ctx.progress.checkpoints[unitId];
     const status = saved?.passedAt ? `<span class="pill sage">${icon("check")} Aprovado · melhor nota ${saved.best}%</span>` : saved?.attempts ? `<span class="pill">Melhor nota até agora: ${saved.best}%</span>` : "";
-    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-intro"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${esc(module.title)}</h1>${status}<p>Perguntas curtas sobre ${esc(topics)}. Com ${PASS_RATIO * 100}% de acerto, a próxima unidade abre.</p><ul class="plain-list"><li>Cada resposta vem com a explicação, na hora.</li><li>Errar não apaga nada, e dá para tentar de novo quando quiser.</li><li>Se você já sabe, pode fazer antes de terminar as aulas.</li></ul><div class="completion-actions"><button class="btn btn-primary" data-checkpoint="start">Começar o checkpoint ${icon("arrow")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}</div></section></div>`;
+    return `<div class="checkpoint-page">${back}<section class="panel checkpoint-intro"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${esc(module.title)}</h1>${status}<p>Perguntas curtas sobre ${esc(topics)}. Com ${PASS_RATIO * 100}% de acerto, ${finalUnit ? "você vence o último checkpoint da trilha principal" : "a próxima unidade abre"}.</p><ul class="plain-list"><li>Cada resposta vem com a explicação, na hora.</li><li>Errar não apaga nada, e dá para tentar de novo quando quiser.</li><li>Se você já sabe, pode fazer antes de terminar as aulas.</li></ul><div class="completion-actions"><button class="btn btn-primary" data-checkpoint="start">Começar o checkpoint ${icon("arrow")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}</div></section></div>`;
   }
 
   // O modo de leitura (kanji como kana) só vale para as provas de antes do katakana.
@@ -51,9 +52,9 @@ export function renderCheckpoint(ctx, unitId) {
     const step = nextStep(ctx.progress);
     const missed = questions.filter((item, i) => answers[i] !== item.answer);
     const heading = result.passed ? "Checkpoint aprovado!" : result.missedCritical.length && result.correct >= need ? "Quase lá." : "Ainda não foi desta vez.";
-    const summary = result.passed ? "A próxima unidade está aberta." : result.correct >= need ? "A nota passou, mas um ponto essencial para a próxima unidade ficou de fora." : `Para passar, são ${need} de ${questions.length}.`;
+    const summary = result.passed ? (finalUnit ? "Você concluiu o último checkpoint da trilha principal." : "A próxima unidade está aberta.") : result.correct >= need ? "A nota passou, mas um ponto essencial para a próxima unidade ficou de fora." : `Para passar, são ${need} de ${questions.length}.`;
     const actions = result.passed
-      ? `${routeLink(stepRoute(step), "Seguir para a próxima parada" + icon("arrow"), "btn btn-primary")}<button class="btn btn-ghost" data-checkpoint="start">Fazer de novo</button>`
+      ? `${routeLink(stepRoute(step), (step ? "Seguir para a próxima parada" : "Voltar à trilha") + icon("arrow"), "btn btn-primary")}<button class="btn btn-ghost" data-checkpoint="start">Fazer de novo</button>`
       : `<button class="btn btn-primary" data-checkpoint="start">Tentar de novo ${icon("repeat")}</button>${routeLink("journey/" + unitId, "Voltar à unidade", "btn btn-ghost")}`;
     return `<div class="checkpoint-page">${back}<section class="panel checkpoint-result ${result.passed ? "is-passed" : ""}"><p class="eyebrow">CHECKPOINT · ${moduleLabel(module).toUpperCase()}</p><h1 tabindex="-1">${heading}</h1><p class="checkpoint-score"><strong>${result.correct} de ${result.total}</strong> · ${result.percent}%</p><p>${summary}</p>${firstPass ? `<span class="pill sage">+50 XP · Checkpoint aprovado</span>` : ""}${notes}${missed.length ? `<details class="concept-help"><summary>Rever as perguntas que você errou</summary>${missed.map(item => `<article class="placement-review"><h3>${text(item.prompt, item)}</h3><p><strong>${text(item.choices[item.answer], item)}</strong> · ${text(item.explanation, item)}</p></article>`).join("")}</details>` : ""}<div class="completion-actions">${actions}</div></section></div>`;
   }
