@@ -13,6 +13,7 @@ const reading = text => VOCABULARY.find(word => word.jp === text).reading;
 const snapshot = page => page.evaluate(() => JSON.parse(localStorage.getItem('maru-learning-v2')));
 
 async function mockVoice(page, respond) {
+  await page.addInitScript(() => Object.defineProperty(window, "speechSynthesis", { value: undefined, configurable: true }));
   const requested = [];
   await page.route('**/api/audio', route => {
     const { text } = route.request().postDataJSON();

@@ -159,12 +159,21 @@ leituras em kana e formas de romaji previstas. Divergência significa “diferen
 do modelo”, não “gramaticalmente impossível”. O mesmo código funciona localmente.
 O formato legado com item permanece, sem dar notas artificiais a frases livres.
 
-O áudio usa `POST /api/audio`. O `speechService.js` do backend valida o texto contra o catálogo
-de estudo, consulta TTS Quest e devolve uma URL de streaming. Só URLs expiráveis
-ficam em memória; o servidor e o frontend não escrevem áudio no disco. O player
+O áudio prioriza Web Speech API com uma voz japonesa disponível no aparelho,
+preferindo `localService`. `core/browserSpeech.js` carrega a lista de vozes ao
+abrir o aplicativo e acompanha `voiceschanged`. A fala começa no clique, sem
+aguardar a API do Maru, usando a leitura de `shared/pronunciation.js` e a velocidade
+escolhida. Uma voz ausente, com erro ou sem iniciar em 2,5 segundos leva ao caminho
+remoto. Cancelar ou navegar não inicia a alternativa nem deixa fala na fila.
+
+A alternativa usa `POST /api/audio`. O `speechService.js` do backend valida o
+texto contra o catálogo de estudo, consulta TTS Quest e devolve uma URL de
+streaming. Só URLs expiráveis ficam em memória; o servidor e o frontend não
+escrevem áudio no disco. O player
 cancela requisições e reprodução ao navegar, respeita a velocidade escolhida e
 trata falhas, limites da API e bloqueio de reprodução automática. `preload(texto)`
-prepara uma URL sem tocar (usado pela karuta para a próxima rodada); os erros
+dispensa a API quando a voz japonesa está disponível ou prepara uma URL sem
+tocar (usado pela karuta para a próxima rodada); os erros
 trazem `status` e `retryAfter` para quem precisa esperar um 429.
 
 `core/kanji.js` consulta KanjiAPI ao abrir um caractere. Valida campos, compartilha

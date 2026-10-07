@@ -1,8 +1,11 @@
 import { audioKey } from "/shared/audioText.js";
+import { getPronunciation } from "/shared/pronunciation.js";
+import { createBrowserSpeech } from "./browserSpeech.js";
 
 export function createAudio(toast, preferences = () => ({})) {
   let sequence = 0, media = null, activeButton = null, requestController = null, effectContext = null, playbackTimer = null;
   const cache = new Map();
+  const browserSpeech = createBrowserSpeech();
   const mark = (button, state) => {
     if (!button) return;
     button.classList.toggle("is-loading", state === "loading");
@@ -14,6 +17,7 @@ export function createAudio(toast, preferences = () => ({})) {
     sequence++;
     requestController?.abort(); requestController = null;
     clearTimeout(playbackTimer); playbackTimer = null;
+    browserSpeech.stop();
     if (media) { media.pause(); media.removeAttribute("src"); media.load(); media = null; }
     mark(activeButton, "idle"); activeButton = null;
   }
@@ -34,16 +38,38 @@ export function createAudio(toast, preferences = () => ({})) {
     if(!signal){pending.set(key,job);job.finally(()=>pending.delete(key)).catch(()=>{});}
     return job;
   }
-  // Prepara a URL sem tocar, para a próxima rodada de um jogo já estar pronta.
-  const preload = text => prepare(text);
+  // Installed voices are ready without a server request; remote voices reuse the URL.
+  const preload = text => browserSpeech.hasVoice() ? Promise.resolve({ provider: "Web Speech API" }) : prepare(text);
   async function speak(text, button = null) {
     if (button && activeButton === button) { stop(); return false; }
     stop();
     const request=sequence;
-    requestController=new AbortController();
     activeButton=button;mark(button,"loading");
     const done=()=>{if(request===sequence){clearTimeout(playbackTimer);mark(button,"idle");activeButton=null;}};
     const fail=message=>{if(request!==sequence)return;done();toast(message);};
+    const reading = getPronunciation(text);
+    if (!reading) { fail("Escolha uma pronúncia do conteúdo de estudo."); return false; }
+    if (browserSpeech.hasVoice()) {
+      try {
+        return await browserSpeech.speak(reading.spoken, {
+          rate: preferences().audioRate || 1,
+          onStart: () => { if (request === sequence) mark(button, "playing"); },
+          onEnd: done,
+          onError: error => {
+            if (request !== sequence) return;
+            done();
+            if (error.name !== "AbortError") toast("A voz foi interrompida. Toque novamente para ouvir.");
+          }
+        });
+      } catch (error) {
+        if (request !== sequence) return false;
+        if (error.name === "AbortError") { done(); return false; }
+        if (error.name === "NotAllowedError") { fail("Toque em ouvir novamente para iniciar a reprodução."); return false; }
+        // A missing or stalled system voice must not make the lesson unusable.
+      }
+    }
+    if (request !== sequence) return false;
+    requestController=new AbortController();
     const player=new Audio();
     media=player;
     player.preload="auto";

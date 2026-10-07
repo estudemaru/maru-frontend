@@ -13,6 +13,7 @@ const wave = (() => {
   return data;
 })();
 async function mockVoice(page, respond) {
+  await page.addInitScript(() => Object.defineProperty(window, "speechSynthesis", { value: undefined, configurable: true }));
   const requested = [];
   await page.route('**/api/audio', route => {
     const { text } = route.request().postDataJSON();
